@@ -4,8 +4,10 @@ CXXFLAGS = -Wall -Werror -Wextra -std=c++17 -O2 -Iincs -MMD -MP
 LDFLAGS = -ldl
 RM = rm -rf
 
-SRCS = srcs/main.cpp
-INCS = incs/Game.hpp
+SRCS = srcs/main.cpp \
+		srcs/Game.cpp
+INCS = incs/Game.hpp \
+		incs/Event.hpp
 
 OBJSDIR = .objs/
 OBJS = $(patsubst %.cpp, $(OBJSDIR)%.o, $(SRCS))
