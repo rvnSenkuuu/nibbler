@@ -13,15 +13,34 @@ Game::Game(int argc, char **argv) : m_rng(std::random_device{}()), m_score(0), m
 		throw std::invalid_argument("Width or height values too low");
 
 	m_snake.push_back({m_width / 2, m_height / 2});
-	m_snake.push_back({m_width / 2, m_height / 2 + 1});
-	m_snake.push_back({m_width / 2, m_height / 2 + 2});
-	m_snake.push_back({m_width / 2, m_height / 2 + 3});
+	m_snake.push_back({m_width / 2 + 1, m_height / 2});
+	m_snake.push_back({m_width / 2 + 2, m_height / 2});
+	m_snake.push_back({m_width / 2 + 3, m_height / 2});
 
-	m_grid.resize(m_height, std::vector<GridType>(m_width, GridType::EMPTY));
+	m_grid.resize(m_width, std::vector<GridType>(m_height, GridType::EMPTY));
+	this->generate_food();
 }
 
-Game::~Game(void)
+Game::~Game(void) { }
+
+//TODO: User Event should be get in the graphical library
+Event	get_user_event(void)
 {
+	char	input[2];
+	std::cin.get(input, sizeof(input));
+
+	if (*input == 'q')
+		return Event::QUIT;
+	else if (*input == 'w')
+		return Event::UP;
+	else if (*input == 's')
+		return Event::DOWN;
+	else if (*input == 'd')	
+		return Event::RIGHT;
+	else if (*input == 'a')	
+		return Event::LEFT;
+
+	return Event::NONE;
 }
 
 void	Game::run(void)
@@ -31,18 +50,74 @@ void	Game::run(void)
 		float	delta_time = std::chrono::duration<float>(current_time - m_last_update_time).count();
 
 		if (delta_time >= 1.0f / m_tick_rate) {
-			this->generate_food(); // Used for testing; remove later
-			this->update();
+
+			Event	event = get_user_event();
+			if (event == Event::QUIT)
+				this->m_game_over = true;
+			else if (event == Event::UP || event == Event::DOWN || event == Event::LEFT || event == Event::RIGHT)
+				this->move_snake(event);
+
+			this->check_collission();
+			this->resync_grid();
 			this->render();
 			this->m_last_update_time = current_time;
+			std::cin.clear();
+		}
+	}
+	std::cout << "=== Leaving Snake ===" << std::endl;
+}
+
+void	Game::check_collission(void)
+{
+	Position	head = this->m_snake.front();
+	if (head.x < 0 || head.x >= this->m_width || head.y < 0 || head.y >= this->m_height) {
+		this->m_game_over = true;
+		return;
+	}
+
+	for (size_t i = 1; i < this->m_snake.size(); i++) {
+		if (head == this->m_snake[i]) {
+			this->m_game_over = true; 
+			return;
 		}
 	}
 }
 
-void	Game::update(void)
+void	Game::move_snake(Event event)
 {
-	for (auto &row : this->m_grid)
-		std::fill(row.begin(), row.end(), GridType::EMPTY);
+	Position	head = this->m_snake.front();
+
+	switch (event) {
+	case Event::UP:
+		head.y--;
+		break;
+	case Event::DOWN:
+		head.y++;
+		break;
+	case Event::RIGHT:
+		head.x++;
+		break;
+	case Event::LEFT:
+		head.x--;
+		break;
+	default:
+		break;
+	}
+
+	bool	is_food = this->m_grid[head.x][head.y] == GridType::FOOD ? true : false;
+	this->m_snake.push_front(head);
+
+	if (is_food) {
+		this->m_score += 10;
+		this->generate_food();
+	} else {
+		this->m_snake.pop_back();
+	}
+}
+void	Game::resync_grid(void)
+{
+	for (auto &col : this->m_grid)
+		std::fill(col.begin(), col.end(), GridType::EMPTY);
 
 	Position	head_pos = this->m_snake[0];
 	this->m_grid[head_pos.x][head_pos.y] = GridType::SNAKE_HEAD;
@@ -59,9 +134,14 @@ void	Game::render(void)
 	std::cout << "\033[2J\033[H";
 	std::cout << "Score = " << m_score << "\n\n";
 	
-	for (auto &row: this->m_grid) {
-		for (const auto &cell: row) {
-			switch (cell) {
+	for (int i = 0; i < this->m_width; i++)
+		std::cout << "=";
+	std::cout << std::endl;
+
+	for (int y = 0; y < this->m_height; y++) {
+		std::cout << '|';
+		for (int x = 0; x < this->m_width; x++) {
+			switch (this->m_grid[x][y]) {
 			case GridType::SNAKE_HEAD:
 				std::cout << 'O';
 				break;
@@ -76,8 +156,13 @@ void	Game::render(void)
 				break;
             }
 		}
-		std::cout << '\n';
+		std::cout << "|\n";
 	}
+
+	for (int i = 0; i < this->m_width; i++)
+		std::cout << "=";
+	std::cout << std::endl;
+
 	std::cout.flush();
 }
 

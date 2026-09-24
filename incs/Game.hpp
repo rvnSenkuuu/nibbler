@@ -8,6 +8,8 @@
 #include <random>
 #include <chrono>
 
+#include "Event.hpp"
+
 struct Position {
 	int	x, y;
 	inline bool	operator==(const Position &rhs)
@@ -29,9 +31,12 @@ class Game {
 		~Game();
 
 		void	run(void);
-		void	update(void);
+		void	resync_grid(void);
 		void	render(void);
 		void	generate_food(void);
+		void	check_collission(void);
+		void	move_snake(Event event);
+	
 	private:
 		Game() = default;
 		Game(const Game &rhs) = default;
