@@ -24,46 +24,73 @@ Game::Game(int argc, char **argv) : m_rng(std::random_device{}()), m_score(0), m
 Game::~Game(void) { }
 
 //TODO: User Event should be get in the graphical library
+// Event	get_user_event(void)
+// {
+// 	char	input[2];
+// 	std::cin.get(input, sizeof(input));
+
+// 	if (*input == 'q')
+// 		return Event::QUIT;
+// 	else if (*input == 'w')
+// 		return Event::UP;
+// 	else if (*input == 's')
+// 		return Event::DOWN;
+// 	else if (*input == 'd')
+// 		return Event::RIGHT;
+// 	else if (*input == 'a')
+// 		return Event::LEFT;
+
+// 	return Event::NONE;
+// }
+
+//Temporary
+#include <unistd.h>
 Event	get_user_event(void)
 {
-	char	input[2];
-	std::cin.get(input, sizeof(input));
+	char	c;
+	ssize_t	n = read(STDIN_FILENO, &c, 1);
 
-	if (*input == 'q')
-		return Event::QUIT;
-	else if (*input == 'w')
-		return Event::UP;
-	else if (*input == 's')
-		return Event::DOWN;
-	else if (*input == 'd')	
-		return Event::RIGHT;
-	else if (*input == 'a')	
-		return Event::LEFT;
+	if (n <= 0)
+		return Event::NONE;
 
-	return Event::NONE;
+	switch (c) {
+	case 'q': return Event::QUIT;
+	case 'w': return Event::UP;
+	case 's': return Event::DOWN;
+	case 'd': return Event::RIGHT;
+	case 'a': return Event::LEFT;
+	default:  return Event::NONE;
+	}
 }
 
 void	Game::run(void)
 {
 	while (!this->m_game_over) {
 		auto	current_time = std::chrono::steady_clock::now();
-		float	delta_time = std::chrono::duration<float>(current_time - m_last_update_time).count();
+		float	delta_time = std::chrono::duration<float>(current_time - this->m_last_update_time).count();
 
-		if (delta_time >= 1.0f / m_tick_rate) {
+		if (delta_time >= 1.5f / m_tick_rate) {
 
 			Event	event = get_user_event();
 			if (event == Event::QUIT)
 				this->m_game_over = true;
-			else if (event == Event::UP || event == Event::DOWN || event == Event::LEFT || event == Event::RIGHT)
-				this->move_snake(event);
+			else if (event == Event::UP ||
+				event == Event::DOWN ||
+				event == Event::LEFT ||
+				event == Event::RIGHT)
+				this->change_snake_dir(event);
 
+			this->move_snake();
 			this->check_collission();
+			if (this->m_game_over)
+				break;
 			this->resync_grid();
 			this->render();
 			this->m_last_update_time = current_time;
 			std::cin.clear();
 		}
 	}
+	
 	std::cout << "=== Leaving Snake ===" << std::endl;
 }
 
@@ -77,17 +104,36 @@ void	Game::check_collission(void)
 
 	for (size_t i = 1; i < this->m_snake.size(); i++) {
 		if (head == this->m_snake[i]) {
-			this->m_game_over = true; 
+			this->m_game_over = true;
 			return;
 		}
 	}
 }
 
-void	Game::move_snake(Event event)
+bool	Game::is_opposite_dir(Event a, Event b)
+{
+	return (a == Event::UP && b == Event::DOWN) ||
+	(a == Event::DOWN && b == Event::UP) ||
+	(a == Event::LEFT && b == Event::RIGHT) ||
+	(a == Event::RIGHT && b == Event::LEFT);
+}
+
+void	Game::change_snake_dir(Event event)
+{
+	if (event == Event::UP ||
+		event == Event::DOWN ||
+		event == Event::RIGHT ||
+		event == Event::LEFT) {
+		if (!is_opposite_dir(this->m_direction, event))
+			this->m_direction = event;
+	}
+}
+
+void	Game::move_snake()
 {
 	Position	head = this->m_snake.front();
 
-	switch (event) {
+	switch (this->m_direction) {
 	case Event::UP:
 		head.y--;
 		break;
@@ -104,7 +150,7 @@ void	Game::move_snake(Event event)
 		break;
 	}
 
-	bool	is_food = this->m_grid[head.x][head.y] == GridType::FOOD ? true : false;
+	bool	is_food = (head == this->m_food);
 	this->m_snake.push_front(head);
 
 	if (is_food) {
@@ -119,12 +165,13 @@ void	Game::resync_grid(void)
 	for (auto &col : this->m_grid)
 		std::fill(col.begin(), col.end(), GridType::EMPTY);
 
-	Position	head_pos = this->m_snake[0];
+	Position	head_pos = this->m_snake.front();
 	this->m_grid[head_pos.x][head_pos.y] = GridType::SNAKE_HEAD;
 	for (size_t i = 1; i < this->m_snake.size(); i++) {
 		const Position	&pos = this->m_snake[i];
 		this->m_grid[pos.x][pos.y] = GridType::SNAKE_BODY;
 	}
+	
 	this->m_grid[this->m_food.x][this->m_food.y] = GridType::FOOD;
 }
 

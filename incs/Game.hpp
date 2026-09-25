@@ -35,12 +35,15 @@ class Game {
 		void	render(void);
 		void	generate_food(void);
 		void	check_collission(void);
-		void	move_snake(Event event);
+		void	move_snake();
+		void	change_snake_dir(Event event);
 	
 	private:
 		Game() = default;
 		Game(const Game &rhs) = default;
 		Game	&operator=(const Game &rhs) = default;
+
+		[[nodiscard]] bool	is_opposite_dir(Event a, Event b);
 
 	private:
 		int	m_width;
@@ -48,6 +51,7 @@ class Game {
 		std::deque<Position>	m_snake;
 		std::vector<std::vector<GridType>>	m_grid;
 		Position	m_food;
+		Event	m_direction = Event::LEFT;
 		std::mt19937	m_rng;
 		size_t	m_score;
 		bool	m_game_over;
