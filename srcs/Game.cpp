@@ -43,6 +43,19 @@ Game::~Game(void) { }
 // 	return Event::NONE;
 // }
 
+GameState	Game::get_state(void) const
+{
+	GameState	state = {
+		.snake = this->m_snake,
+		.food = this->m_food,
+		.score = this->m_score,
+		.width = this->m_width,
+		.height = this->m_height,
+		.game_over = this->m_game_over};
+
+	return state;
+}
+
 //Temporary
 #include <unistd.h>
 Event	get_user_event(void)
@@ -81,20 +94,19 @@ void	Game::run(void)
 				this->change_snake_dir(event);
 
 			this->move_snake();
-			this->check_collission();
+			this->check_collision();
 			if (this->m_game_over)
 				break;
 			this->resync_grid();
 			this->render();
 			this->m_last_update_time = current_time;
-			std::cin.clear();
 		}
 	}
 	
 	std::cout << "=== Leaving Snake ===" << std::endl;
 }
 
-void	Game::check_collission(void)
+void	Game::check_collision(void)
 {
 	Position	head = this->m_snake.front();
 	if (head.x < 0 || head.x >= this->m_width || head.y < 0 || head.y >= this->m_height) {

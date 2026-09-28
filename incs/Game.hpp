@@ -8,33 +8,20 @@
 #include <random>
 #include <chrono>
 
-#include "Event.hpp"
-
-struct Position {
-	int	x, y;
-	inline bool	operator==(const Position &rhs)
-	{
-		return x == rhs.x && y == rhs.y;
-	}
-};
-
-enum class GridType : int {
-	EMPTY,
-	SNAKE_HEAD,
-	SNAKE_BODY,
-	FOOD
-};
+#include "Types.hpp"
 
 class Game {
 	public:
 		Game(int argc, char **argv);
 		~Game();
 
+		GameState	get_state(void) const;
+
 		void	run(void);
 		void	resync_grid(void);
 		void	render(void);
 		void	generate_food(void);
-		void	check_collission(void);
+		void	check_collision(void);
 		void	move_snake();
 		void	change_snake_dir(Event event);
 	
