@@ -8,8 +8,7 @@ CXXFLAGS = -Wall -Werror -Wextra -std=c++17 -O2 -fPIC \
 LDFLAGS = -shared -L$(DEPS_DIR)/lib -lsfml-graphics -lsfml-window -lsfml-system \
              -Wl,-rpath,$(DEPS_DIR)/lib
 
-SRCS = lib.cpp
-INCS = lib.hpp
+SRCS = sfml.cpp
 
 OBJSDIR = .objs/
 OBJS = $(patsubst %.cpp, $(OBJSDIR)%.o, $(SRCS))
@@ -19,7 +18,7 @@ RM = rm -rf
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(INCS)
+$(NAME): $(OBJS)
 	$(CXX) $(OBJS) $(LDFLAGS) -o $(NAME)
 
 $(OBJSDIR)%.o: %.cpp

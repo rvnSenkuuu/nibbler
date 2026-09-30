@@ -1,11 +1,13 @@
 #include "Game.hpp"
+#include "Lib.hpp"
 #include "Types.hpp"
 
-#include <termios.h>
-#include <unistd.h>
-#include <fcntl.h>
+//TODO: remove this
+// #include <termios.h>
+// #include <unistd.h>
+// #include <fcntl.h>
 
-//Temporary
+//TODO: remove this
 // class TermRawMode {
 // 	public:
 // 		TermRawMode(void)
@@ -32,11 +34,14 @@
 
 int	main(int argc, char **argv)
 {
+	//TODO: remove this
 	// TermRawMode	term_guard;
 
 	try {
 		Game	game(argc, argv);
-		game.run();
+		Lib	lib(DEFAULT_LIB);
+		game.run(lib);
+		lib.unload();
 	} catch (const std::exception &e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		return 1;

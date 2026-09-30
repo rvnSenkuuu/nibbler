@@ -3,8 +3,9 @@
 #include <deque>
 
 struct Position {
-	int	x, y;
-	inline bool	operator==(const Position &rhs) const
+	size_t	x;
+	size_t	y;
+	bool	operator==(const Position &rhs) const
 	{
 		return x == rhs.x && y == rhs.y;
 	}
@@ -33,7 +34,7 @@ struct GameState {
 	std::deque<Position>	snake;
 	Position	food;
 	size_t	score;
-	int	width;
-	int	height;
+	size_t	width;
+	size_t	height;
 	bool	game_over;
 };

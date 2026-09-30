@@ -1,13 +1,16 @@
 NAME = nibbler
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=c++17 -O2 -Iincs -MMD -MP
+CXXFLAGS = -Wall -Werror -Wextra -std=c++17 -O2 -Iincs -MMD -MP -g3 -fsanitize=address,leak
 LDFLAGS = -ldl
 RM = rm -rf
 
 SRCS = srcs/main.cpp \
 		srcs/Game.cpp
+
 INCS = incs/Game.hpp \
-		incs/Event.hpp
+		incs/Types.hpp \
+		incs/IGraphic.hpp \
+		incs/Lib.hpp
 
 OBJSDIR = .objs/
 OBJS = $(patsubst %.cpp, $(OBJSDIR)%.o, $(SRCS))

@@ -2,12 +2,12 @@
 
 #include <iostream>
 #include <exception>
-#include <vector>
 #include <deque>
 #include <algorithm>
 #include <random>
 #include <chrono>
 
+#include "Lib.hpp"
 #include "Types.hpp"
 
 class Game {
@@ -17,9 +17,9 @@ class Game {
 
 		GameState	get_state(void) const;
 
-		void	run(void);
+		void	run(Lib &lib);
 		void	resync_grid(void);
-		void	render(void);
+		// void	render(void);
 		void	generate_food(void);
 		void	check_collision(void);
 		void	move_snake();
@@ -33,8 +33,8 @@ class Game {
 		[[nodiscard]] bool	is_opposite_dir(Event a, Event b);
 
 	private:
-		int	m_width;
-		int	m_height;
+		size_t	m_width;
+		size_t	m_height;
 		std::deque<Position>	m_snake;
 		std::vector<std::vector<GridType>>	m_grid;
 		Position	m_food;
