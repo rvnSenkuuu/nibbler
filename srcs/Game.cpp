@@ -1,8 +1,7 @@
 #include "Game.hpp"
 
-Game::Game(int argc, char **argv) : m_rng(std::random_device{}()), m_score(0), m_game_over(false),
-									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now()),
-									m_direction(Event::LEFT)
+Game::Game(int argc, char **argv) : m_direction(Event::LEFT), m_rng(std::random_device{}()), m_score(0), m_game_over(false),
+									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
 {
 	if (argc != 3)
 		throw std::logic_error("Usage: ./nibbler <width> <height>");

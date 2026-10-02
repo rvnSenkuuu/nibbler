@@ -41,7 +41,6 @@ int	main(int argc, char **argv)
 		Game	game(argc, argv);
 		Lib	lib(DEFAULT_LIB);
 		game.run(lib);
-		lib.unload();
 	} catch (const std::exception &e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		return 1;
