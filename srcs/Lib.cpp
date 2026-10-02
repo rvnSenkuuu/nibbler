@@ -1,5 +1,10 @@
 #include "Lib.hpp"
 
+Lib::Lib(void)
+{
+	this->load(DEFAULT_LIB);
+}
+
 Lib::Lib(const std::string &path)
 {
 	this->load(path);

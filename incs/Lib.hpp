@@ -17,6 +17,7 @@ using FnDestroy = void	(*)();
 
 class Lib {
 	public:
+		Lib();
 		Lib(const std::string &path);
 		~Lib();
 
@@ -30,9 +31,8 @@ class Lib {
 		FnDestroy	destroy;
 
 	private:
-		Lib() = default;
-		Lib(const Lib &) = default;
-		Lib	&operator=(const Lib &) = default;
+		Lib(const Lib &) = delete;
+		Lib	&operator=(const Lib &) = delete;
 
 		void	*m_handle;
 };
