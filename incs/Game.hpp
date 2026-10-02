@@ -38,7 +38,7 @@ class Game {
 		std::deque<Position>	m_snake;
 		std::vector<std::vector<GridType>>	m_grid;
 		Position	m_food;
-		Event	m_direction = Event::LEFT;
+		Event	m_direction;
 		std::mt19937	m_rng;
 		size_t	m_score;
 		bool	m_game_over;

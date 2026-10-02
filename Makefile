@@ -5,7 +5,8 @@ LDFLAGS = -ldl
 RM = rm -rf
 
 SRCS = srcs/main.cpp \
-		srcs/Game.cpp
+		srcs/Game.cpp \
+		srcs/Lib.cpp
 
 INCS = incs/Game.hpp \
 		incs/Types.hpp \

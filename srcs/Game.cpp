@@ -1,7 +1,8 @@
 #include "Game.hpp"
 
 Game::Game(int argc, char **argv) : m_rng(std::random_device{}()), m_score(0), m_game_over(false),
-									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
+									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now()),
+									m_direction(Event::LEFT)
 {
 	if (argc != 3)
 		throw std::logic_error("Usage: ./nibbler <width> <height>");
@@ -19,7 +20,6 @@ Game::Game(int argc, char **argv) : m_rng(std::random_device{}()), m_score(0), m
 	m_snake.push_back({m_width / 2 + 3, m_height / 2});
 
 	m_grid.resize(m_width, std::vector<GridType>(m_height, GridType::EMPTY));
-	this->generate_food();
 }
 
 Game::~Game(void) { }
@@ -39,12 +39,13 @@ GameState	Game::get_state(void) const
 
 void	Game::run(Lib &lib)
 {
+	this->generate_food();
 	lib.create(this->m_width, this->m_height);
 	while (!this->m_game_over) {
 		auto	current_time = std::chrono::steady_clock::now();
 		float	delta_time = std::chrono::duration<float>(current_time - this->m_last_update_time).count();
 
-		if (delta_time >= 1.5f / m_tick_rate) {
+		if (delta_time >= 1.0f / m_tick_rate) {
 
 			// lib.get_event();
 			this->move_snake();
@@ -125,6 +126,7 @@ void	Game::move_snake(void)
 		this->m_snake.pop_back();
 	}
 }
+
 void	Game::resync_grid(void)
 {
 	for (auto &col : this->m_grid)
