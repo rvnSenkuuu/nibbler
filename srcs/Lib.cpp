@@ -1,13 +1,8 @@
 #include "Lib.hpp"
 
-Lib::Lib(void)
+Lib::Lib(void) : m_current_lib_path(DEFAULT_LIB)
 {
 	this->load(DEFAULT_LIB);
-}
-
-Lib::Lib(const std::string &path)
-{
-	this->load(path);
 }
 
 Lib::~Lib()
@@ -35,6 +30,7 @@ void	Lib::load(const std::string &path)
 	this->get_event = reinterpret_cast<FnEvent>(sym("get_event"));
 	this->render = reinterpret_cast<FnRender>(sym("render_game"));
 	this->destroy = reinterpret_cast<FnDestroy>(sym("destroy_window"));
+	this->m_current_lib_path = path;
 }
 
 void	Lib::unload(void)
@@ -49,8 +45,12 @@ void	Lib::unload(void)
 	this->destroy = nullptr;
 }
 
-void	Lib::switch_lib(const std::string &path)
+bool	Lib::switch_lib(const std::string &path)
 {
+	if (path == this->m_current_lib_path)
+		return false;
+
 	this->unload();
 	this->load(path);
+	return true;
 }

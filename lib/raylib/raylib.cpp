@@ -15,7 +15,6 @@ class GraphicLib : public IGraphic {
 		{
 			SetTraceLogLevel(LOG_NONE);
 			InitWindow(width * cell_size, height * cell_size, "Nibbler");
-			SetTargetFPS(60);
 		}
 
 		void	render_game(const GameState &state) override
@@ -37,17 +36,27 @@ class GraphicLib : public IGraphic {
 
 		Event	get_event(void) override
 		{
-			if  (IsKeyPressed(KEY_ESCAPE))
+			int	key = GetKeyPressed();
+			switch (key) {
+			case KEY_ESCAPE:
 				return Event::QUIT;
-			else if (IsKeyPressed(KEY_W))
+			case KEY_W:
 				return Event::UP;
-			else if (IsKeyPressed(KEY_S))
+			case KEY_S:
 				return Event::DOWN;
-			else if (IsKeyPressed(KEY_A))
+			case KEY_A:
 				return Event::LEFT;
-			else if (IsKeyPressed(KEY_D))
+			case KEY_D:
 				return Event::RIGHT;
-
+			case KEY_ONE:
+				return Event::LIB1;
+			case KEY_TWO:
+				return Event::LIB2;
+			case KEY_THREE:
+				return Event::LIB3;
+			default:
+				break;
+			}
 			return Event::NONE;
 		}
 

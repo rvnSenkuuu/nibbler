@@ -18,12 +18,11 @@ using FnDestroy = void	(*)();
 class Lib {
 	public:
 		Lib();
-		Lib(const std::string &path);
 		~Lib();
 
 		void	load(const std::string &path);
 		void	unload(void);
-		void	switch_lib(const std::string &path);
+		[[nodiscard]] bool	switch_lib(const std::string &path);
 
 		FnCreate	create;
 		FnRender	render;
@@ -32,7 +31,9 @@ class Lib {
 
 	private:
 		Lib(const Lib &) = delete;
+		Lib(const std::string &path) = delete;
 		Lib	&operator=(const Lib &) = delete;
 
 		void	*m_handle;
+		std::string	m_current_lib_path;
 };

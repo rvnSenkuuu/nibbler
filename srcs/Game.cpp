@@ -47,7 +47,7 @@ void	Game::run(Lib &lib)
 			Event	event = lib.get_event();
 			switch (event) {
 			case Event::QUIT:
-				break;
+				return;
 			case Event::UP:
 			case Event::DOWN:
 			case Event::RIGHT:
@@ -55,19 +55,22 @@ void	Game::run(Lib &lib)
 				change_snake_dir(event);
 				break;
 			case Event::LIB1:
-				lib.switch_lib(FIRST_LIB);
+				if (lib.switch_lib(FIRST_LIB))
+					lib.create(this->m_width, this->m_height);
 				break;
 			case Event::LIB2:
-				lib.switch_lib(SECOND_LIB);
+				if (lib.switch_lib(SECOND_LIB))
+					lib.create(this->m_width, this->m_height);
 				break;
 			case Event::LIB3:
-				lib.switch_lib(THIRD_LIB);
+				if (lib.switch_lib(THIRD_LIB))
+					lib.create(this->m_width, this->m_height);
 				break;
 			default:
 				break;
 			}
 
-			this->move_snake();	
+			this->move_snake();
 			this->check_collision();
 			if (this->m_game_over)
 				break;
