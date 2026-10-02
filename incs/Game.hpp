@@ -18,8 +18,6 @@ class Game {
 		GameState	get_state(void) const;
 
 		void	run(Lib &lib);
-		void	resync_grid(void);
-		// void	render(void);
 		void	generate_food(void);
 		void	check_collision(void);
 		void	move_snake();
@@ -36,7 +34,6 @@ class Game {
 		size_t	m_width;
 		size_t	m_height;
 		std::deque<Position>	m_snake;
-		std::vector<std::vector<GridType>>	m_grid;
 		Position	m_food;
 		Event	m_direction;
 		std::mt19937	m_rng;

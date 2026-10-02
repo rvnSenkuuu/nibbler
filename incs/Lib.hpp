@@ -5,10 +5,10 @@
 
 #include "Types.hpp"
 
-#define	LIB1 "./lib/raylib/libraylib.so"
-#define	LIB2 "./lib/sdl2/libsdl2.so"
-#define	LIB3 "./lib/sfml/libsfml.so"
-#define DEFAULT_LIB LIB1
+#define	FIRST_LIB "./lib/raylib/libraylib.so"
+#define	SECOND_LIB "./lib/sdl2/libsdl2.so"
+#define	THIRD_LIB "./lib/sfml/libsfml.so"
+#define DEFAULT_LIB FIRST_LIB
 
 using FnCreate = void	(*)(int width, int height);
 using FnRender = void	(*)(const GameState &);

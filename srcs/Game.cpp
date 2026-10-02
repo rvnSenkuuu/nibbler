@@ -17,8 +17,6 @@ Game::Game(int argc, char **argv) : m_direction(Event::LEFT), m_rng(std::random_
 	m_snake.push_back({m_width / 2 + 1, m_height / 2});
 	m_snake.push_back({m_width / 2 + 2, m_height / 2});
 	m_snake.push_back({m_width / 2 + 3, m_height / 2});
-
-	m_grid.resize(m_width, std::vector<GridType>(m_height, GridType::EMPTY));
 }
 
 Game::~Game(void) { }
@@ -46,12 +44,33 @@ void	Game::run(Lib &lib)
 
 		if (delta_time >= 1.0f / m_tick_rate) {
 
-			// lib.get_event();
-			this->move_snake();
+			Event	event = lib.get_event();
+			switch (event) {
+			case Event::QUIT:
+				break;
+			case Event::UP:
+			case Event::DOWN:
+			case Event::RIGHT:
+			case Event::LEFT:
+				change_snake_dir(event);
+				break;
+			case Event::LIB1:
+				lib.switch_lib(FIRST_LIB);
+				break;
+			case Event::LIB2:
+				lib.switch_lib(SECOND_LIB);
+				break;
+			case Event::LIB3:
+				lib.switch_lib(THIRD_LIB);
+				break;
+			default:
+				break;
+			}
+
+			this->move_snake();	
 			this->check_collision();
 			if (this->m_game_over)
 				break;
-			this->resync_grid();
 			lib.render(this->get_state());
 			this->m_last_update_time = current_time;
 		}
@@ -93,7 +112,7 @@ void	Game::change_snake_dir(Event event)
 	}
 }
 
-void	Game::move_snake(void)
+void	Game::move_snake()
 {
 	Position	head = this->m_snake.front();
 
@@ -123,21 +142,6 @@ void	Game::move_snake(void)
 	} else {
 		this->m_snake.pop_back();
 	}
-}
-
-void	Game::resync_grid(void)
-{
-	for (auto &col : this->m_grid)
-		std::fill(col.begin(), col.end(), GridType::EMPTY);
-
-	Position	head_pos = this->m_snake.front();
-	this->m_grid[head_pos.x][head_pos.y] = GridType::SNAKE_HEAD;
-	for (size_t i = 1; i < this->m_snake.size(); i++) {
-		const Position	&pos = this->m_snake[i];
-		this->m_grid[pos.x][pos.y] = GridType::SNAKE_BODY;
-	}
-	
-	this->m_grid[this->m_food.x][this->m_food.y] = GridType::FOOD;
 }
 
 void	Game::generate_food(void)
