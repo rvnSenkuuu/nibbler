@@ -7,19 +7,20 @@ Lib::Lib(const std::string &path)
 
 Lib::~Lib()
 {
-	this->unload();
+	if (this->m_handle)
+		this->unload();
 }
 
 void	Lib::load(const std::string &path)
 {
-	this->handle = dlopen(path.c_str(), RTLD_LAZY);
-	if (!this->handle)
+	this->m_handle = dlopen(path.c_str(), RTLD_LAZY);
+	if (!this->m_handle)
 		throw std::runtime_error(dlerror());
 
 	auto	sym = [&](const char *name) {
-		void	*sym_ptr = dlsym(this->handle, name);
+		void	*sym_ptr = dlsym(this->m_handle, name);
 		if (!sym_ptr) {
-			dlclose(this->handle);
+			dlclose(this->m_handle);
 			throw std::runtime_error(dlerror());
 		}
 		return sym_ptr;
@@ -34,9 +35,9 @@ void	Lib::load(const std::string &path)
 void	Lib::unload(void)
 {
 	this->destroy();
-	if (dlclose(this->handle) != 0)
+	if (dlclose(this->m_handle) != 0)
 		throw std::runtime_error(dlerror());
-	this->handle = nullptr;
+	this->m_handle = nullptr;
 	this->create = nullptr;
 	this->render = nullptr;
 	this->get_event = nullptr;

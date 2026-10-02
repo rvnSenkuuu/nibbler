@@ -52,7 +52,6 @@ void	Game::run(Lib &lib)
 			if (this->m_game_over)
 				break;
 			this->resync_grid();
-			// this->render();
 			lib.render(this->get_state());
 			this->m_last_update_time = current_time;
 		}
@@ -140,44 +139,6 @@ void	Game::resync_grid(void)
 	
 	this->m_grid[this->m_food.x][this->m_food.y] = GridType::FOOD;
 }
-
-//TODO: Rendering shouldn’t be handled by the core
-// void	Game::render(void)
-// {
-// 	std::cout << "\033[2J\033[H";
-// 	std::cout << "Score = " << m_score << "\n\n";
-	
-// 	for (size_t i = 0; i < this->m_width; i++)
-// 		std::cout << "=";
-// 	std::cout << std::endl;
-
-// 	for (size_t y = 0; y < this->m_height; y++) {
-// 		std::cout << '|';
-// 		for (size_t x = 0; x < this->m_width; x++) {
-// 			switch (this->m_grid[x][y]) {
-// 			case GridType::SNAKE_HEAD:
-// 				std::cout << 'O';
-// 				break;
-// 			case GridType::SNAKE_BODY:
-// 				std::cout << 'o'; 
-// 				break;
-// 			case GridType::FOOD:
-// 				std::cout << '@';
-// 				break;
-// 			default:
-// 				std::cout << ' ';
-// 				break;
-//             }
-// 		}
-// 		std::cout << "|\n";
-// 	}
-
-// 	for (size_t i = 0; i < this->m_width; i++)
-// 		std::cout << "=";
-// 	std::cout << std::endl;
-
-// 	std::cout.flush();
-// }
 
 void	Game::generate_food(void)
 {

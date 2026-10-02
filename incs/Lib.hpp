@@ -34,5 +34,5 @@ class Lib {
 		Lib(const Lib &) = default;
 		Lib	&operator=(const Lib &) = default;
 
-		void	*handle;
+		void	*m_handle;
 };
