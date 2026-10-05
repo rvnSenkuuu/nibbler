@@ -2,6 +2,8 @@
 
 #include <deque>
 
+#define CELL_SIZE 30
+
 struct Position {
 	size_t	x;
 	size_t	y;

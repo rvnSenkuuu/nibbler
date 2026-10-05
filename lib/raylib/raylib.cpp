@@ -4,8 +4,6 @@
 #include "Types.hpp"
 #include "IGraphic.hpp"
 
-static constexpr int	cell_size = 30;
-
 class GraphicLib : public IGraphic {
 	public:
 		GraphicLib(void) { }
@@ -14,7 +12,7 @@ class GraphicLib : public IGraphic {
 		void	create_window(int width, int height) override
 		{
 			SetTraceLogLevel(LOG_NONE);
-			InitWindow(width * cell_size, height * cell_size, "Nibbler");
+			InitWindow(width * CELL_SIZE, height * CELL_SIZE, "Nibbler");
 		}
 
 		void	render_game(const GameState &state) override
@@ -25,10 +23,10 @@ class GraphicLib : public IGraphic {
 			for (size_t i = 0; i < state.snake.size(); i++) {
 				const auto	&pos = state.snake.at(i);
 				Color	color = i == 0 ? DARKGREEN : GREEN;
-				DrawRectangle(pos.x * cell_size, pos.y * cell_size, cell_size, cell_size, color);
+				DrawRectangle(pos.x * CELL_SIZE, pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, color);
 			}
 
-			DrawRectangle(state.food.x * cell_size, state.food.y * cell_size, cell_size, cell_size, RED);
+			DrawRectangle(state.food.x * CELL_SIZE, state.food.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, RED);
 			DrawText(TextFormat("Score: %zu", state.score), 10, 10, 20, RAYWHITE);
 
 			EndDrawing();

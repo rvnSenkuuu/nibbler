@@ -1,35 +1,132 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 
-#ifdef __cplusplus
+#include "Types.hpp"
+#include "IGraphic.hpp"
+
+static constexpr SDL_Color	BLACK_C = {0, 0, 0, 255};
+static constexpr SDL_Color	DARKGREEN_C = {0, 117, 44, 255};
+static constexpr SDL_Color	GREEN_C = {0, 228, 48, 255};
+static constexpr SDL_Color	RED_C = {255, 0, 0, 255};
+static constexpr SDL_Color	WHITE_C = {245, 245, 245, 255};
+
+class GraphicLib : public IGraphic {
+	public:
+		GraphicLib(void) : m_window(nullptr), m_renderer(nullptr) { };
+		~GraphicLib(void) { };
+
+		void	create_window(int width, int height) override
+		{
+			if (SDL_Init(SDL_INIT_VIDEO) < 0)
+				throw std::runtime_error(SDL_GetError());
+			
+			m_window = SDL_CreateWindow("Nibbler",
+				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+				width * CELL_SIZE, height * CELL_SIZE, 0);
+			if (!m_window)
+				throw std::runtime_error(SDL_GetError());
+			
+			m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
+			if (!m_renderer)
+				throw std::runtime_error(SDL_GetError());
+		}
+
+		void	render_game(const GameState &state) override
+		{
+			SDL_SetRenderDrawColor(m_renderer, 0x18, 0x18, 0x18, 0xFF);
+			SDL_RenderClear(m_renderer);
+
+			for (size_t i = 0; i < state.snake.size(); i++) {
+				const auto	&pos = state.snake.at(i);
+				draw_cell(pos.x, pos.y, i == 0 ? DARKGREEN_C : GREEN_C);
+			}
+
+			draw_cell(state.food.x, state.food.y, RED_C);
+			//TODO: render score
+			SDL_RenderPresent(m_renderer);
+		}
+
+		Event	get_event(void) override
+		{
+			SDL_Event	event;
+			while (SDL_PollEvent(&event)) {
+				if (event.type == SDL_QUIT)
+					return Event::QUIT;
+				if (event.type == SDL_KEYDOWN) {
+					switch (event.key.keysym.scancode) {
+					case SDL_SCANCODE_1:
+						return Event::LIB1;
+					case SDL_SCANCODE_2:
+						return Event::LIB2;
+					case SDL_SCANCODE_3:
+						return Event::LIB3;
+					case SDL_SCANCODE_W:
+						return Event::UP;
+					case SDL_SCANCODE_S:
+						return Event::DOWN;
+					case SDL_SCANCODE_A:
+						return Event::LEFT;
+					case SDL_SCANCODE_D:
+						return Event::RIGHT;
+					case SDL_SCANCODE_ESCAPE:
+						return Event::QUIT;
+					default:
+						break;
+					}
+				}
+			}
+			return Event::NONE;
+		}
+
+		void	destroy_window(void) override
+		{
+			if (m_renderer)
+				SDL_DestroyRenderer(m_renderer);
+			if (m_window)
+				SDL_DestroyWindow(m_window);
+			SDL_Quit();
+		}
+
+		private:
+			GraphicLib(const GraphicLib &other) = delete;
+			GraphicLib	&operator=(const GraphicLib &other) = delete;
+
+			void	draw_cell(int x, int y, const SDL_Color &color)
+			{
+				const SDL_Rect	rect = {
+					.x = x * CELL_SIZE,
+					.y = y * CELL_SIZE,
+					.w = CELL_SIZE,
+					.h = CELL_SIZE
+				};
+				SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
+				SDL_RenderFillRect(m_renderer, &rect);
+			}
+
+			SDL_Window	*m_window;
+			SDL_Renderer	*m_renderer;
+};
+
+GraphicLib	lib;
+
 extern "C" {
-#endif
-
-void	create_window(int width, int height);
-void	destroy_window(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-SDL_Window *window;
-
-void	create_window(int width, int height)
-{
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
-		return;
+	void	create_window(int width, int height)
+	{
+		lib.create_window(width, height);
 	}
 
-	window = SDL_CreateWindow("Nibbler", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
-	if (!window) {
-		std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << std::endl;
-		return;
+	void	render_game(const GameState &state)
+	{
+		lib.render_game(state);
 	}
-}
 
-void	destroy_window()
-{
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+	Event	get_event(void)
+	{
+		return lib.get_event();
+	}
+
+	void	destroy_window(void)
+	{
+		lib.destroy_window();
+	}
 }
