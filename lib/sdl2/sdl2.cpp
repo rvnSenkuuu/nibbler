@@ -1,34 +1,52 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
 
 #include "Types.hpp"
 #include "IGraphic.hpp"
 
+#define FONT_PATH "./assets/font.ttf"
+
 static constexpr SDL_Color	BLACK_C = {0, 0, 0, 255};
 static constexpr SDL_Color	DARKGREEN_C = {0, 117, 44, 255};
 static constexpr SDL_Color	GREEN_C = {0, 228, 48, 255};
 static constexpr SDL_Color	RED_C = {255, 0, 0, 255};
-static constexpr SDL_Color	WHITE_C = {245, 245, 245, 255};
+static constexpr SDL_Color	RAYWHITE_C = {245, 245, 245, 255};
 
 class GraphicLib : public IGraphic {
 	public:
-		GraphicLib(void) : m_window(nullptr), m_renderer(nullptr) { };
-		~GraphicLib(void) { };
+		GraphicLib(void) : m_window(nullptr), m_renderer(nullptr), m_font(nullptr) { };
+		~GraphicLib(void) {  };
 
 		void	create_window(int width, int height) override
 		{
 			if (SDL_Init(SDL_INIT_VIDEO) < 0)
 				throw std::runtime_error(SDL_GetError());
+
+			if (TTF_Init() < 0) {
+				destroy_window();
+				throw std::runtime_error(SDL_GetError());
+			}
+
+			m_font = TTF_OpenFont(FONT_PATH, 20);
+			if (!m_font) {
+				destroy_window();
+				throw std::runtime_error(SDL_GetError());
+			}
 			
 			m_window = SDL_CreateWindow("Nibbler",
 				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 				width * CELL_SIZE, height * CELL_SIZE, 0);
-			if (!m_window)
+			if (!m_window) {
+				destroy_window();
 				throw std::runtime_error(SDL_GetError());
+			}
 			
 			m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
-			if (!m_renderer)
+			if (!m_renderer) {
+				destroy_window();
 				throw std::runtime_error(SDL_GetError());
+			}
 		}
 
 		void	render_game(const GameState &state) override
@@ -42,7 +60,7 @@ class GraphicLib : public IGraphic {
 			}
 
 			draw_cell(state.food.x, state.food.y, RED_C);
-			//TODO: render score
+			draw_score(state.score);
 			SDL_RenderPresent(m_renderer);
 		}
 
@@ -80,10 +98,19 @@ class GraphicLib : public IGraphic {
 
 		void	destroy_window(void) override
 		{
-			if (m_renderer)
+			if (m_renderer) {
 				SDL_DestroyRenderer(m_renderer);
-			if (m_window)
+				m_renderer = nullptr;
+			}
+			if (m_font) {
+				TTF_CloseFont(m_font);
+				m_font = nullptr;
+			}
+			if (m_window) {
 				SDL_DestroyWindow(m_window);
+				m_window = nullptr;
+			}
+			TTF_Quit();
 			SDL_Quit();
 		}
 
@@ -102,9 +129,25 @@ class GraphicLib : public IGraphic {
 				SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 				SDL_RenderFillRect(m_renderer, &rect);
 			}
+			void	draw_score(const size_t score)
+			{
+				const std::string	text = "Score: " + std::to_string(score);
+				SDL_Surface	*surface = TTF_RenderText_Solid(m_font, text.c_str(), RAYWHITE_C);
+				SDL_Texture	*texture = SDL_CreateTextureFromSurface(m_renderer, surface);
+				const SDL_Rect	rect = {
+					.x = 10,
+					.y = 10,
+					.w = surface->w,
+					.h = surface->h
+				};
+				SDL_RenderCopy(m_renderer, texture, nullptr, &rect);
+				SDL_FreeSurface(surface);
+				SDL_DestroyTexture(texture);
+			}
 
 			SDL_Window	*m_window;
 			SDL_Renderer	*m_renderer;
+			TTF_Font	*m_font;
 };
 
 GraphicLib	lib;
