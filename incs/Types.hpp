@@ -3,6 +3,7 @@
 #include <deque>
 
 #define CELL_SIZE 30
+#define FONT_PATH "./assets/font.ttf"
 
 struct Position {
 	size_t	x;

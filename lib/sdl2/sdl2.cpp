@@ -5,8 +5,6 @@
 #include "Types.hpp"
 #include "IGraphic.hpp"
 
-#define FONT_PATH "./assets/font.ttf"
-
 static constexpr SDL_Color	BLACK_C = {0, 0, 0, 255};
 static constexpr SDL_Color	DARKGREEN_C = {0, 117, 44, 255};
 static constexpr SDL_Color	GREEN_C = {0, 228, 48, 255};
