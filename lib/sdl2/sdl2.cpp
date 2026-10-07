@@ -24,28 +24,32 @@ class GraphicLib : public IGraphic {
 				throw std::runtime_error(SDL_GetError());
 
 			if (TTF_Init() < 0) {
+				const std::string	err = SDL_GetError();
 				destroy_window();
-				throw std::runtime_error(SDL_GetError());
+				throw std::runtime_error(err);
 			}
 
 			m_font = TTF_OpenFont(FONT_PATH, 20);
 			if (!m_font) {
+				const std::string	err = SDL_GetError();
 				destroy_window();
-				throw std::runtime_error(SDL_GetError());
+				throw std::runtime_error(err);
 			}
 			
 			m_window = SDL_CreateWindow("Nibbler",
 				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 				width * CELL_SIZE, height * CELL_SIZE, 0);
 			if (!m_window) {
+				const std::string	err = SDL_GetError();
 				destroy_window();
-				throw std::runtime_error(SDL_GetError());
+				throw std::runtime_error(err);
 			}
 			
 			m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
 			if (!m_renderer) {
+				const std::string	err = SDL_GetError();
 				destroy_window();
-				throw std::runtime_error(SDL_GetError());
+				throw std::runtime_error(err);
 			}
 		}
 
