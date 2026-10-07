@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Dossier où on installe tout, en dehors du repo Git et en dehors de $HOME
-# (utile en 42 car $HOME est souvent limité en espace, goinfre ne l'est pas)
 DEPS_DIR="${HOME}/goinfre/nibbler_deps"
 BUILD_DIR="${DEPS_DIR}/_build"
 NPROC=$(nproc 2>/dev/null || echo 4)
 
-# CMake >= 4.0 rejette les projets qui déclarent une compatibilité < 3.5
-# (cas de SFML 2.6.x, SDL 2.30, raylib 5.0). Ce flag est ignoré par les
-# versions plus anciennes de CMake, donc ça ne casse rien ailleurs.
 CMAKE_COMPAT=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
 
 mkdir -p "${DEPS_DIR}/include" "${DEPS_DIR}/lib" "${BUILD_DIR}"
@@ -47,7 +42,6 @@ if [ -z "${UDEV_RUNTIME_LIB}" ]; then
     echo "!! SFML (Window) ne pourra pas se construire ni s'exécuter." >&2
 else
     echo "==> udev runtime found: ${UDEV_RUNTIME_LIB}"
-    # -sfn : idempotent, répare aussi un symlink cassé d'un run précédent
     ln -sfn "${UDEV_RUNTIME_LIB}" "${DEPS_DIR}/lib/libudev.so"
 fi
 
@@ -97,8 +91,7 @@ fi
 
 # ---------------------------------------------------------------------------
 # libFLAC (requise par SFML Audio)
-# Toutes les options docs/manpages/tools coupées : pas de pandoc sur les
-# machines 42, et on n'en a pas besoin.
+# Toutes les options docs/manpages/tools coupées
 # ---------------------------------------------------------------------------
 if [ ! -f "${DEPS_DIR}/lib/libFLAC.so" ]; then
     echo "==> Building libFLAC"
@@ -126,7 +119,6 @@ fi
 
 # ---------------------------------------------------------------------------
 # OpenAL Soft (requis par SFML Audio)
-# 1.24.3 minimum : compatible GCC récents (1.23.1 casse sur GCC 16)
 # ---------------------------------------------------------------------------
 if [ ! -f "${DEPS_DIR}/lib/libopenal.so" ]; then
     echo "==> Building OpenAL Soft"

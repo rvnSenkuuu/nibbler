@@ -19,7 +19,9 @@ D_FILES = $(OBJS:.o=.d)
 
 LIBS_DIRS = lib/raylib lib/sfml lib/sdl2
 
-all: deps $(NAME) libs
+all: deps 
+	$(MAKE) $(NAME)
+	$(MAKE) libs
 
 deps:
 	@bash scripts/install_deps.sh
@@ -45,9 +47,12 @@ fclean: clean
 	$(RM) ./lib/sdl2/.objs ./lib/raylib/libsdl2.so
 	$(RM) ./lib/sfml/.objs ./lib/raylib/libsfml.so
 
+clean_deps: fclean
+	$(RM) "${HOME}/goinfre/nibbler_deps"
+
 re: fclean
 	$(MAKE) all
 
 sinclude $(D_FILES)
 
-.PHONY: all deps libs clean fclean re
+.PHONY: all deps libs clean fclean clean_deps re
