@@ -26,7 +26,7 @@ class GraphicLib : public IGraphic {
 				DrawRectangle(pos.x * CELL_SIZE, pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, color);
 			}
 
-			DrawRectangle(state.food.x * CELL_SIZE, state.food.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, RED);
+			DrawCircle(state.food.x * CELL_SIZE + 15, state.food.y * CELL_SIZE + 15, 15.f, RED);
 			DrawText(TextFormat("Score: %zu", state.score), 10, 10, 20, RAYWHITE);
 
 			EndDrawing();
