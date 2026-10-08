@@ -32,12 +32,36 @@ class GraphicLib : public IGraphic {
 			EndDrawing();
 		}
 
+		void	render_end_game(const GameState &state)
+		{
+			BeginDrawing();
+			ClearBackground(BLACK);
+
+			const int	font_size = 20;
+			int	center_x = state.width * CELL_SIZE / 2;
+
+			auto	draw_centered = [&](const char *text, int y) {
+				int	text_width = MeasureText(text, font_size);
+				DrawText(text, center_x - text_width / 2, y, font_size, RAYWHITE);
+			};
+
+			int	start_y = state.height * CELL_SIZE / 2 - (100 + font_size) / 2;
+
+			draw_centered("Game Over !", start_y);
+			draw_centered(TextFormat("Your final score: %zu", state.score), start_y + 45);
+			draw_centered("Press 'Enter' for restart the game", start_y + 100);
+
+			EndDrawing();
+		}
+
 		Event	get_event(void) override
 		{
 			int	key = GetKeyPressed();
 			switch (key) {
 			case KEY_ESCAPE:
 				return Event::QUIT;
+			case KEY_ENTER:
+				return Event::RESTART;
 			case KEY_W:
 				return Event::UP;
 			case KEY_S:
@@ -74,6 +98,10 @@ extern "C" {
 
 	void	render_game(const GameState &state)
 	{
+		if (state.game_over) {
+			lib.render_end_game(state);
+			return;
+		}
 		lib.render_game(state);
 	}
 

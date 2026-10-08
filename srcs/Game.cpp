@@ -17,6 +17,7 @@ Game::Game(int argc, char **argv) : m_direction(Event::LEFT), m_rng(std::random_
 	m_snake.push_back({m_width / 2 + 1, m_height / 2});
 	m_snake.push_back({m_width / 2 + 2, m_height / 2});
 	m_snake.push_back({m_width / 2 + 3, m_height / 2});
+	generate_food();
 }
 
 Game::~Game(void) { }
@@ -34,51 +35,53 @@ GameState	Game::get_state(void) const
 	return state;
 }
 
-#include <unistd.h>
-
 void	Game::run(Lib &lib)
 {
-	generate_food();
 	lib.create(m_width, m_height);
-	while (!m_game_over) {
-		auto	current_time = std::chrono::steady_clock::now();
-		float	delta_time = std::chrono::duration<float>(current_time - m_last_update_time).count();
-
-		if (delta_time >= 1.0f / m_tick_rate) {
-
-			Event	event = lib.get_event();
-			switch (event) {
-			case Event::QUIT:
-				return;
-			case Event::UP:
-			case Event::DOWN:
-			case Event::RIGHT:
-			case Event::LEFT:
-				change_snake_dir(event);
-				break;
-			case Event::LIB1:
-				if (lib.switch_lib(FIRST_LIB))
-					lib.create(m_width, m_height);
-				break;
-			case Event::LIB2:
-				if (lib.switch_lib(SECOND_LIB))
-					lib.create(m_width, m_height);
-				break;
-			case Event::LIB3:
-				if (lib.switch_lib(THIRD_LIB))
-					lib.create(m_width, m_height);
-				break;
-			default:
-				break;
-			}
-
-			move_snake();
-			check_collision();
+	
+	bool	running = true;
+	while (running) {
+		Event	event = lib.get_event();
+		switch (event) {
+		case Event::QUIT:
+			running = false;
+			return;
+		case Event::RESTART:
 			if (m_game_over)
-				break;
-			lib.render(get_state());
-			m_last_update_time = current_time;
+				reset_game();
+			break;
+		case Event::UP:
+		case Event::DOWN:
+		case Event::RIGHT:
+		case Event::LEFT:
+			change_snake_dir(event);
+			break;
+		case Event::LIB1:
+			if (lib.switch_lib(FIRST_LIB))
+				lib.create(m_width, m_height);
+			break;
+		case Event::LIB2:
+			if (lib.switch_lib(SECOND_LIB))
+				lib.create(m_width, m_height);
+			break;
+		case Event::LIB3:
+			if (lib.switch_lib(THIRD_LIB))
+				lib.create(m_width, m_height);
+			break;
+		default:
+			break;
 		}
+
+		if (!m_game_over) {
+			auto	current_time = std::chrono::steady_clock::now();
+			float	delta_time = std::chrono::duration<float>(current_time - m_last_update_time).count();
+			if (delta_time >= 1.0f / m_tick_rate) {
+				move_snake();
+				check_collision();
+				m_last_update_time = current_time;
+			}
+		}
+		lib.render(get_state());
 	}
 }
 
@@ -171,4 +174,18 @@ void	Game::generate_food(void)
 		}
 	}
 	m_food = new_food;
+}
+
+void	Game::reset_game(void)
+{
+	m_direction = Event::LEFT;
+	m_snake.clear();
+	m_snake.push_back({m_width / 2, m_height / 2});
+	m_snake.push_back({m_width / 2 + 1, m_height / 2});
+	m_snake.push_back({m_width / 2 + 2, m_height / 2});
+	m_snake.push_back({m_width / 2 + 3, m_height / 2});
+	m_game_over = false;
+	m_score = 0;
+	m_last_update_time = std::chrono::steady_clock::now();
+	generate_food();
 }

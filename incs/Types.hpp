@@ -30,6 +30,7 @@ enum class Event : int {
 	LIB1,
 	LIB2,
 	LIB3,
+	RESTART,
 	QUIT
 };
 

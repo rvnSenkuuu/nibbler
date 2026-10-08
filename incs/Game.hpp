@@ -18,6 +18,7 @@ class Game {
 		GameState	get_state(void) const;
 
 		void	run(Lib &lib);
+		void	reset_game(void);
 		void	generate_food(void);
 		void	check_collision(void);
 		void	move_snake();
