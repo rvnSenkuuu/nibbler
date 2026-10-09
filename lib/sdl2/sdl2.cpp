@@ -51,25 +51,38 @@ class GraphicLib : public IGraphic {
 			}
 		}
 
-		void	render_game(const GameData &state) override
+		void	render_game(const GameData &data) override
 		{
 			SDL_SetRenderDrawColor(m_renderer, 0x18, 0x18, 0x18, 0xFF);
 			SDL_RenderClear(m_renderer);
 
-			for (size_t i = 0; i < state.snake.size(); i++) {
-				const auto	&pos = state.snake.at(i);
+			for (size_t i = 0; i < data.snake.size(); i++) {
+				const auto	&pos = data.snake.at(i);
 				draw_cell(pos.x, pos.y, i == 0 ? DARKGREEN_C : GREEN_C);
 			}
 
-			draw_cell(state.food.x, state.food.y, RED_C);
-			draw_score(state.score);
+			draw_cell(data.food.x, data.food.y, RED_C);
+			// std::string	score = "Score: " + std::to_string(data.score);
+			draw_text("Score: " + std::to_string(data.score), 10, 10, RAYWHITE_C);
 			SDL_RenderPresent(m_renderer);
 		}
 
-		void	render_end_game(const GameData &state)
+		void	render_end_game(const GameData &data)
 		{
-			(void)state;
-			throw std::runtime_error("TODO: render_end_game");
+			SDL_SetRenderDrawColor(m_renderer, BLACK_C.r, BLACK_C.g, BLACK_C.b, BLACK_C.a);
+			SDL_RenderClear(m_renderer);
+
+			const int	center_x = data.width * CELL_SIZE / 2;
+			const int	start_y = data.height * CELL_SIZE / 2 - (100 + 20) / 2;
+
+			if (data.state == GameState::WON)
+				draw_text_centered("You won !", center_x, start_y, RAYWHITE_C);
+			else
+				draw_text_centered("Game Over !", center_x, start_y, RAYWHITE_C);
+			draw_text_centered("Your score: " + std::to_string(data.score), center_x, start_y + 45, RAYWHITE_C);
+			draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 100, RAYWHITE_C);
+
+			SDL_RenderPresent(m_renderer);
 		}
 
 		Event	get_event(void) override
@@ -134,25 +147,32 @@ class GraphicLib : public IGraphic {
 					.x = x * CELL_SIZE,
 					.y = y * CELL_SIZE,
 					.w = CELL_SIZE,
-					.h = CELL_SIZE
-				};
+					.h = CELL_SIZE};
 				SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 				SDL_RenderFillRect(m_renderer, &rect);
 			}
-			void	draw_score(const size_t score)
+
+			void	draw_text(const std::string &text, int x, int y, const SDL_Color &color)
 			{
-				const std::string	text = "Score: " + std::to_string(score);
-				SDL_Surface	*surface = TTF_RenderText_Solid(m_font, text.c_str(), RAYWHITE_C);
+				SDL_Surface	*surface = TTF_RenderText_Solid(m_font, text.c_str(), color);
 				SDL_Texture	*texture = SDL_CreateTextureFromSurface(m_renderer, surface);
 				const SDL_Rect	rect = {
-					.x = 10,
-					.y = 10,
+					.x = x,
+					.y = y,
 					.w = surface->w,
-					.h = surface->h
-				};
+					.h = surface->h};
+				
 				SDL_RenderCopy(m_renderer, texture, nullptr, &rect);
 				SDL_FreeSurface(surface);
 				SDL_DestroyTexture(texture);
+			}
+
+			void	draw_text_centered(const std::string &text, int center_x, int y, const SDL_Color &color)
+			{
+				int	w = 0;
+				int	h = 0;
+				TTF_SizeText(m_font, text.c_str(), &w, &h);
+				draw_text(text, center_x - w / 2, y, color);
 			}
 
 			SDL_Window	*m_window;
@@ -168,13 +188,13 @@ extern "C" {
 		lib.create_window(width, height);
 	}
 
-	void	render_game(const GameData &state)
+	void	render_game(const GameData &data)
 	{
-		if (state.game_over) {
-			lib.render_end_game(state);
+		if (data.state == GameState::GAME_OVER || data.state == GameState::WON) {
+			lib.render_end_game(data);
 			return;
 		}
-		lib.render_game(state);
+		lib.render_game(data);
 	}
 
 	Event	get_event(void)

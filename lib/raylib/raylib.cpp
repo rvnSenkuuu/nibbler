@@ -15,40 +15,42 @@ class GraphicLib : public IGraphic {
 			InitWindow(width * CELL_SIZE, height * CELL_SIZE, "Nibbler");
 		}
 
-		void	render_game(const GameData &state) override
+		void	render_game(const GameData &data) override
 		{
 			BeginDrawing();
 			ClearBackground(BLACK);
 
-			for (size_t i = 0; i < state.snake.size(); i++) {
-				const auto	&pos = state.snake.at(i);
+			for (size_t i = 0; i < data.snake.size(); i++) {
+				const auto	&pos = data.snake.at(i);
 				Color	color = i == 0 ? DARKGREEN : GREEN;
 				DrawRectangle(pos.x * CELL_SIZE, pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, color);
 			}
 
-			DrawCircle(state.food.x * CELL_SIZE + 15, state.food.y * CELL_SIZE + 15, 15.f, RED);
-			DrawText(TextFormat("Score: %zu", state.score), 10, 10, 20, RAYWHITE);
+			DrawCircle(data.food.x * CELL_SIZE + 15, data.food.y * CELL_SIZE + 15, 15.f, RED);
+			DrawText(TextFormat("Score: %zu", data.score), 10, 10, 20, RAYWHITE);
 
 			EndDrawing();
 		}
 
-		void	render_end_game(const GameData &state)
+		void	render_end_game(const GameData &data)
 		{
 			BeginDrawing();
 			ClearBackground(BLACK);
 
 			const int	font_size = 20;
-			int	center_x = state.width * CELL_SIZE / 2;
+			const int	center_x = data.width * CELL_SIZE / 2;
+			const int	start_y = data.height * CELL_SIZE / 2 - (100 + font_size) / 2;
 
 			auto	draw_centered = [&](const char *text, int y) {
 				int	text_width = MeasureText(text, font_size);
 				DrawText(text, center_x - text_width / 2, y, font_size, RAYWHITE);
 			};
 
-			int	start_y = state.height * CELL_SIZE / 2 - (100 + font_size) / 2;
-
-			draw_centered("Game Over !", start_y);
-			draw_centered(TextFormat("Your final score: %zu", state.score), start_y + 45);
+			if (data.state == GameState::WON)
+				draw_centered("You won !", start_y);
+			else
+				draw_centered("Game Over !", start_y);
+			draw_centered(TextFormat("Your score: %zu", data.score), start_y + 45);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100);
 
 			EndDrawing();
@@ -96,13 +98,13 @@ extern "C" {
 		lib.create_window(width, height);
 	}
 
-	void	render_game(const GameData &state)
+	void	render_game(const GameData &data)
 	{
-		if (state.game_over) {
-			lib.render_end_game(state);
+		if (data.state == GameState::GAME_OVER || data.state == GameState::WON) {
+			lib.render_end_game(data);
 			return;
 		}
-		lib.render_game(state);
+		lib.render_game(data);
 	}
 
 	Event	get_event(void)
