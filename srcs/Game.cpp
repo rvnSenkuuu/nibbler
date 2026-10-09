@@ -22,9 +22,9 @@ Game::Game(int argc, char **argv) : m_direction(Event::LEFT), m_rng(std::random_
 
 Game::~Game(void) { }
 
-GameState	Game::get_state(void) const
+GameData	Game::get_state(void) const
 {
-	GameState	state = {
+	GameData	state = {
 		.snake = m_snake,
 		.food = m_food,
 		.score = m_score,

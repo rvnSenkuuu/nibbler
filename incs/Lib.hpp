@@ -11,7 +11,7 @@
 #define DEFAULT_LIB FIRST_LIB
 
 using FnCreate = void	(*)(int width, int height);
-using FnRender = void	(*)(const GameState &);
+using FnRender = void	(*)(const GameData &);
 using FnEvent = Event	(*)();
 using FnDestroy = void	(*)();
 

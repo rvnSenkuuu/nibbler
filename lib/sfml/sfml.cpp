@@ -28,7 +28,7 @@ class GraphicLib : public IGraphic {
 			}
 		}
 
-		void	render_game(const GameState &state) override
+		void	render_game(const GameData &state) override
 		{
 			m_window->clear(sf::Color::Black);
 
@@ -52,6 +52,12 @@ class GraphicLib : public IGraphic {
 			m_window->draw(food);
 
 			m_window->display();
+		}
+
+		void	render_end_game(const GameData&state)
+		{
+			(void)state;
+			throw std::runtime_error("TODO: render_end_game");
 		}
 
 		Event	get_event(void) override
@@ -122,8 +128,12 @@ extern "C" {
 		lib.create_window(width, height);
 	}
 
-	void	render_game(const GameState &state)
+	void	render_game(const GameData &state)
 	{
+		if (state.game_over) {
+			lib.render_end_game(state);
+			return;
+		}
 		lib.render_game(state);
 	}
 

@@ -15,7 +15,7 @@ class GraphicLib : public IGraphic {
 			InitWindow(width * CELL_SIZE, height * CELL_SIZE, "Nibbler");
 		}
 
-		void	render_game(const GameState &state) override
+		void	render_game(const GameData &state) override
 		{
 			BeginDrawing();
 			ClearBackground(BLACK);
@@ -32,7 +32,7 @@ class GraphicLib : public IGraphic {
 			EndDrawing();
 		}
 
-		void	render_end_game(const GameState &state)
+		void	render_end_game(const GameData &state)
 		{
 			BeginDrawing();
 			ClearBackground(BLACK);
@@ -96,7 +96,7 @@ extern "C" {
 		lib.create_window(width, height);
 	}
 
-	void	render_game(const GameState &state)
+	void	render_game(const GameData &state)
 	{
 		if (state.game_over) {
 			lib.render_end_game(state);

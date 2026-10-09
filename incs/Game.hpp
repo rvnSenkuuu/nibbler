@@ -15,7 +15,7 @@ class Game {
 		Game(int argc, char **argv);
 		~Game();
 
-		GameState	get_state(void) const;
+		GameData	get_state(void) const;
 
 		void	run(Lib &lib);
 		void	reset_game(void);

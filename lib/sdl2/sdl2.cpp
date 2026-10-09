@@ -51,7 +51,7 @@ class GraphicLib : public IGraphic {
 			}
 		}
 
-		void	render_game(const GameState &state) override
+		void	render_game(const GameData &state) override
 		{
 			SDL_SetRenderDrawColor(m_renderer, 0x18, 0x18, 0x18, 0xFF);
 			SDL_RenderClear(m_renderer);
@@ -64,6 +64,12 @@ class GraphicLib : public IGraphic {
 			draw_cell(state.food.x, state.food.y, RED_C);
 			draw_score(state.score);
 			SDL_RenderPresent(m_renderer);
+		}
+
+		void	render_end_game(const GameData &state)
+		{
+			(void)state;
+			throw std::runtime_error("TODO: render_end_game");
 		}
 
 		Event	get_event(void) override
@@ -90,6 +96,8 @@ class GraphicLib : public IGraphic {
 						return Event::RIGHT;
 					case SDL_SCANCODE_ESCAPE:
 						return Event::QUIT;
+					case SDL_SCANCODE_KP_ENTER:
+						return Event::RESTART;
 					default:
 						break;
 					}
@@ -160,8 +168,12 @@ extern "C" {
 		lib.create_window(width, height);
 	}
 
-	void	render_game(const GameState &state)
+	void	render_game(const GameData &state)
 	{
+		if (state.game_over) {
+			lib.render_end_game(state);
+			return;
+		}
 		lib.render_game(state);
 	}
 
