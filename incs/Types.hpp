@@ -34,11 +34,18 @@ enum class Event : int {
 	QUIT
 };
 
+enum class GameState : int {
+	RUNNING,
+	GAME_OVER,
+	WON,
+	QUIT
+};
+
 struct GameData {
 	std::deque<Position>	snake;
 	Position	food;
 	size_t	score;
 	size_t	width;
 	size_t	height;
-	bool	game_over;
+	GameState	state;
 };

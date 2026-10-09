@@ -1,6 +1,6 @@
 #include "Game.hpp"
 
-Game::Game(int argc, char **argv) : m_direction(Event::LEFT), m_rng(std::random_device{}()), m_score(0), m_game_over(false),
+Game::Game(int argc, char **argv) : m_direction(Event::LEFT), m_rng(std::random_device{}()), m_score(0), m_state(GameState::RUNNING),
 									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
 {
 	if (argc != 3)
@@ -22,34 +22,28 @@ Game::Game(int argc, char **argv) : m_direction(Event::LEFT), m_rng(std::random_
 
 Game::~Game(void) { }
 
-GameData	Game::get_state(void) const
+GameData	Game::get_data(void) const
 {
-	GameData	state = {
+	GameData	data = {
 		.snake = m_snake,
 		.food = m_food,
 		.score = m_score,
 		.width = m_width,
 		.height = m_height,
-		.game_over = m_game_over};
+		.state = m_state};
 
-	return state;
+	return data;
 }
 
-void	Game::run(Lib &lib)
+void	Game::handle_event(Lib &lib, Event &event)
 {
-	lib.create(m_width, m_height);
-	
-	bool	running = true;
-	while (running) {
-		Event	event = lib.get_event();
+	if (m_state == GameState::GAME_OVER || m_state == GameState::WON) {
+		if (event == Event::RESTART)
+			reset_game();
+	} else if (m_state == GameState::RUNNING) {
 		switch (event) {
 		case Event::QUIT:
-			running = false;
 			return;
-		case Event::RESTART:
-			if (m_game_over)
-				reset_game();
-			break;
 		case Event::UP:
 		case Event::DOWN:
 		case Event::RIGHT:
@@ -71,8 +65,19 @@ void	Game::run(Lib &lib)
 		default:
 			break;
 		}
+	}
+}
 
-		if (!m_game_over) {
+void	Game::run(Lib &lib)
+{
+	lib.create(m_width, m_height);
+	while (true) {
+		Event	event = lib.get_event();
+		if (event == Event::QUIT)
+			return;
+		
+		handle_event(lib, event);
+		if (m_state == GameState::RUNNING) {
 			auto	current_time = std::chrono::steady_clock::now();
 			float	delta_time = std::chrono::duration<float>(current_time - m_last_update_time).count();
 			if (delta_time >= 1.0f / m_tick_rate) {
@@ -81,7 +86,7 @@ void	Game::run(Lib &lib)
 				m_last_update_time = current_time;
 			}
 		}
-		lib.render(get_state());
+		lib.render(get_data());
 	}
 }
 
@@ -89,13 +94,13 @@ void	Game::check_collision(void)
 {
 	Position	head = m_snake.front();
 	if (head.x >= m_width || head.y >= m_height) {
-		m_game_over = true;
+		m_state = GameState::GAME_OVER;
 		return;
 	}
 
 	for (size_t i = 1; i < m_snake.size(); i++) {
 		if (head == m_snake[i]) {
-			m_game_over = true;
+			m_state = GameState::GAME_OVER;
 			return;
 		}
 	}
@@ -146,7 +151,10 @@ void	Game::move_snake()
 
 	if (is_food) {
 		m_score += 10;
-		generate_food();
+		if (m_snake.size() == m_width * m_height)
+			m_state = GameState::WON;
+		else
+			generate_food();
 	} else {
 		m_snake.pop_back();
 	}
@@ -154,9 +162,6 @@ void	Game::move_snake()
 
 void	Game::generate_food(void)
 {
-	if (m_snake.size() == m_width * m_height)
-		return;
-
 	std::uniform_int_distribution<size_t>	x_pos(0, m_width - 1);
 	std::uniform_int_distribution<size_t>	y_pos(0, m_height - 1);
 
@@ -184,7 +189,7 @@ void	Game::reset_game(void)
 	m_snake.push_back({m_width / 2 + 1, m_height / 2});
 	m_snake.push_back({m_width / 2 + 2, m_height / 2});
 	m_snake.push_back({m_width / 2 + 3, m_height / 2});
-	m_game_over = false;
+	m_state = GameState::RUNNING;
 	m_score = 0;
 	m_last_update_time = std::chrono::steady_clock::now();
 	generate_food();

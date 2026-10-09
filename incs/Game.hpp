@@ -15,7 +15,7 @@ class Game {
 		Game(int argc, char **argv);
 		~Game();
 
-		GameData	get_state(void) const;
+		GameData	get_data(void) const;
 
 		void	run(Lib &lib);
 		void	reset_game(void);
@@ -23,6 +23,7 @@ class Game {
 		void	check_collision(void);
 		void	move_snake();
 		void	change_snake_dir(Event event);
+		void	handle_event(Lib &lib, Event &event);
 	
 	private:
 		Game() = default;
@@ -39,7 +40,7 @@ class Game {
 		Event	m_direction;
 		std::mt19937	m_rng;
 		size_t	m_score;
-		bool	m_game_over;
+		GameState	m_state;
 
 	    float	m_tick_rate;
     	std::chrono::steady_clock::time_point	m_last_update_time;
