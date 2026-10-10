@@ -75,10 +75,8 @@ class GraphicLib : public IGraphic {
 			const int	center_x = data.width * CELL_SIZE / 2;
 			const int	start_y = data.height * CELL_SIZE / 2 - (100 + 20) / 2;
 
-			if (data.state == GameState::WON)
-				draw_text_centered("You won !", center_x, start_y, RAYWHITE_C);
-			else
-				draw_text_centered("Game Over !", center_x, start_y, RAYWHITE_C);
+			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
+			draw_text_centered(end_msg, center_x, start_y, RAYWHITE_C);
 			draw_text_centered("Your score: " + std::to_string(data.score), center_x, start_y + 45, RAYWHITE_C);
 			draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 100, RAYWHITE_C);
 

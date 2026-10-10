@@ -41,15 +41,13 @@ class GraphicLib : public IGraphic {
 			const int	center_x = data.width * CELL_SIZE / 2;
 			const int	start_y = data.height * CELL_SIZE / 2 - (100 + font_size) / 2;
 
-			auto	draw_centered = [&](const char *text, int y) {
-				int	text_width = MeasureText(text, font_size);
-				DrawText(text, center_x - text_width / 2, y, font_size, RAYWHITE);
+			auto	draw_centered = [&](const std::string &text, int y) {
+				int	text_width = MeasureText(text.c_str(), font_size);
+				DrawText(text.c_str(), center_x - text_width / 2, y, font_size, RAYWHITE);
 			};
 
-			if (data.state == GameState::WON)
-				draw_centered("You won !", start_y);
-			else
-				draw_centered("Game Over !", start_y);
+			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
+			draw_centered(end_msg, start_y);
 			draw_centered(TextFormat("Your score: %zu", data.score), start_y + 45);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100);
 

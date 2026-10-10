@@ -76,10 +76,8 @@ class GraphicLib : public IGraphic {
 
 			m_window->clear(sf::Color::Black);
 
-			if (data.state == GameState::WON)
-				draw_centered("You won !", start_y);
-			else
-				draw_centered("Game Over !", start_y);
+			const std::string	end_msg = data.state == GameState::WON ? "You Won !" :  "Game Over !";
+			draw_centered(end_msg, start_y);
 			draw_centered("Your score: " + std::to_string(data.score), start_y + 45);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100);
 
