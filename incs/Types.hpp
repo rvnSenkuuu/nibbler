@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <vector>
 
 #define CELL_SIZE 30
 #define FONT_PATH "./assets/font.ttf"
@@ -27,6 +28,10 @@ enum class Event : int {
 	LEFT,
 	RIGHT,
 	DOWN,
+	W,
+	S,
+	A,
+	D,
 	LIB1,
 	LIB2,
 	LIB3,
@@ -41,10 +46,17 @@ enum class GameState : int {
 	QUIT
 };
 
-struct GameData {
-	std::deque<Position>	snake;
-	Position	food;
+struct Snake {
+	std::deque<Position>	body;
 	size_t	score;
+	Event	direction;
+	bool	alive;
+};
+
+struct GameData {
+	std::vector<Snake>	snakes;
+	Position	food;
+	// size_t	score;
 	size_t	width;
 	size_t	height;
 	GameState	state;

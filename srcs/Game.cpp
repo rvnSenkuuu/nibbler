@@ -1,39 +1,78 @@
 #include "Game.hpp"
 
-Game::Game(int argc, char **argv) : m_direction(Event::LEFT), m_rng(std::random_device{}()), m_score(0), m_state(GameState::RUNNING),
+Game::Game(int argc, char **argv) : m_player_count(1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
 									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
 {
-	if (argc != 3)
-		throw std::logic_error("Usage: ./nibbler <width> <height>");
+	if (argc < 3 || argc > 4)
+		throw std::invalid_argument("Usage: ./nibbler <width> <height> [--multi]");
 
 	m_width = std::stoi(argv[1]);
 	m_height = std::stoi(argv[2]);
+
+	if (argc == 4) {
+		if (std::string(argv[3]) != "--multi")
+			throw std::invalid_argument("Unknown option (expected --multi)");
+		m_player_count = 2;
+	}
 
 	//TODO: Check for higher value
 	if (m_width < 10 || m_height < 10)
 		throw std::invalid_argument("Width or height values too low");
 
-	m_snake.push_back({m_width / 2, m_height / 2});
-	m_snake.push_back({m_width / 2 + 1, m_height / 2});
-	m_snake.push_back({m_width / 2 + 2, m_height / 2});
-	m_snake.push_back({m_width / 2 + 3, m_height / 2});
+	init_snakes();
 	generate_food();
 }
 
 Game::~Game(void) { }
 
+void	Game::init_snakes(void)
+{
+	m_snakes.reserve(2);
+	m_snakes.clear();
+
+	size_t	row = m_player_count == 2 ? m_height / 3 : m_height / 2;
+
+	Snake	p1;
+	p1.direction = Event::LEFT;
+	p1.score = 0;
+	p1.alive = true;
+	p1.body.push_back({m_width / 2, row});
+	p1.body.push_back({m_width / 2 + 1, row});
+	p1.body.push_back({m_width / 2 + 2, row});
+	p1.body.push_back({m_width / 2 + 3, row});
+
+	m_snakes.push_back(p1);
+
+	if (m_player_count == 2) {
+		row = 2 * m_height / 3;
+
+		Snake	p2;
+		p2.direction = Event::RIGHT;
+		p2.score = 0;
+		p2.alive = true;
+		p2.body.push_back({m_width / 2, row});
+		p2.body.push_back({m_width / 2 - 1, row});
+		p2.body.push_back({m_width / 2 - 2, row});
+		p2.body.push_back({m_width / 2 - 3, row});
+
+		m_snakes.push_back(p2);
+	}
+}
+
 GameData	Game::get_data(void) const
 {
 	GameData	data = {
-		.snake = m_snake,
+		.snakes = m_snakes,
 		.food = m_food,
-		.score = m_score,
 		.width = m_width,
 		.height = m_height,
 		.state = m_state};
 
 	return data;
 }
+
+#define FIRST_SNAKE 0
+#define SECOND_SNAKE 1
 
 void	Game::handle_event(Lib &lib, Event &event)
 {
@@ -44,11 +83,17 @@ void	Game::handle_event(Lib &lib, Event &event)
 		switch (event) {
 		case Event::QUIT:
 			return;
+		case Event::W:
+		case Event::S:
+		case Event::A:
+		case Event::D:
+			change_snake_dir(FIRST_SNAKE, event);
+			break;
 		case Event::UP:
 		case Event::DOWN:
 		case Event::RIGHT:
 		case Event::LEFT:
-			change_snake_dir(event);
+			change_snake_dir(m_player_count == 2 ? SECOND_SNAKE : FIRST_SNAKE, event);
 			break;
 		case Event::LIB1:
 			if (lib.switch_lib(FIRST_LIB))
@@ -81,8 +126,8 @@ void	Game::run(Lib &lib)
 			auto	current_time = std::chrono::steady_clock::now();
 			float	delta_time = std::chrono::duration<float>(current_time - m_last_update_time).count();
 			if (delta_time >= 1.0f / m_tick_rate) {
-				move_snake();
-				check_collision();
+				update_game();
+				// check_collision();
 				m_last_update_time = current_time;
 			}
 		}
@@ -90,75 +135,96 @@ void	Game::run(Lib &lib)
 	}
 }
 
-void	Game::check_collision(void)
-{
-	Position	head = m_snake.front();
-	if (head.x >= m_width || head.y >= m_height) {
-		m_state = GameState::GAME_OVER;
-		return;
-	}
+// void	Game::check_collision(void)
+// {
+// 	Position	head = m_snake.front();
+// 	if (head.x >= m_width || head.y >= m_height) {
+// 		m_state = GameState::GAME_OVER;
+// 		return;
+// 	}
 
-	for (size_t i = 1; i < m_snake.size(); i++) {
-		if (head == m_snake[i]) {
-			m_state = GameState::GAME_OVER;
-			return;
-		}
+// 	for (size_t i = 1; i < m_snake.size(); i++) {
+// 		if (head == m_snake[i]) {
+// 			m_state = GameState::GAME_OVER;
+// 			return;
+// 		}
+// 	}
+// }
+
+Event	Game::get_dir(Event event)
+{
+	switch (event) {
+	case Event::W:
+		return Event::UP;
+	case Event::S:
+		return Event::DOWN;
+	case Event::A:
+		return Event::LEFT;
+	case Event::D:
+		return Event::RIGHT;
+	default:
+		return event;
 	}
 }
 
 bool	Game::is_opposite_dir(Event a, Event b)
 {
-	return (a == Event::UP && b == Event::DOWN) ||
-	(a == Event::DOWN && b == Event::UP) ||
-	(a == Event::LEFT && b == Event::RIGHT) ||
-	(a == Event::RIGHT && b == Event::LEFT);
+	a = get_dir(a);
+	b = get_dir(b);
+	return (a == Event::UP && b == Event::DOWN) || (a == Event::DOWN && b == Event::UP) ||
+		(a == Event::LEFT && b == Event::RIGHT) || (a == Event::RIGHT && b == Event::LEFT);
 }
 
-void	Game::change_snake_dir(Event event)
+void	Game::change_snake_dir(size_t snake_index, Event event)
 {
-	if (event == Event::UP ||
-		event == Event::DOWN ||
-		event == Event::RIGHT ||
-		event == Event::LEFT) {
-		if (!is_opposite_dir(m_direction, event))
-			m_direction = event;
+	Snake	&snake = m_snakes[snake_index];
+	if (snake.alive && !is_opposite_dir(snake.direction, event))
+		snake.direction = get_dir(event);
+}
+
+void	Game::update_game(void)
+{
+	for (size_t i = 0; i < m_snakes.size(); i++) {
+		if (m_snakes.at(i).alive)
+			move_snake(m_snakes.at(i));
 	}
 }
 
-void	Game::move_snake()
+void	Game::move_snake(Snake &snake)
 {
-	Position	head = m_snake.front();
+	Position	head = snake.body.front();
 
-	switch (m_direction) {
+	switch (snake.direction) {
 	case Event::UP:
 		head.y--;
 		break;
 	case Event::DOWN:
 		head.y++;
 		break;
-	case Event::RIGHT:
-		head.x++;
-		break;
 	case Event::LEFT:
 		head.x--;
+		break;
+	case Event::RIGHT:
+		head.x++;
 		break;
 	default:
 		break;
 	}
 
 	bool	is_food = (head == m_food);
-	m_snake.push_front(head);
+	snake.body.push_front(head);
 
 	if (!is_food) {
-		m_snake.pop_back();
+		snake.body.pop_back();
 		return;
 	}
 
-	m_score += 10;
-	if (m_snake.size() == m_width * m_height)
+	snake.score += 10;
+	if (snake.body.size() == m_width * m_height) {
 		m_state = GameState::WON;
-	else
+	} else {
 		generate_food();
+	}
 }
 
 void	Game::generate_food(void)
@@ -167,31 +233,26 @@ void	Game::generate_food(void)
 	std::uniform_int_distribution<size_t>	y_pos(0, m_height - 1);
 
 	bool	valid_pos = false;
-	Position	new_food;
+	Position	pos;
 	while (!valid_pos) {
-		new_food = {x_pos(m_rng), y_pos(m_rng)};
+		pos = {x_pos(m_rng), y_pos(m_rng)};
 		
 		valid_pos = true;
-		for (auto &snake_part : m_snake) {
-			if (snake_part == new_food) {
+
+		for (auto &snake : m_snakes) {
+			if (std::find(snake.body.begin(), snake.body.end(), pos) != snake.body.end()) {
 				valid_pos = false;
 				break;
 			}
 		}
 	}
-	m_food = new_food;
+	m_food = pos;
 }
 
 void	Game::reset_game(void)
 {
-	m_direction = Event::LEFT;
-	m_snake.clear();
-	m_snake.push_back({m_width / 2, m_height / 2});
-	m_snake.push_back({m_width / 2 + 1, m_height / 2});
-	m_snake.push_back({m_width / 2 + 2, m_height / 2});
-	m_snake.push_back({m_width / 2 + 3, m_height / 2});
+	init_snakes();
 	m_state = GameState::RUNNING;
-	m_score = 0;
 	m_last_update_time = std::chrono::steady_clock::now();
 	generate_food();
 }
