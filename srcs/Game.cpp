@@ -149,15 +149,16 @@ void	Game::move_snake()
 	bool	is_food = (head == m_food);
 	m_snake.push_front(head);
 
-	if (is_food) {
-		m_score += 10;
-		if (m_snake.size() == m_width * m_height)
-			m_state = GameState::WON;
-		else
-			generate_food();
-	} else {
+	if (!is_food) {
 		m_snake.pop_back();
+		return;
 	}
+
+	m_score += 10;
+	if (m_snake.size() == m_width * m_height)
+		m_state = GameState::WON;
+	else
+		generate_food();
 }
 
 void	Game::generate_food(void)
