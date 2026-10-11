@@ -6,6 +6,9 @@
 #define CELL_SIZE 30
 #define FONT_PATH "./assets/font.ttf"
 
+#define __FIRST_SNAKE 0
+#define __SECOND_SNAKE 1
+
 struct Position {
 	size_t	x;
 	size_t	y;
@@ -56,7 +59,6 @@ struct Snake {
 struct GameData {
 	std::vector<Snake>	snakes;
 	Position	food;
-	// size_t	score;
 	size_t	width;
 	size_t	height;
 	GameState	state;

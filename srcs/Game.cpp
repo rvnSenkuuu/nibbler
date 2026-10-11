@@ -27,7 +27,7 @@ Game::~Game(void) { }
 
 void	Game::init_snakes(void)
 {
-	m_snakes.reserve(2);
+	m_snakes.reserve(m_player_count);
 	m_snakes.clear();
 
 	size_t	row = m_player_count == 2 ? m_height / 3 : m_height / 2;
@@ -47,7 +47,7 @@ void	Game::init_snakes(void)
 		row = 2 * m_height / 3;
 
 		Snake	p2;
-		p2.direction = Event::RIGHT;
+		p2.direction = Event::LEFT;
 		p2.score = 0;
 		p2.alive = true;
 		p2.body.push_back({m_width / 2, row});
@@ -71,9 +71,6 @@ GameData	Game::get_data(void) const
 	return data;
 }
 
-#define FIRST_SNAKE 0
-#define SECOND_SNAKE 1
-
 void	Game::handle_event(Lib &lib, Event &event)
 {
 	if (m_state == GameState::GAME_OVER || m_state == GameState::WON) {
@@ -87,13 +84,13 @@ void	Game::handle_event(Lib &lib, Event &event)
 		case Event::S:
 		case Event::A:
 		case Event::D:
-			change_snake_dir(FIRST_SNAKE, event);
+			change_snake_dir(__FIRST_SNAKE, event);
 			break;
 		case Event::UP:
 		case Event::DOWN:
 		case Event::RIGHT:
 		case Event::LEFT:
-			change_snake_dir(m_player_count == 2 ? SECOND_SNAKE : FIRST_SNAKE, event);
+			change_snake_dir(m_player_count == 2 ? __SECOND_SNAKE : __FIRST_SNAKE, event);
 			break;
 		case Event::LIB1:
 			if (lib.switch_lib(FIRST_LIB))
@@ -151,7 +148,7 @@ void	Game::run(Lib &lib)
 // 	}
 // }
 
-Event	Game::get_dir(Event event)
+Event	Game::get_event_dir(Event event)
 {
 	switch (event) {
 	case Event::W:
@@ -169,8 +166,9 @@ Event	Game::get_dir(Event event)
 
 bool	Game::is_opposite_dir(Event a, Event b)
 {
-	a = get_dir(a);
-	b = get_dir(b);
+	a = get_event_dir(a);
+	b = get_event_dir(b);
+
 	return (a == Event::UP && b == Event::DOWN) || (a == Event::DOWN && b == Event::UP) ||
 		(a == Event::LEFT && b == Event::RIGHT) || (a == Event::RIGHT && b == Event::LEFT);
 }
@@ -179,7 +177,7 @@ void	Game::change_snake_dir(size_t snake_index, Event event)
 {
 	Snake	&snake = m_snakes[snake_index];
 	if (snake.alive && !is_opposite_dir(snake.direction, event))
-		snake.direction = get_dir(event);
+		snake.direction = get_event_dir(event);
 }
 
 void	Game::update_game(void)
@@ -236,9 +234,7 @@ void	Game::generate_food(void)
 	Position	pos;
 	while (!valid_pos) {
 		pos = {x_pos(m_rng), y_pos(m_rng)};
-		
 		valid_pos = true;
-
 		for (auto &snake : m_snakes) {
 			if (std::find(snake.body.begin(), snake.body.end(), pos) != snake.body.end()) {
 				valid_pos = false;

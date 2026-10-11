@@ -33,7 +33,7 @@ class Game {
 		Game	&operator=(const Game &rhs) = default;
 
 		[[nodiscard]] bool	is_opposite_dir(Event a, Event b);
-		Event	get_dir(Event event);
+		Event	get_event_dir(Event event);
 
 	private:
 		size_t	m_width;
