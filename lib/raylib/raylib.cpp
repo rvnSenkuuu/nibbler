@@ -4,6 +4,9 @@
 #include "Types.hpp"
 #include "IGraphic.hpp"
 
+const Color	p1_color[2] = {DARKGREEN, GREEN};
+const Color	p2_color[2] = {DARKBLUE, BLUE};
+
 class GraphicLib : public IGraphic {
 	public:
 		GraphicLib(void) { }
@@ -20,8 +23,6 @@ class GraphicLib : public IGraphic {
 			BeginDrawing();
 			ClearBackground(BLACK);
 
-			const Color	p1_color[2] = {DARKGREEN, GREEN};
-			const Color	p2_color[2] = {DARKBLUE, BLUE};
 			for (size_t i = 0; i < data.snakes.size(); i++) {
 				Snake	snake = data.snakes[i];
 				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
@@ -41,15 +42,29 @@ class GraphicLib : public IGraphic {
 			const int	center_x = data.width * CELL_SIZE / 2;
 			const int	start_y = data.height * CELL_SIZE / 2 - (100 + font_size) / 2;
 
-			auto	draw_centered = [&](const std::string &text, int y) {
+			auto	draw_centered = [&](const std::string &text, int y, Color color) {
 				int	text_width = MeasureText(text.c_str(), font_size);
-				DrawText(text.c_str(), center_x - text_width / 2, y, font_size, RAYWHITE);
+				DrawText(text.c_str(), center_x - text_width / 2, y, font_size, color);
 			};
 
+			if (data.snakes.size() == 2) {
+				std::string	game_winner;
+				if (data.state == GameState::DRAW)
+					game_winner = "Draw !";
+				else
+					game_winner = data.winner == __FIRST_SNAKE ? "P1 won !" : "P2 won !";
+				draw_centered(game_winner, start_y, RAYWHITE);
+				draw_centered(TextFormat("P1 Score: %zu", data.snakes[0].score), start_y + 30, p1_color[1]);
+				draw_centered(TextFormat("P2 Score: %zu", data.snakes[1].score), start_y + 60, p2_color[1]);
+				draw_centered("Press 'Enter' for restart the game", start_y + 90, RAYWHITE);
+				EndDrawing();
+				return;
+			}
+
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
-			draw_centered(end_msg, start_y);
-			draw_centered(TextFormat("Your score: %zu", data.snakes[0].score), start_y + 45);
-			draw_centered("Press 'Enter' for restart the game", start_y + 100);
+			draw_centered(end_msg, start_y, RAYWHITE);
+			draw_centered(TextFormat("Your score: %zu", data.snakes[0].score), start_y + 45, RAYWHITE);
+			draw_centered("Press 'Enter' for restart the game", start_y + 100, RAYWHITE);
 
 			EndDrawing();
 		}
@@ -122,7 +137,7 @@ extern "C" {
 
 	void	render_game(const GameData &data)
 	{
-		if (data.state == GameState::GAME_OVER || data.state == GameState::WON) {
+		if (data.state == GameState::GAME_OVER || data.state == GameState::WON || data.state == GameState::DRAW) {
 			lib.render_end_game(data);
 			return;
 		}

@@ -4,6 +4,7 @@
 #include <exception>
 #include <deque>
 #include <algorithm>
+#include <iterator>
 #include <random>
 #include <chrono>
 
@@ -22,7 +23,7 @@ class Game {
 		void	update_game(void);
 		void	reset_game(void);
 		void	generate_food(void);
-		void	check_collision(void);
+		void	check_collision(Snake &current);
 		void	move_snake(Snake &snake);
 		void	change_snake_dir(size_t snake_index, Event event);
 		void	handle_event(Lib &lib, Event &event);
@@ -40,6 +41,7 @@ class Game {
 		size_t	m_height;
 
 		size_t	m_player_count;
+		int	m_winner;
 		std::vector<Snake>	m_snakes;
 		Position	m_food;
 		std::mt19937	m_rng;

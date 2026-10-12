@@ -1,6 +1,6 @@
 #include "Game.hpp"
 
-Game::Game(int argc, char **argv) : m_player_count(1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
+Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
 									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
 {
 	if (argc < 3 || argc > 4)
@@ -61,20 +61,19 @@ void	Game::init_snakes(void)
 
 GameData	Game::get_data(void) const
 {
-	GameData	data = {
+	return (GameData) {
 		.snakes = m_snakes,
 		.food = m_food,
 		.width = m_width,
 		.height = m_height,
-		.state = m_state
+		.state = m_state,
+		.winner = m_winner
 	};
-
-	return data;
 }
 
 void	Game::handle_event(Lib &lib, Event &event)
 {
-	if (m_state == GameState::GAME_OVER || m_state == GameState::WON) {
+	if (m_state == GameState::GAME_OVER || m_state == GameState::WON || m_state == GameState::DRAW) {
 		if (event == Event::RESTART)
 			reset_game();
 	} else if (m_state == GameState::RUNNING) {
@@ -125,7 +124,6 @@ void	Game::run(Lib &lib)
 			float	delta_time = std::chrono::duration<float>(current_time - m_last_update_time).count();
 			if (delta_time >= 1.0f / m_tick_rate) {
 				update_game();
-				// check_collision();
 				m_last_update_time = current_time;
 			}
 		}
@@ -133,21 +131,31 @@ void	Game::run(Lib &lib)
 	}
 }
 
-// void	Game::check_collision(void)
-// {
-// 	Position	head = m_snake.front();
-// 	if (head.x >= m_width || head.y >= m_height) {
-// 		m_state = GameState::GAME_OVER;
-// 		return;
-// 	}
+void	Game::check_collision(Snake &current)
+{
+	Position	head = current.body.front();
+	if (head.x >= m_width || head.y >= m_height) {
+		m_state = GameState::GAME_OVER;
+		current.alive = false;
+		return;
+	}
 
-// 	for (size_t i = 1; i < m_snake.size(); i++) {
-// 		if (head == m_snake[i]) {
-// 			m_state = GameState::GAME_OVER;
-// 			return;
-// 		}
-// 	}
-// }
+	for (auto &snake : m_snakes) {
+		auto	begin_it = snake.body.begin();
+		if (&current == &snake)
+			begin_it = std::next(begin_it);
+
+		if (std::any_of(
+			begin_it,
+			snake.body.end(),
+			[&head](const Position &pos) { return head == pos; }
+		)) {
+			current.alive = false;
+			m_state = GameState::GAME_OVER;
+			break;
+		}
+	}
+}
 
 Event	Game::get_event_dir(Event event)
 {
@@ -186,6 +194,36 @@ void	Game::update_game(void)
 	for (auto &snake : m_snakes) {
 		if (snake.alive)
 			move_snake(snake);
+	}
+
+	for (auto &snake : m_snakes) {
+		if (snake.alive)
+			check_collision(snake);
+	}
+
+	//Test need to remove
+	// for (auto &snake : m_snakes) {
+	// 	if (snake.alive && snake.score == 20) {
+	// 		m_state = GameState::DRAW;
+	// 		if (&snake == &m_snakes[0])
+	// 			m_winner = __FIRST_SNAKE;
+	// 		else
+	// 			m_winner = __SECOND_SNAKE;
+	// 		return;
+	// 	}
+	// }
+
+	size_t	alive_count = std::count_if(
+		m_snakes.begin(),
+		m_snakes.end(),
+		[](const Snake &snake) { return snake.alive; }
+	);
+
+	if (alive_count == 0) {
+		m_state = m_player_count == 2 ? GameState::DRAW : GameState::GAME_OVER;
+	} else if (m_player_count == 2 && alive_count == 1) {
+		m_state = GameState::WON;
+		m_winner = m_snakes[0].alive ? __FIRST_SNAKE : __SECOND_SNAKE;
 	}
 }
 

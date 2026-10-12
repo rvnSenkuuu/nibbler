@@ -46,6 +46,7 @@ enum class GameState : int {
 	RUNNING,
 	GAME_OVER,
 	WON,
+	DRAW,
 	QUIT
 };
 
@@ -62,4 +63,5 @@ struct GameData {
 	size_t	width;
 	size_t	height;
 	GameState	state;
+	int	winner;
 };
