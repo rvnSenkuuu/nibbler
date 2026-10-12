@@ -7,6 +7,8 @@ const sf::Color	RAYWHITE_C(245, 245, 245);
 const sf::Color	RED_C(255, 0, 0);
 const sf::Color	DARKGREEN_C(0, 117, 44);
 const sf::Color	GREEN_C(0, 228, 48);
+const sf::Color	DARKBLUE_C(0, 82, 172);
+const sf::Color	BLUE_C(0, 121, 241);
 
 class GraphicLib : public IGraphic {
 	public:
@@ -19,7 +21,8 @@ class GraphicLib : public IGraphic {
 			m_window = new sf::RenderWindow(
 				sf::VideoMode(width * CELL_SIZE, height * CELL_SIZE),
 				"Nibbler",
-				sf::Style::Default);
+				sf::Style::Default
+			);
 
 			m_font = new sf::Font();
 			if (!m_font->loadFromFile(FONT_PATH)) {
@@ -31,24 +34,22 @@ class GraphicLib : public IGraphic {
 		void	render_game(const GameData &data) override
 		{
 			m_window->clear(sf::Color::Black);
-
-			sf::Text	score;
-			score.setFont(*m_font);
-			score.setString("Score: " + std::to_string(data.score));
-			score.setCharacterSize(20);
-			score.setFillColor(RAYWHITE_C);
-			score.setPosition(15, 15);
-			m_window->draw(score);
-
-			for (size_t i = 0; i < data.snake.size(); i++) {
-				const auto	&pos = data.snake.at(i);
-				draw_cell(pos.x, pos.y, i == 0 ? DARKGREEN_C : GREEN_C);
+			
+			const sf::Color	p1_color[2] = {DARKGREEN_C, GREEN_C};
+			const sf::Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
+		
+			draw_score(data.snakes, p1_color[1], p2_color[1]);
+			for (size_t i = 0; i < data.snakes.size(); i++) {
+				Snake	snake = data.snakes[i];
+				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
 			}
 
 			sf::RectangleShape	food(sf::Vector2f(CELL_SIZE, CELL_SIZE));
 			food.setFillColor(RED_C);
-			food.setPosition(sf::Vector2f(static_cast<float>(data.food.x * CELL_SIZE), 
-				static_cast<float>(data.food.y * CELL_SIZE)));
+			food.setPosition(sf::Vector2f(
+				static_cast<float>(data.food.x * CELL_SIZE), 
+				static_cast<float>(data.food.y * CELL_SIZE))
+			);
 			m_window->draw(food);
 
 			m_window->display();
@@ -62,7 +63,6 @@ class GraphicLib : public IGraphic {
 
 			auto	draw_centered = [&](const std::string &str, float y) {
 				sf::Text	text;
-
 				text.setFont(*m_font);
 				text.setString(str);
 				text.setCharacterSize(font_size);
@@ -78,7 +78,7 @@ class GraphicLib : public IGraphic {
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" :  "Game Over !";
 			draw_centered(end_msg, start_y);
-			draw_centered("Your score: " + std::to_string(data.score), start_y + 45);
+			draw_centered("Your score: " + std::to_string(data.snakes[0].score), start_y + 45);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100);
 
 			m_window->display();
@@ -99,12 +99,20 @@ class GraphicLib : public IGraphic {
 					case sf::Keyboard::Num3:
 						return Event::LIB3;
 					case sf::Keyboard::W:
-						return Event::UP;
+						return Event::W;
 					case sf::Keyboard::S:
-						return Event::DOWN;
+						return Event::S;
 					case sf::Keyboard::A:
-						return Event::LEFT;
+						return Event::A;
 					case sf::Keyboard::D:
+						return Event::D;
+					case sf::Keyboard::Up:
+						return Event::UP;
+					case sf::Keyboard::Down:
+						return Event::DOWN;
+					case sf::Keyboard::Left:
+						return Event::LEFT;
+					case sf::Keyboard::Right:
 						return Event::RIGHT;
 					case sf::Keyboard::Escape:
 						return Event::QUIT;
@@ -133,13 +141,36 @@ class GraphicLib : public IGraphic {
 			GraphicLib(const GraphicLib &other) = delete;
 			GraphicLib	&operator=(const GraphicLib &other) = delete;
 
-			void	draw_cell(int x, int y, sf::Color color)
+			void	draw_score(const std::vector<Snake> &snakes, sf::Color p1, sf::Color p2)
 			{
-				sf::RectangleShape	cell(sf::Vector2f(CELL_SIZE, CELL_SIZE));
-				cell.setFillColor(color);
-				cell.setPosition(sf::Vector2f(static_cast<float>(x * CELL_SIZE),
-					static_cast<float>(y * CELL_SIZE)));
-				m_window->draw(cell);
+				sf::Text	score;
+				score.setFont(*m_font);
+				score.setCharacterSize(20);
+				score.setString("P1 Score: " + std::to_string(snakes[0].score));
+				score.setFillColor(p1);
+				score.setPosition(10, 10);
+				m_window->draw(score);
+				
+				if (snakes.size() == 2) {
+					score.setString("P2 Score: " + std::to_string(snakes[1].score));
+					score.setFillColor(p2);
+					score.setPosition(10, 40);
+					m_window->draw(score);
+				}
+			}
+
+			void	draw_snake(const Snake &snake, const sf::Color &head_color, const sf::Color &body_color)
+			{
+				for (auto &pos : snake.body) {
+					sf::RectangleShape	cell(sf::Vector2f(CELL_SIZE, CELL_SIZE));
+					sf::Color	color = (pos == snake.body[0]) ? head_color : body_color;
+					cell.setFillColor(color);
+					cell.setPosition(sf::Vector2f(
+						static_cast<float>(pos.x * CELL_SIZE),
+						static_cast<float>(pos.y * CELL_SIZE))
+					);
+					m_window->draw(cell);
+				}
 			}
 
 			sf::RenderWindow	*m_window;

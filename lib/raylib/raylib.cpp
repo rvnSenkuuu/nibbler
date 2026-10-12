@@ -20,15 +20,15 @@ class GraphicLib : public IGraphic {
 			BeginDrawing();
 			ClearBackground(BLACK);
 
-			for (size_t i = 0; i < data.snake.size(); i++) {
-				const auto	&pos = data.snake.at(i);
-				Color	color = i == 0 ? DARKGREEN : GREEN;
-				DrawRectangle(pos.x * CELL_SIZE, pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, color);
+			const Color	p1_color[2] = {DARKGREEN, GREEN};
+			const Color	p2_color[2] = {DARKBLUE, BLUE};
+			for (size_t i = 0; i < data.snakes.size(); i++) {
+				Snake	snake = data.snakes[i];
+				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
 			}
 
 			DrawCircle(data.food.x * CELL_SIZE + 15, data.food.y * CELL_SIZE + 15, 15.f, RED);
-			DrawText(TextFormat("Score: %zu", data.score), 10, 10, 20, RAYWHITE);
-
+			draw_score(data.snakes, p1_color[1], p2_color[1]);
 			EndDrawing();
 		}
 
@@ -48,7 +48,7 @@ class GraphicLib : public IGraphic {
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
 			draw_centered(end_msg, start_y);
-			draw_centered(TextFormat("Your score: %zu", data.score), start_y + 45);
+			draw_centered(TextFormat("Your score: %zu", data.snakes[0].score), start_y + 45);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100);
 
 			EndDrawing();
@@ -63,12 +63,20 @@ class GraphicLib : public IGraphic {
 			case KEY_ENTER:
 				return Event::RESTART;
 			case KEY_W:
-				return Event::UP;
+				return Event::W;
 			case KEY_S:
-				return Event::DOWN;
+				return Event::S;
 			case KEY_A:
-				return Event::LEFT;
+				return Event::A;
 			case KEY_D:
+				return Event::D;
+			case KEY_UP:
+				return Event::UP;
+			case KEY_DOWN:
+				return Event::DOWN;
+			case KEY_LEFT:
+				return Event::LEFT;
+			case KEY_RIGHT:
 				return Event::RIGHT;
 			case KEY_ONE:
 				return Event::LIB1;
@@ -86,6 +94,22 @@ class GraphicLib : public IGraphic {
 		{
 			CloseWindow();
 		}
+
+		private:
+			void	draw_snake(const Snake &snake, const Color &head_color, const Color &body_color)
+			{
+				for (auto &pos : snake.body) {
+					Color	color = (pos == snake.body[0]) ? head_color : body_color;
+					DrawRectangle(pos.x * CELL_SIZE, pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, color);
+				}
+			}
+
+			void	draw_score(const std::vector<Snake> &snakes, Color p1, Color p2)
+			{
+				DrawText(TextFormat("P1 Score: %zu", snakes[0].score), 10, 10, 20, p1);
+				if (snakes.size() == 2)
+					DrawText(TextFormat("P2 Score: %zu", snakes[1].score), 10, 40, 20, p2);
+			}
 };
 
 GraphicLib	lib;

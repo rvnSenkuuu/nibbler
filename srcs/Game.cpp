@@ -51,9 +51,9 @@ void	Game::init_snakes(void)
 		p2.score = 0;
 		p2.alive = true;
 		p2.body.push_back({m_width / 2, row});
-		p2.body.push_back({m_width / 2 - 1, row});
-		p2.body.push_back({m_width / 2 - 2, row});
-		p2.body.push_back({m_width / 2 - 3, row});
+		p2.body.push_back({m_width / 2 + 1, row});
+		p2.body.push_back({m_width / 2 + 2, row});
+		p2.body.push_back({m_width / 2 + 3, row});
 
 		m_snakes.push_back(p2);
 	}
@@ -66,7 +66,8 @@ GameData	Game::get_data(void) const
 		.food = m_food,
 		.width = m_width,
 		.height = m_height,
-		.state = m_state};
+		.state = m_state
+	};
 
 	return data;
 }
@@ -182,9 +183,9 @@ void	Game::change_snake_dir(size_t snake_index, Event event)
 
 void	Game::update_game(void)
 {
-	for (size_t i = 0; i < m_snakes.size(); i++) {
-		if (m_snakes.at(i).alive)
-			move_snake(m_snakes.at(i));
+	for (auto &snake : m_snakes) {
+		if (snake.alive)
+			move_snake(snake);
 	}
 }
 
