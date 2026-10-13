@@ -4,11 +4,11 @@
 #include "IGraphic.hpp"
 
 const sf::Color	RAYWHITE_C(245, 245, 245);
-const sf::Color	RED_C(255, 0, 0);
-const sf::Color	DARKGREEN_C(0, 117, 44);
-const sf::Color	GREEN_C(0, 228, 48);
+const sf::Color	RED(255, 0, 0);
 const sf::Color	DARKBLUE_C(0, 82, 172);
 const sf::Color	BLUE_C(0, 121, 241);
+const sf::Color	DARKBROWN_C(76, 63, 47);
+const sf::Color	BROWN_C(127, 106, 79);
 
 class GraphicLib : public IGraphic {
 	public:
@@ -41,11 +41,12 @@ class GraphicLib : public IGraphic {
 				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
 			}
 
+			sf::Color	food_color = get_food_color(data.food.type);
 			sf::RectangleShape	food(sf::Vector2f(CELL_SIZE, CELL_SIZE));
-			food.setFillColor(RED_C);
+			food.setFillColor(food_color);
 			food.setPosition(sf::Vector2f(
-				static_cast<float>(data.food.x * CELL_SIZE), 
-				static_cast<float>(data.food.y * CELL_SIZE))
+				static_cast<float>(data.food.pos.x * CELL_SIZE), 
+				static_cast<float>(data.food.pos.y * CELL_SIZE))
 			);
 			m_window->draw(food);
 
@@ -55,8 +56,8 @@ class GraphicLib : public IGraphic {
 		void	render_end_game(const GameData &data)
 		{
 			const int	font_size = 20;
-			const float	center_x = data.width * CELL_SIZE / 2.f;
-			const float	start_y = data.height * CELL_SIZE / 2.f - (100 + font_size) / 2.f;
+			const float	center_x = data.config.width * CELL_SIZE / 2.f;
+			const float	start_y = data.config.height * CELL_SIZE / 2.f - (100 + font_size) / 2.f;
 
 			auto	draw_centered = [&](const std::string &str, float y, sf::Color color) {
 				sf::Text	text;
@@ -73,26 +74,26 @@ class GraphicLib : public IGraphic {
 
 			m_window->clear(sf::Color::Black);
 
-			if (data.snakes.size() == 2) {
+			if (data.config.opt_is_multi) {
 				std::string	game_winner;
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
 				else
 					game_winner = data.winner == data.snakes[0].id ? "P1 won !" : "P2 won !";
 
-				draw_centered(game_winner, start_y, RAYWHITE_C);
+				draw_centered(game_winner, start_y, sf::Color::White);
 				draw_centered("P1 Score: " + std::to_string(data.snakes[0].score), start_y + 30, p1_color[1]);
 				draw_centered("P2 Score: " + std::to_string(data.snakes[1].score), start_y + 60, p2_color[1]);
-				draw_centered("Press 'Enter' for restart the game", start_y + 90, RAYWHITE_C);
+				draw_centered("Press 'Enter' for restart the game", start_y + 90, sf::Color::White);
 				
 				m_window->display();
 				return;
 			}
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" :  "Game Over !";
-			draw_centered(end_msg, start_y, RAYWHITE_C);
-			draw_centered("Your score: " + std::to_string(data.snakes[0].score), start_y + 45, RAYWHITE_C);
-			draw_centered("Press 'Enter' for restart the game", start_y + 100, RAYWHITE_C);
+			draw_centered(end_msg, start_y, sf::Color::White);
+			draw_centered("Your score: " + std::to_string(data.snakes[0].score), start_y + 45, sf::Color::White);
+			draw_centered("Press 'Enter' for restart the game", start_y + 100, sf::Color::White);
 
 			m_window->display();
 		}
@@ -186,10 +187,20 @@ class GraphicLib : public IGraphic {
 				}
 			}
 
+			sf::Color	get_food_color(const FoodType &type)
+			{
+				sf::Color	food_color = sf::Color::Red;	
+				if (type == FoodType::FOOD_GREEN)
+					food_color = sf::Color::Green;
+				else if (type == FoodType::FOOD_YELLOW)
+					food_color = sf::Color::Yellow;
+				return food_color;
+			}
+
 			sf::RenderWindow	*m_window;
 			sf::Font	*m_font;
 
-			const sf::Color	p1_color[2] = {DARKGREEN_C, GREEN_C};
+			const sf::Color	p1_color[2] = {DARKBROWN_C, BROWN_C};
 			const sf::Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
 };
 

@@ -41,6 +41,12 @@ enum class GameState : int {
 	QUIT
 };
 
+enum class FoodType : int {
+	FOOD_RED,
+	FOOD_GREEN,
+	FOOD_YELLOW
+};
+
 struct Position {
 	size_t	x;
 	size_t	y;
@@ -51,6 +57,9 @@ struct Position {
 };
 
 struct GameConfig {
+	size_t	width;
+	size_t	height;
+
 	bool	opt_is_multi;
 	bool	opt_limit_score;
 	bool	opt_food_variance;
@@ -66,12 +75,28 @@ struct Snake {
 	bool	alive;
 };
 
+struct FoodKind {
+	FoodType	type;
+	int	score;
+	int	weight;
+};
+
+static const FoodKind	food_kinds[] = {
+	{FoodType::FOOD_RED, 10, 6},
+	{FoodType::FOOD_GREEN, 30, 3},
+	{FoodType::FOOD_YELLOW, 50, 1},
+};
+
+struct Food {
+	Position	pos;
+	FoodType	type;
+	int	given_score;
+};
+
 struct GameData {
 	std::vector<Snake>	snakes;
 	GameConfig	config;
-	Position	food;
-	size_t	width;
-	size_t	height;
+	Food	food;
 	GameState	state;
 	int	winner;
 };

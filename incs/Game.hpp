@@ -30,6 +30,8 @@ class Game {
 		void	move_snake(Snake &snake);
 		void	change_snake_dir(size_t snake_index, Event event);
 		void	handle_event(Lib &lib, Event &event);
+
+		const FoodKind	&get_food_kind(void);
 	
 	private:
 		Game() = default;
@@ -40,13 +42,10 @@ class Game {
 		Event	get_event_dir(Event event);
 
 	private:
-		size_t	m_width;
-		size_t	m_height;
-
 		size_t	m_player_count;
 		int	m_winner;
 		std::vector<Snake>	m_snakes;
-		Position	m_food;
+		Food	m_food;
 		std::mt19937	m_rng;
 		GameState	m_state;
 		GameConfig	m_config;

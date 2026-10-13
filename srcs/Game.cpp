@@ -1,23 +1,13 @@
 #include "Game.hpp"
 
 Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
-									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
+									m_config(), m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
 {
-	if (argc < 3)
-		throw std::invalid_argument("Invalid argument count");
-
 	if (!config_game(argc, argv, m_config))
 		throw std::invalid_argument("Failed to get game configuration");
-
-	m_width = std::stoi(argv[1]);
-	m_height = std::stoi(argv[2]);
-
+	
 	if (m_config.opt_is_multi)
 		m_player_count = 2;
-
-	//TODO: Check for higher value
-	if (m_width < 10 || m_height < 10)
-		throw std::invalid_argument("Width or height values too low");
 
 	init_snakes();
 	generate_food();
@@ -27,6 +17,16 @@ Game::~Game(void) { }
 
 bool	Game::config_game(int argc, char **argv, GameConfig &config)
 {
+	if (argc < 3)
+		throw std::invalid_argument("Invalid argument count");
+	
+	config.width = std::stoi(argv[1]);
+	config.height = std::stoi(argv[2]);
+
+	//TODO: Check for higher value
+	if (config.width < 10 || config.height < 10)
+		throw std::invalid_argument("Width or height values too low");
+
 	for (int i = 3; i < argc; i++) {
 		std::string	arg = argv[i];
 		
@@ -37,7 +37,7 @@ bool	Game::config_game(int argc, char **argv, GameConfig &config)
 			if (argv[++i] == nullptr)
 				return false;
 			config.max_score = std::strtoll(argv[i], nullptr, 10);
-			if (errno == ERANGE)
+			if (config.max_score <= 0 || config.max_score > std::numeric_limits<int>::max())
 				return false;
 		} else if (arg == "--food-variance") {
 			config.opt_food_variance = true;
@@ -53,32 +53,32 @@ void	Game::init_snakes(void)
 	m_snakes.reserve(m_player_count);
 	m_snakes.clear();
 
-	size_t	row = m_player_count == 2 ? m_height / 3 : m_height / 2;
+	size_t	row = m_player_count == 2 ? m_config.height / 3 : m_config.height / 2;
 
 	Snake	p1;
 	p1.direction = Event::LEFT;
 	p1.score = 0;
 	p1.id = __FIRST_SNAKE;
 	p1.alive = true;
-	p1.body.push_back({m_width / 2, row});
-	p1.body.push_back({m_width / 2 + 1, row});
-	p1.body.push_back({m_width / 2 + 2, row});
-	p1.body.push_back({m_width / 2 + 3, row});
+	p1.body.push_back({m_config.width / 2, row});
+	p1.body.push_back({m_config.width / 2 + 1, row});
+	p1.body.push_back({m_config.width / 2 + 2, row});
+	p1.body.push_back({m_config.width / 2 + 3, row});
 
 	m_snakes.push_back(p1);
 
 	if (m_player_count == 2) {
-		row = 2 * m_height / 3;
+		row = 2 * m_config.height / 3;
 
 		Snake	p2;
 		p2.direction = Event::LEFT;
 		p2.score = 0;
 		p2.id = __SECOND_SNAKE;
 		p2.alive = true;
-		p2.body.push_back({m_width / 2, row});
-		p2.body.push_back({m_width / 2 + 1, row});
-		p2.body.push_back({m_width / 2 + 2, row});
-		p2.body.push_back({m_width / 2 + 3, row});
+		p2.body.push_back({m_config.width / 2, row});
+		p2.body.push_back({m_config.width / 2 + 1, row});
+		p2.body.push_back({m_config.width / 2 + 2, row});
+		p2.body.push_back({m_config.width / 2 + 3, row});
 
 		m_snakes.push_back(p2);
 	}
@@ -90,8 +90,6 @@ GameData	Game::get_data(void) const
 		.snakes = m_snakes,
 		.config = m_config,
 		.food = m_food,
-		.width = m_width,
-		.height = m_height,
 		.state = m_state,
 		.winner = m_winner
 	};
@@ -120,15 +118,15 @@ void	Game::handle_event(Lib &lib, Event &event)
 			break;
 		case Event::LIB1:
 			if (lib.switch_lib(FIRST_LIB))
-				lib.create(m_width, m_height);
+				lib.create(m_config.width, m_config.height);
 			break;
 		case Event::LIB2:
 			if (lib.switch_lib(SECOND_LIB))
-				lib.create(m_width, m_height);
+				lib.create(m_config.width, m_config.height);
 			break;
 		case Event::LIB3:
 			if (lib.switch_lib(THIRD_LIB))
-				lib.create(m_width, m_height);
+				lib.create(m_config.width, m_config.height);
 			break;
 		default:
 			break;
@@ -138,7 +136,7 @@ void	Game::handle_event(Lib &lib, Event &event)
 
 void	Game::run(Lib &lib)
 {
-	lib.create(m_width, m_height);
+	lib.create(m_config.width, m_config.height);
 	while (true) {
 		Event	event = lib.get_event();
 		if (event == Event::QUIT)
@@ -160,7 +158,7 @@ void	Game::run(Lib &lib)
 void	Game::check_collision(Snake &current)
 {
 	Position	head = current.body.front();
-	if (head.x >= m_width || head.y >= m_height) {
+	if (head.x >= m_config.width || head.y >= m_config.height) {
 		m_state = GameState::GAME_OVER;
 		current.alive = false;
 		return;
@@ -276,7 +274,7 @@ void	Game::move_snake(Snake &snake)
 		break;
 	}
 
-	bool	is_food = (head == m_food);
+	bool	is_food = (head == m_food.pos);
 	snake.body.push_front(head);
 
 	if (!is_food) {
@@ -284,18 +282,32 @@ void	Game::move_snake(Snake &snake)
 		return;
 	}
 
-	snake.score += 10;
-	if (snake.body.size() == m_width * m_height) {
-		m_state = GameState::WON;
-	} else {
-		generate_food();
+	snake.score += m_food.given_score;
+	generate_food();
+}
+
+const FoodKind	&Game::get_food_kind(void)
+{
+	int	total = 0;
+	for (const auto &kind : food_kinds)
+		total += kind.weight;
+
+	std::uniform_int_distribution<int>	dist(0, total - 1);
+	int	roll = dist(m_rng);
+
+	for (const auto &kind : food_kinds) {
+		if (roll < kind.weight)
+			return kind;
+		roll -= kind.weight;
 	}
+	
+	return food_kinds[0]; 
 }
 
 void	Game::generate_food(void)
 {
-	std::uniform_int_distribution<size_t>	x_pos(0, m_width - 1);
-	std::uniform_int_distribution<size_t>	y_pos(0, m_height - 1);
+	std::uniform_int_distribution<size_t>	x_pos(0, m_config.width - 1);
+	std::uniform_int_distribution<size_t>	y_pos(0, m_config.height - 1);
 
 	bool	valid_pos = false;
 	Position	pos;
@@ -309,7 +321,11 @@ void	Game::generate_food(void)
 			}
 		}
 	}
-	m_food = pos;
+
+	const FoodKind	&kind = m_config.opt_food_variance ? get_food_kind() : food_kinds[0];
+	m_food.pos = pos;
+	m_food.type = kind.type;
+	m_food.given_score = kind.score;
 }
 
 void	Game::reset_game(void)

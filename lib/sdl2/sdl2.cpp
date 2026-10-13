@@ -12,6 +12,9 @@ static constexpr SDL_Color	DARKBLUE_C = {0, 82, 172, 255};
 static constexpr SDL_Color	BLUE_C = {0, 121, 241, 255};
 static constexpr SDL_Color	RED_C = {255, 0, 0, 255};
 static constexpr SDL_Color	RAYWHITE_C = {245, 245, 245, 255};
+static constexpr SDL_Color	YELLOW_C = {253, 249, 0, 255};
+static constexpr SDL_Color	DARKORANGE_C = {255, 161, 0, 255};
+static constexpr SDL_Color	ORANGE_C = {255, 205, 4, 255};
 
 class GraphicLib : public IGraphic {
 	public:
@@ -64,10 +67,10 @@ class GraphicLib : public IGraphic {
 				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
 			}
 
-			draw_cell(data.food.x, data.food.y, RED_C);
-			draw_text("P1 Score: " + std::to_string(data.snakes[0].score), 10, 10, GREEN_C);
+			draw_cell(data.food.pos.x, data.food.pos.y,  get_food_color(data.food.type));
+			draw_text("P1 Score: " + std::to_string(data.snakes[0].score), 10, 10, p1_color[1]);
 			if (data.snakes.size() == 2)
-				draw_text("P2 Score: " + std::to_string(data.snakes[0].score), 10, 40, BLUE_C);
+				draw_text("P2 Score: " + std::to_string(data.snakes[0].score), 10, 40, p2_color[1]);
 			SDL_RenderPresent(m_renderer);
 		}
 
@@ -76,10 +79,10 @@ class GraphicLib : public IGraphic {
 			SDL_SetRenderDrawColor(m_renderer, BLACK_C.r, BLACK_C.g, BLACK_C.b, BLACK_C.a);
 			SDL_RenderClear(m_renderer);
 
-			const int	center_x = data.width * CELL_SIZE / 2;
-			const int	start_y = data.height * CELL_SIZE / 2 - (100 + 20) / 2;
+			const int	center_x = data.config.width * CELL_SIZE / 2;
+			const int	start_y = data.config.height * CELL_SIZE / 2 - (100 + 20) / 2;
 
-			if (data.snakes.size() == 2) {
+			if (data.config.opt_is_multi) {
 				std::string	game_winner;
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
@@ -97,7 +100,7 @@ class GraphicLib : public IGraphic {
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
 			draw_text_centered(end_msg, center_x, start_y, RAYWHITE_C);
-			draw_text_centered("Your score: " + std::to_string(data.snakes[0].score), center_x, start_y + 45, RAYWHITE_C);
+			draw_text_centered("Your score: " + std::to_string(data.snakes[0].score), center_x, start_y + 45, p1_color[1]);
 			draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 100, RAYWHITE_C);
 
 			SDL_RenderPresent(m_renderer);
@@ -135,6 +138,7 @@ class GraphicLib : public IGraphic {
 						return Event::RIGHT;
 					case SDL_SCANCODE_ESCAPE:
 						return Event::QUIT;
+					case SDL_SCANCODE_RETURN:
 					case SDL_SCANCODE_KP_ENTER:
 						return Event::RESTART;
 					default:
@@ -217,11 +221,21 @@ class GraphicLib : public IGraphic {
 				draw_text(text, center_x - w / 2, y, color);
 			}
 
+			SDL_Color	get_food_color(const FoodType &type)
+			{
+				SDL_Color	food_color = RED_C;	
+				if (type == FoodType::FOOD_GREEN)
+					food_color = GREEN_C;
+				else if (type == FoodType::FOOD_YELLOW)
+					food_color = YELLOW_C;
+				return food_color;
+			}
+
 			SDL_Window	*m_window;
 			SDL_Renderer	*m_renderer;
 			TTF_Font	*m_font;
 
-			const SDL_Color	p1_color[2] = {DARKGREEN_C, GREEN_C};
+			const SDL_Color	p1_color[2] = {DARKORANGE_C, ORANGE_C};
 			const SDL_Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
 };
 

@@ -4,7 +4,7 @@
 #include "Types.hpp"
 #include "IGraphic.hpp"
 
-const Color	p1_color[2] = {DARKGREEN, GREEN};
+const Color	p1_color[2] = {DARKPURPLE, PURPLE};
 const Color	p2_color[2] = {DARKBLUE, BLUE};
 
 class GraphicLib : public IGraphic {
@@ -28,7 +28,11 @@ class GraphicLib : public IGraphic {
 				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
 			}
 
-			DrawCircle(data.food.x * CELL_SIZE + 15, data.food.y * CELL_SIZE + 15, 15.f, RED);
+			DrawCircle(
+				data.food.pos.x * CELL_SIZE + 15,
+				data.food.pos.y * CELL_SIZE + 15, 15.f,
+				get_food_color(data.food.type)
+			);
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
 			EndDrawing();
 		}
@@ -39,15 +43,15 @@ class GraphicLib : public IGraphic {
 			ClearBackground(BLACK);
 
 			const int	font_size = 20;
-			const int	center_x = data.width * CELL_SIZE / 2;
-			const int	start_y = data.height * CELL_SIZE / 2 - (100 + font_size) / 2;
+			const int	center_x = data.config.width * CELL_SIZE / 2;
+			const int	start_y = data.config.height * CELL_SIZE / 2 - (100 + font_size) / 2;
 
 			auto	draw_centered = [&](const std::string &text, int y, Color color) {
 				int	text_width = MeasureText(text.c_str(), font_size);
 				DrawText(text.c_str(), center_x - text_width / 2, y, font_size, color);
 			};
 
-			if (data.snakes.size() == 2) {
+			if (data.config.opt_is_multi) {
 				std::string	game_winner;
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
@@ -125,6 +129,16 @@ class GraphicLib : public IGraphic {
 				DrawText(TextFormat("P1 Score: %zu", snakes[0].score), 10, 10, 20, p1);
 				if (snakes.size() == 2)
 					DrawText(TextFormat("P2 Score: %zu", snakes[1].score), 10, 40, 20, p2);
+			}
+
+			Color	get_food_color(const FoodType &type)
+			{
+				Color	food_color = RED;	
+				if (type == FoodType::FOOD_GREEN)
+					food_color = GREEN;
+				else if (type == FoodType::FOOD_YELLOW)
+					food_color = YELLOW;
+				return food_color;
 			}
 };
 
