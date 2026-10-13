@@ -16,11 +16,12 @@ void	usage(void);
 class Game {
 	public:
 		Game(int argc, char **argv);
-		~Game();
+		~Game() { };
 
 		GameData	get_data(void) const;
 
-		bool	config_game(int argc, char **argv, GameConfig &config);
+		[[nodiscard]] bool	is_board_full(void);
+		[[nodiscard]] bool	get_game_config(int argc, char **argv, GameConfig &config);
 		void	init_snakes();
 		void	run(Lib &lib);
 		void	update_game(void);

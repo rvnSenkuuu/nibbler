@@ -9,7 +9,7 @@ static const FoodKind	food_kinds[] = {
 Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
 									m_config(), m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
 {
-	if (!config_game(argc, argv, m_config))
+	if (!get_game_config(argc, argv, m_config))
 		throw std::invalid_argument("Failed to get game configuration");
 	
 	if (m_config.opt_is_multi)
@@ -19,9 +19,7 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	generate_food();
 }
 
-Game::~Game(void) { }
-
-bool	Game::config_game(int argc, char **argv, GameConfig &config)
+bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 {
 	if (argc < 3)
 		throw std::invalid_argument("Invalid argument count");
@@ -219,6 +217,16 @@ void	Game::change_snake_dir(size_t snake_index, Event event)
 		snake.direction = get_event_dir(event);
 }
 
+bool	Game::is_board_full(void)
+{
+	size_t	total = 0;
+	for (auto &snake : m_snakes) {
+		total += snake.body.size();
+	}
+
+	return total >= m_config.width * m_config.height;
+}
+
 void	Game::update_game(void)
 {
 	for (auto &snake : m_snakes) {
@@ -256,6 +264,16 @@ void	Game::update_game(void)
 	} else if (m_player_count == 2 && alive_count == 1) {
 		m_state = GameState::WON;
 		m_winner = m_snakes[0].alive ? __FIRST_SNAKE : __SECOND_SNAKE;
+	} else if (is_board_full()) {
+		if (m_player_count == 1) {
+			m_state = GameState::WON;
+			m_winner = __FIRST_SNAKE;
+		} else if (m_snakes[0].body.size() == m_snakes[1].body.size()) {
+			m_state = GameState::DRAW;
+		} else {
+			m_state = GameState::WON;
+			m_winner = m_snakes[0].body.size() > m_snakes[0].body.size() ? __FIRST_SNAKE : __SECOND_SNAKE;
+		}
 	}
 }
 
