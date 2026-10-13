@@ -59,9 +59,6 @@ class GraphicLib : public IGraphic {
 			SDL_SetRenderDrawColor(m_renderer, 0x18, 0x18, 0x18, 0xFF);
 			SDL_RenderClear(m_renderer);
 
-			const SDL_Color	p1_color[2] = {DARKGREEN_C, GREEN_C};
-			const SDL_Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
-
 			for (size_t i = 0; i < data.snakes.size(); i++) {
 				Snake	snake = data.snakes[i];
 				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
@@ -81,6 +78,20 @@ class GraphicLib : public IGraphic {
 
 			const int	center_x = data.width * CELL_SIZE / 2;
 			const int	start_y = data.height * CELL_SIZE / 2 - (100 + 20) / 2;
+
+			if (data.snakes.size() == 2) {
+				std::string	game_winner;
+				if (data.state == GameState::DRAW)
+					game_winner = "Draw !";
+				else
+					game_winner = data.winner == __FIRST_SNAKE ? "P1 won !" : "P2 won !";
+				draw_text_centered(game_winner, center_x, start_y, RAYWHITE_C);
+				draw_text_centered("P1 Score: " + std::to_string(data.snakes[0].score), center_x, start_y + 30, p1_color[1]);
+				draw_text_centered("P2 Score: " + std::to_string(data.snakes[1].score), center_x, start_y + 60, p2_color[1]);
+				draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 90, RAYWHITE_C);
+				SDL_RenderPresent(m_renderer);
+				return;
+			}
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
 			draw_text_centered(end_msg, center_x, start_y, RAYWHITE_C);
@@ -207,6 +218,9 @@ class GraphicLib : public IGraphic {
 			SDL_Window	*m_window;
 			SDL_Renderer	*m_renderer;
 			TTF_Font	*m_font;
+
+			const SDL_Color	p1_color[2] = {DARKGREEN_C, GREEN_C};
+			const SDL_Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
 };
 
 GraphicLib	lib;
@@ -219,7 +233,7 @@ extern "C" {
 
 	void	render_game(const GameData &data)
 	{
-		if (data.state == GameState::GAME_OVER || data.state == GameState::WON) {
+		if (data.state == GameState::GAME_OVER || data.state == GameState::WON || data.state == GameState::DRAW) {
 			lib.render_end_game(data);
 			return;
 		}

@@ -34,9 +34,6 @@ class GraphicLib : public IGraphic {
 		void	render_game(const GameData &data) override
 		{
 			m_window->clear(sf::Color::Black);
-			
-			const sf::Color	p1_color[2] = {DARKGREEN_C, GREEN_C};
-			const sf::Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
 		
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
 			for (size_t i = 0; i < data.snakes.size(); i++) {
@@ -61,12 +58,12 @@ class GraphicLib : public IGraphic {
 			const float	center_x = data.width * CELL_SIZE / 2.f;
 			const float	start_y = data.height * CELL_SIZE / 2.f - (100 + font_size) / 2.f;
 
-			auto	draw_centered = [&](const std::string &str, float y) {
+			auto	draw_centered = [&](const std::string &str, float y, sf::Color color) {
 				sf::Text	text;
 				text.setFont(*m_font);
 				text.setString(str);
 				text.setCharacterSize(font_size);
-				text.setFillColor(RAYWHITE_C);
+				text.setFillColor(color);
 
 				sf::FloatRect	bounds = text.getLocalBounds();
 				text.setPosition(center_x - bounds.width / 2.f, y);
@@ -76,10 +73,24 @@ class GraphicLib : public IGraphic {
 
 			m_window->clear(sf::Color::Black);
 
+			if (data.snakes.size() == 2) {
+				std::string	game_winner;
+				if (data.state == GameState::DRAW)
+					game_winner = "Draw !";
+				else
+					game_winner = data.winner == __FIRST_SNAKE ? "P1 won !" : "P2 won !";
+				draw_centered(game_winner, start_y, RAYWHITE_C);
+				draw_centered("P1 Score: " + std::to_string(data.snakes[0].score), start_y + 30, p1_color[1]);
+				draw_centered("P2 Score: " + std::to_string(data.snakes[1].score), start_y + 60, p2_color[1]);
+				draw_centered("Press 'Enter' for restart the game", start_y + 90, RAYWHITE_C);
+				m_window->display();
+				return;
+			}
+
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" :  "Game Over !";
-			draw_centered(end_msg, start_y);
-			draw_centered("Your score: " + std::to_string(data.snakes[0].score), start_y + 45);
-			draw_centered("Press 'Enter' for restart the game", start_y + 100);
+			draw_centered(end_msg, start_y, RAYWHITE_C);
+			draw_centered("Your score: " + std::to_string(data.snakes[0].score), start_y + 45, RAYWHITE_C);
+			draw_centered("Press 'Enter' for restart the game", start_y + 100, RAYWHITE_C);
 
 			m_window->display();
 		}
@@ -175,6 +186,9 @@ class GraphicLib : public IGraphic {
 
 			sf::RenderWindow	*m_window;
 			sf::Font	*m_font;
+
+			const sf::Color	p1_color[2] = {DARKGREEN_C, GREEN_C};
+			const sf::Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
 };
 
 GraphicLib	lib;
@@ -187,7 +201,7 @@ extern "C" {
 
 	void	render_game(const GameData &data)
 	{
-		if (data.state == GameState::GAME_OVER || data.state == GameState::WON) {
+		if (data.state == GameState::GAME_OVER || data.state == GameState::WON || data.state == GameState::DRAW) {
 			lib.render_end_game(data);
 			return;
 		}
