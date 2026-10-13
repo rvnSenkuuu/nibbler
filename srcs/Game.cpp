@@ -1,5 +1,11 @@
 #include "Game.hpp"
 
+static const FoodKind	food_kinds[] = {
+	{FoodType::FOOD_RED, 10, 6},
+	{FoodType::FOOD_GREEN, 30, 3},
+	{FoodType::FOOD_YELLOW, 50, 1},
+};
+
 Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
 									m_config(), m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
 {

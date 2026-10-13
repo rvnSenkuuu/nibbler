@@ -81,12 +81,6 @@ struct FoodKind {
 	int	weight;
 };
 
-static const FoodKind	food_kinds[] = {
-	{FoodType::FOOD_RED, 10, 6},
-	{FoodType::FOOD_GREEN, 30, 3},
-	{FoodType::FOOD_YELLOW, 50, 1},
-};
-
 struct Food {
 	Position	pos;
 	FoodType	type;
