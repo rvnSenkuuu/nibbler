@@ -11,6 +11,8 @@
 #include "Lib.hpp"
 #include "Types.hpp"
 
+void	usage(void);
+
 class Game {
 	public:
 		Game(int argc, char **argv);
@@ -18,6 +20,7 @@ class Game {
 
 		GameData	get_data(void) const;
 
+		bool	config_game(int argc, char **argv, GameConfig &config);
 		void	init_snakes();
 		void	run(Lib &lib);
 		void	update_game(void);
@@ -46,6 +49,7 @@ class Game {
 		Position	m_food;
 		std::mt19937	m_rng;
 		GameState	m_state;
+		GameConfig	m_config;
 
 		float	m_tick_rate;
 		std::chrono::steady_clock::time_point	m_last_update_time;

@@ -84,11 +84,13 @@ class GraphicLib : public IGraphic {
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
 				else
-					game_winner = data.winner == __FIRST_SNAKE ? "P1 won !" : "P2 won !";
+					game_winner = data.winner == data.snakes[0].id ? "P1 won !" : "P2 won !";
+
 				draw_text_centered(game_winner, center_x, start_y, RAYWHITE_C);
 				draw_text_centered("P1 Score: " + std::to_string(data.snakes[0].score), center_x, start_y + 30, p1_color[1]);
 				draw_text_centered("P2 Score: " + std::to_string(data.snakes[1].score), center_x, start_y + 60, p2_color[1]);
 				draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 90, RAYWHITE_C);
+				
 				SDL_RenderPresent(m_renderer);
 				return;
 			}

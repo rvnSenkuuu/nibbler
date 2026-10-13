@@ -3,17 +3,17 @@
 Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
 									m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
 {
-	if (argc < 3 || argc > 4)
-		throw std::invalid_argument("Usage: ./nibbler <width> <height> [--multi]");
+	if (argc < 3)
+		throw std::invalid_argument("Invalid argument count");
+
+	if (!config_game(argc, argv, m_config))
+		throw std::invalid_argument("Failed to get game configuration");
 
 	m_width = std::stoi(argv[1]);
 	m_height = std::stoi(argv[2]);
 
-	if (argc == 4) {
-		if (std::string(argv[3]) != "--multi")
-			throw std::invalid_argument("Unknown option (expected --multi)");
+	if (m_config.opt_is_multi)
 		m_player_count = 2;
-	}
 
 	//TODO: Check for higher value
 	if (m_width < 10 || m_height < 10)
@@ -25,6 +25,29 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 
 Game::~Game(void) { }
 
+bool	Game::config_game(int argc, char **argv, GameConfig &config)
+{
+	for (int i = 3; i < argc; i++) {
+		std::string	arg = argv[i];
+		
+		if (arg == "--multi") {
+			config.opt_is_multi = true;
+		} else if (arg == "--limit-score") {
+			config.opt_limit_score = true;
+			if (argv[++i] == nullptr)
+				return false;
+			config.max_score = std::strtoll(argv[i], nullptr, 10);
+			if (errno == ERANGE)
+				return false;
+		} else if (arg == "--food-variance") {
+			config.opt_food_variance = true;
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
 void	Game::init_snakes(void)
 {
 	m_snakes.reserve(m_player_count);
@@ -35,6 +58,7 @@ void	Game::init_snakes(void)
 	Snake	p1;
 	p1.direction = Event::LEFT;
 	p1.score = 0;
+	p1.id = __FIRST_SNAKE;
 	p1.alive = true;
 	p1.body.push_back({m_width / 2, row});
 	p1.body.push_back({m_width / 2 + 1, row});
@@ -49,6 +73,7 @@ void	Game::init_snakes(void)
 		Snake	p2;
 		p2.direction = Event::LEFT;
 		p2.score = 0;
+		p2.id = __SECOND_SNAKE;
 		p2.alive = true;
 		p2.body.push_back({m_width / 2, row});
 		p2.body.push_back({m_width / 2 + 1, row});
@@ -63,6 +88,7 @@ GameData	Game::get_data(void) const
 {
 	return (GameData) {
 		.snakes = m_snakes,
+		.config = m_config,
 		.food = m_food,
 		.width = m_width,
 		.height = m_height,
@@ -201,17 +227,19 @@ void	Game::update_game(void)
 			check_collision(snake);
 	}
 
-	//Test need to remove
-	// for (auto &snake : m_snakes) {
-	// 	if (snake.alive && snake.score == 20) {
-	// 		m_state = GameState::DRAW;
-	// 		if (&snake == &m_snakes[0])
-	// 			m_winner = __FIRST_SNAKE;
-	// 		else
-	// 			m_winner = __SECOND_SNAKE;
-	// 		return;
-	// 	}
-	// }
+	if (m_config.opt_limit_score) {
+		size_t	max = m_config.max_score;
+		auto	it = std::find_if(
+			m_snakes.begin(),
+			m_snakes.end(),
+			[&max](const auto &snake) { return snake.score >= max; }
+		);
+
+		if (it != m_snakes.end()) {
+			m_state = GameState::WON;
+			m_winner = it->id;
+		}
+	}
 
 	size_t	alive_count = std::count_if(
 		m_snakes.begin(),

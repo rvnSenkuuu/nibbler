@@ -52,7 +52,8 @@ class GraphicLib : public IGraphic {
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
 				else
-					game_winner = data.winner == __FIRST_SNAKE ? "P1 won !" : "P2 won !";
+					game_winner = data.winner == data.snakes[0].id ? "P1 won !" : "P2 won !";
+
 				draw_centered(game_winner, start_y, RAYWHITE);
 				draw_centered(TextFormat("P1 Score: %zu", data.snakes[0].score), start_y + 30, p1_color[1]);
 				draw_centered(TextFormat("P2 Score: %zu", data.snakes[1].score), start_y + 60, p2_color[1]);
