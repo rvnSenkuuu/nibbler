@@ -21,7 +21,7 @@ class GraphicLib : public IGraphic {
 			m_window = new sf::RenderWindow(
 				sf::VideoMode(width * CELL_SIZE, height * CELL_SIZE),
 				"Nibbler",
-				sf::Style::Default
+				sf::Style::Close
 			);
 
 			m_font = new sf::Font();
@@ -36,10 +36,11 @@ class GraphicLib : public IGraphic {
 			m_window->clear(sf::Color::Black);
 		
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
-			for (size_t i = 0; i < data.snakes.size(); i++) {
-				Snake	snake = data.snakes[i];
-				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
-			}
+			for (auto &snake : data.snakes)
+				draw_snake(snake, 
+					snake.id == __FIRST_SNAKE ? p1_color[0] : p2_color[0],
+					snake.id == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
+				);
 
 			sf::Color	food_color = get_food_color(data.food.type);
 			sf::RectangleShape	food(sf::Vector2f(CELL_SIZE, CELL_SIZE));
@@ -92,7 +93,7 @@ class GraphicLib : public IGraphic {
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" :  "Game Over !";
 			draw_centered(end_msg, start_y, sf::Color::White);
-			draw_centered("Your score: " + std::to_string(data.snakes[0].score), start_y + 45, sf::Color::White);
+			draw_centered("Your score: " + std::to_string(data.snakes[0].score), start_y + 45, p1_color[1]);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100, sf::Color::White);
 
 			m_window->display();

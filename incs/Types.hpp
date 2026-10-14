@@ -3,7 +3,7 @@
 #include <deque>
 #include <vector>
 
-#define CELL_SIZE 30
+#define CELL_SIZE 20
 #define FONT_PATH "./assets/font.ttf"
 
 #define __FIRST_SNAKE 0

@@ -41,8 +41,8 @@ class GraphicLib : public IGraphic {
 			}
 			
 			m_window = SDL_CreateWindow("Nibbler",
-				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-				width * CELL_SIZE, height * CELL_SIZE, 0
+				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED - 5,
+				width * CELL_SIZE, height * CELL_SIZE, SDL_WINDOW_SHOWN
 			);
 			if (!m_window) {
 				const std::string	err = SDL_GetError();
@@ -66,8 +66,8 @@ class GraphicLib : public IGraphic {
 			for (const auto &obstacle : data.obstacles)
 				draw_cell(obstacle.x, obstacle.y, WHITE_C);
 
-			for (const auto &snake : data.snakes)
-				draw_snake(snake,
+			for (auto &snake : data.snakes)
+				draw_snake(snake, 
 					snake.id == __FIRST_SNAKE ? p1_color[0] : p2_color[0],
 					snake.id == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
 				);
@@ -181,8 +181,8 @@ class GraphicLib : public IGraphic {
 				for (auto &pos : snake.body) {
 					const SDL_Color	color = (pos == snake.body[0]) ? head_color : body_color; 
 					const SDL_Rect	rect = {
-						.x = static_cast<int>(pos.x * CELL_SIZE),
-						.y = static_cast<int>(pos.y * CELL_SIZE),
+						.x = static_cast<int>(pos.x) * CELL_SIZE,
+						.y = static_cast<int>(pos.y) * CELL_SIZE,
 						.w = CELL_SIZE,
 						.h = CELL_SIZE
 					};

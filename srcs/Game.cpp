@@ -6,6 +6,11 @@ static const FoodKind	food_kinds[] = {
 	{FoodType::FOOD_YELLOW, 50, 1},
 };
 
+#define MIN_WIDTH 15
+#define MIN_HEIGHT 15
+#define MAX_WIDTH 50
+#define MAX_HEIGHT 50
+
 static const size_t	max_attempts = 1000;
 
 Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
@@ -32,14 +37,16 @@ bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 	config.width = std::stoi(argv[1]);
 	config.height = std::stoi(argv[2]);
 
-	//TODO: Check for higher value
-	if (config.width < 10 || config.height < 10)
-		throw std::invalid_argument("Width or height values too low");
+	if ((config.width < MIN_WIDTH && config.width > MAX_WIDTH) || (config.height < MIN_HEIGHT && config.height > MAX_HEIGHT))
+		throw std::invalid_argument("Width or height values too low or too high");
 
 	for (int i = 3; i < argc; i++) {
 		std::string	arg = argv[i];
 		
-		if (arg == "--multi") {
+		if (arg == "--help") {
+			usage();
+			std::exit(0);
+		} else if (arg == "--multi") {
 			config.opt_is_multi = true;
 		} else if (arg == "--limit-score") {
 			config.opt_limit_score = true;
@@ -425,5 +432,6 @@ void	Game::reset_game(void)
 		generate_obstacle();
 	generate_food();
 	m_state = GameState::RUNNING;
+	m_winner = -1;
 	m_last_update_time = std::chrono::steady_clock::now();
 }

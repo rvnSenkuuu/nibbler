@@ -33,16 +33,20 @@ class GraphicLib : public IGraphic {
 				DrawRectangleRoundedLines(rec, 0.15f, 0, 1.5f, WHITE);
 			}
 
-			for (size_t i = 0; i < data.snakes.size(); i++) {
-				Snake	snake = data.snakes[i];
-				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
-			}
+			for (auto &snake : data.snakes)
+				draw_snake(snake, 
+					snake.id == __FIRST_SNAKE ? p1_color[0] : p2_color[0],
+					snake.id == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
+				);
 
-			DrawCircle(
-				data.food.pos.x * CELL_SIZE + 15,
-				data.food.pos.y * CELL_SIZE + 15, 15.f,
-				get_food_color(data.food.type)
-			);
+			auto	food = data.food;
+			Rectangle	food_rec = {
+				.x = static_cast<float>(food.pos.x) * CELL_SIZE,
+				.y = static_cast<float>(food.pos.y) * CELL_SIZE,
+				.width = CELL_SIZE,
+				.height = CELL_SIZE,
+			};
+			DrawRectangleRounded(food_rec, 2.0f, 0, get_food_color(food.type));
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
 			
 			EndDrawing();
