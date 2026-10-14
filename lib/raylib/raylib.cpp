@@ -87,6 +87,9 @@ class GraphicLib : public IGraphic {
 
 		Event	get_event(void) override
 		{
+			if (WindowShouldClose())
+				return Event::QUIT;
+
 			int	key = GetKeyPressed();
 			switch (key) {
 			case KEY_ESCAPE:
