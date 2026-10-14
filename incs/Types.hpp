@@ -89,6 +89,7 @@ struct Food {
 
 struct GameData {
 	std::vector<Snake>	snakes;
+	std::vector<Position>	obstacles;
 	GameConfig	config;
 	Food	food;
 	GameState	state;

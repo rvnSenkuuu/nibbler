@@ -11,10 +11,11 @@ void	usage(void)
 	std::cout << "\t--limit-score [score]\n";
 	std::cout << "\t Can specify a score limit\n\n";
 	std::cout << "\t--food-variance\n";
-	std::cout << "\tThree type of apple (RED, GREEN, YELLOW) each apple give a different amount of points\n";
+	std::cout << "\tThree type of apple (RED, GREEN, YELLOW) each apple give a different amount of points\n\n";
+	std::cout << "\t--enable-obstacle\n";
+	std::cout << "\tCreate 10 obstacles randomly, player die if it collides with one of them\n";
 	
 	std::cout << std::endl;
-	std::exit(1);
 }
 
 int	main(int argc, char **argv)
