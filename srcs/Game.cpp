@@ -6,6 +6,8 @@ static const FoodKind	food_kinds[] = {
 	{FoodType::FOOD_YELLOW, 50, 1},
 };
 
+#define MIN_TICK_RATE 10.0f
+#define MAX_TICK_RATE 15.0f
 #define MIN_WIDTH 15
 #define MIN_HEIGHT 15
 #define MAX_WIDTH 50
@@ -14,7 +16,7 @@ static const FoodKind	food_kinds[] = {
 static const size_t	max_attempts = 1000;
 
 Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
-									m_config(), m_tick_rate(10.0f), m_last_update_time(std::chrono::steady_clock::now())
+									m_config(), m_tick_rate(MIN_TICK_RATE), m_last_update_time(std::chrono::steady_clock::now())
 {
 	if (!get_game_config(argc, argv, m_config))
 		throw std::invalid_argument("Failed to get game configuration");
@@ -110,6 +112,7 @@ GameData	Game::get_data(void) const
 		.config = m_config,
 		.food = m_food,
 		.state = m_state,
+		.tick_rate = m_tick_rate,
 		.winner = m_winner
 	};
 }
@@ -146,6 +149,12 @@ void	Game::handle_event(Lib &lib, Event &event)
 		case Event::LIB3:
 			if (lib.switch_lib(THIRD_LIB))
 				lib.create(m_config.width, m_config.height);
+			break;
+		case Event::SPEED_UP:
+			m_tick_rate = std::min(m_tick_rate + 1.0f, MAX_TICK_RATE);
+			break;
+		case Event::SPEED_DOWN:
+			m_tick_rate = std::min(m_tick_rate - 1.0f, MIN_TICK_RATE);
 			break;
 		default:
 			break;
@@ -406,7 +415,7 @@ bool	Game::is_valid_obstacle_pos(const Position &pos)
 	return true;
 }
 
-void	Game::generate_obstacle()
+void	Game::generate_obstacle(void)
 {
 	const size_t	obstacle_count = 10;
 
@@ -433,5 +442,6 @@ void	Game::reset_game(void)
 	generate_food();
 	m_state = GameState::RUNNING;
 	m_winner = -1;
+	m_tick_rate = MIN_TICK_RATE;
 	m_last_update_time = std::chrono::steady_clock::now();
 }

@@ -23,6 +23,12 @@ class GraphicLib : public IGraphic {
 			BeginDrawing();
 			ClearBackground(BLACK);
 
+			draw_score(data.snakes, p1_color[1], p2_color[1]);
+
+			char speed[32];
+			snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
+			DrawText(speed, data.config.width * CELL_SIZE - 125, 10, 20, WHITE);
+
 			for (auto &pos : data.obstacles) {
 				Rectangle	rec = {
 					.x = static_cast<float>(pos.x) * CELL_SIZE,
@@ -47,7 +53,6 @@ class GraphicLib : public IGraphic {
 				.height = CELL_SIZE,
 			};
 			DrawRectangleRounded(food_rec, 2.0f, 0, get_food_color(food.type));
-			draw_score(data.snakes, p1_color[1], p2_color[1]);
 			
 			EndDrawing();
 		}
@@ -74,8 +79,8 @@ class GraphicLib : public IGraphic {
 					game_winner = data.winner == data.snakes[0].id ? "P1 won !" : "P2 won !";
 
 				draw_centered(game_winner, start_y, RAYWHITE);
-				draw_centered(TextFormat("P1 Score: %zu", data.snakes[0].score), start_y + 30, p1_color[1]);
-				draw_centered(TextFormat("P2 Score: %zu", data.snakes[1].score), start_y + 60, p2_color[1]);
+				draw_centered("P1 Score: " + std::to_string(data.snakes[0].score), start_y + 30, p1_color[1]);
+				draw_centered("P2 Score: " + std::to_string(data.snakes[1].score), start_y + 60, p2_color[1]);
 				draw_centered("Press 'Enter' for restart the game", start_y + 90, RAYWHITE);
 				EndDrawing();
 				return;
@@ -83,7 +88,7 @@ class GraphicLib : public IGraphic {
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
 			draw_centered(end_msg, start_y, RAYWHITE);
-			draw_centered(TextFormat("Your score: %zu", data.snakes[0].score), start_y + 45, RAYWHITE);
+			draw_centered("Your score: " + std::to_string(data.snakes[0].score), start_y + 45, RAYWHITE);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100, RAYWHITE);
 
 			EndDrawing();
@@ -122,6 +127,10 @@ class GraphicLib : public IGraphic {
 				return Event::LIB2;
 			case KEY_THREE:
 				return Event::LIB3;
+			case KEY_EQUAL:
+				return Event::SPEED_UP;
+			case KEY_MINUS:
+				return Event::SPEED_DOWN;
 			default:
 				break;
 			}

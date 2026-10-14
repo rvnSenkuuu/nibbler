@@ -30,6 +30,8 @@ enum class Event : int {
 	LIB2,
 	LIB3,
 	RESTART,
+	SPEED_UP,
+	SPEED_DOWN,
 	QUIT
 };
 
@@ -93,5 +95,6 @@ struct GameData {
 	GameConfig	config;
 	Food	food;
 	GameState	state;
+	float	tick_rate;
 	int	winner;
 };

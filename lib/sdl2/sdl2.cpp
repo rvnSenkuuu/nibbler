@@ -63,6 +63,14 @@ class GraphicLib : public IGraphic {
 			SDL_SetRenderDrawColor(m_renderer, 0x18, 0x18, 0x18, 0xFF);
 			SDL_RenderClear(m_renderer);
 
+			draw_text("P1 Score: " + std::to_string(data.snakes[0].score), 10, 10, p1_color[1]);
+			if (data.config.opt_is_multi)
+				draw_text("P2 Score: " + std::to_string(data.snakes[0].score), 10, 40, p2_color[1]);
+
+			char speed[32];
+			snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
+			draw_text(speed, data.config.width * CELL_SIZE - 155, 10, RAYWHITE_C);
+
 			for (const auto &obstacle : data.obstacles)
 				draw_cell(obstacle.x, obstacle.y, WHITE_C);
 
@@ -73,9 +81,6 @@ class GraphicLib : public IGraphic {
 				);
 
 			draw_cell(data.food.pos.x, data.food.pos.y,  get_food_color(data.food.type));
-			draw_text("P1 Score: " + std::to_string(data.snakes[0].score), 10, 10, p1_color[1]);
-			if (data.config.opt_is_multi)
-				draw_text("P2 Score: " + std::to_string(data.snakes[0].score), 10, 40, p2_color[1]);
 			SDL_RenderPresent(m_renderer);
 		}
 
@@ -146,6 +151,10 @@ class GraphicLib : public IGraphic {
 					case SDL_SCANCODE_RETURN:
 					case SDL_SCANCODE_KP_ENTER:
 						return Event::RESTART;
+					case SDL_SCANCODE_EQUALS:
+						return Event::SPEED_UP;
+					case SDL_SCANCODE_MINUS:
+						return Event::SPEED_DOWN;
 					default:
 						break;
 					}

@@ -30,12 +30,14 @@ class GraphicLib : public IGraphic {
 				throw std::runtime_error("Failed to load font");
 			}
 		}
-
+		
 		void	render_game(const GameData &data) override
 		{
 			m_window->clear(sf::Color::Black);
 		
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
+			draw_speed(data);
+
 			for (auto &snake : data.snakes)
 				draw_snake(snake, 
 					snake.id == __FIRST_SNAKE ? p1_color[0] : p2_color[0],
@@ -133,6 +135,10 @@ class GraphicLib : public IGraphic {
 						return Event::QUIT;
 					case sf::Keyboard::Enter:
 						return Event::RESTART;
+					case sf::Keyboard::Equal:
+						return Event::SPEED_UP;
+					case sf::Keyboard::Hyphen:
+						return Event::SPEED_DOWN;
 					default:
 						break;
 					}
@@ -172,6 +178,23 @@ class GraphicLib : public IGraphic {
 					score.setPosition(10, 40);
 					m_window->draw(score);
 				}
+			}
+
+			void	draw_speed(const GameData &data)
+			{
+				char speed[32];
+				snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
+
+				sf::Text	text;
+				text.setFont(*m_font);
+				text.setString(speed);
+				text.setCharacterSize(20);
+				text.setFillColor(RAYWHITE_C);
+
+				sf::FloatRect	bounds = text.getLocalBounds();
+				text.setOrigin(bounds.width, 0.f);
+				text.setPosition(data.config.width * CELL_SIZE - 10.f, 10.f);
+				m_window->draw(text);
 			}
 
 			void	draw_snake(const Snake &snake, const sf::Color &head_color, const sf::Color &body_color)
