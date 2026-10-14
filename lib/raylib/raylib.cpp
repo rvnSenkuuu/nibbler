@@ -23,6 +23,16 @@ class GraphicLib : public IGraphic {
 			BeginDrawing();
 			ClearBackground(BLACK);
 
+			for (auto &pos : data.obstacles) {
+				Rectangle	rec = {
+					.x = static_cast<float>(pos.x) * CELL_SIZE,
+					.y = static_cast<float>(pos.y) * CELL_SIZE,
+					.width = CELL_SIZE,
+					.height = CELL_SIZE
+				};
+				DrawRectangleRoundedLines(rec, 0.15f, 0, 1.5f, WHITE);
+			}
+
 			for (size_t i = 0; i < data.snakes.size(); i++) {
 				Snake	snake = data.snakes[i];
 				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
@@ -34,6 +44,7 @@ class GraphicLib : public IGraphic {
 				get_food_color(data.food.type)
 			);
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
+			
 			EndDrawing();
 		}
 
