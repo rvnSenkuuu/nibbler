@@ -11,6 +11,7 @@ static constexpr SDL_Color	GREEN_C = {0, 228, 48, 255};
 static constexpr SDL_Color	DARKBLUE_C = {0, 82, 172, 255};
 static constexpr SDL_Color	BLUE_C = {0, 121, 241, 255};
 static constexpr SDL_Color	RED_C = {255, 0, 0, 255};
+static constexpr SDL_Color	WHITE_C = {255, 255, 255, 255};
 static constexpr SDL_Color	RAYWHITE_C = {245, 245, 245, 255};
 static constexpr SDL_Color	YELLOW_C = {253, 249, 0, 255};
 static constexpr SDL_Color	DARKORANGE_C = {255, 161, 0, 255};
@@ -62,14 +63,18 @@ class GraphicLib : public IGraphic {
 			SDL_SetRenderDrawColor(m_renderer, 0x18, 0x18, 0x18, 0xFF);
 			SDL_RenderClear(m_renderer);
 
-			for (size_t i = 0; i < data.snakes.size(); i++) {
-				Snake	snake = data.snakes[i];
-				draw_snake(snake, i == 0 ? p1_color[0] : p2_color[0], i == 0 ? p1_color[1] : p2_color[1]);
-			}
+			for (const auto &obstacle : data.obstacles)
+				draw_cell(obstacle.x, obstacle.y, WHITE_C);
+
+			for (const auto &snake : data.snakes)
+				draw_snake(snake,
+					snake.id == __FIRST_SNAKE ? p1_color[0] : p2_color[0],
+					snake.id == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
+				);
 
 			draw_cell(data.food.pos.x, data.food.pos.y,  get_food_color(data.food.type));
 			draw_text("P1 Score: " + std::to_string(data.snakes[0].score), 10, 10, p1_color[1]);
-			if (data.snakes.size() == 2)
+			if (data.config.opt_is_multi)
 				draw_text("P2 Score: " + std::to_string(data.snakes[0].score), 10, 40, p2_color[1]);
 			SDL_RenderPresent(m_renderer);
 		}
@@ -171,7 +176,7 @@ class GraphicLib : public IGraphic {
 			GraphicLib(const GraphicLib &other) = delete;
 			GraphicLib	&operator=(const GraphicLib &other) = delete;
 
-			void	draw_snake(Snake &snake, const SDL_Color head_color, const SDL_Color body_color)
+			void	draw_snake(const Snake &snake, const SDL_Color head_color, const SDL_Color body_color)
 			{
 				for (auto &pos : snake.body) {
 					const SDL_Color	color = (pos == snake.body[0]) ? head_color : body_color; 
