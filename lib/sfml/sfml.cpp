@@ -34,9 +34,6 @@ class GraphicLib : public IGraphic {
 		void	render_game(const GameData &data) override
 		{
 			m_window->clear(sf::Color::Black);
-		
-			draw_score(data.snakes, p1_color[1], p2_color[1]);
-			draw_speed(data);
 
 			for (auto &snake : data.snakes)
 				draw_snake(snake, 
@@ -52,6 +49,9 @@ class GraphicLib : public IGraphic {
 				static_cast<float>(data.food.pos.y * CELL_SIZE))
 			);
 			m_window->draw(food);
+
+			draw_score(data.snakes, p1_color[1], p2_color[1]);
+			draw_speed(data);
 
 			m_window->display();
 		}

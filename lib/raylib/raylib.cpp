@@ -23,12 +23,6 @@ class GraphicLib : public IGraphic {
 			BeginDrawing();
 			ClearBackground(BLACK);
 
-			draw_score(data.snakes, p1_color[1], p2_color[1]);
-
-			char speed[32];
-			snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
-			DrawText(speed, data.config.width * CELL_SIZE - 125, 10, 20, WHITE);
-
 			for (auto &pos : data.obstacles) {
 				Rectangle	rec = {
 					.x = static_cast<float>(pos.x) * CELL_SIZE,
@@ -53,6 +47,12 @@ class GraphicLib : public IGraphic {
 				.height = CELL_SIZE,
 			};
 			DrawRectangleRounded(food_rec, 2.0f, 0, get_food_color(food.type));
+
+			draw_score(data.snakes, p1_color[1], p2_color[1]);
+			
+			char speed[32];
+			snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
+			DrawText(speed, data.config.width * CELL_SIZE - 125, 10, 20, WHITE);
 			
 			EndDrawing();
 		}
