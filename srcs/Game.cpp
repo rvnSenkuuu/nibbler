@@ -24,7 +24,7 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	if (m_config.opt_is_multi)
 		m_player_count = 2;
 
-	if (m_config.opt_have_obstacle)
+	if (m_config.opt_have_obstacles)
 		generate_obstacle();
 
 	init_snakes();
@@ -59,8 +59,8 @@ bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 				return false;
 		} else if (arg == "--food-variance") {
 			config.opt_food_variance = true;
-		} else if (arg == "--enable-obstacle") {
-			config.opt_have_obstacle = true;
+		} else if (arg == "--enable-obstacles") {
+			config.opt_have_obstacles = true;
 		} else {
 			return false;
 		}
@@ -437,7 +437,7 @@ void	Game::generate_obstacle(void)
 void	Game::reset_game(void)
 {
 	init_snakes();
-	if (m_config.opt_have_obstacle)
+	if (m_config.opt_have_obstacles)
 		generate_obstacle();
 	generate_food();
 	m_state = GameState::RUNNING;

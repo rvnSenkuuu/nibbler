@@ -65,7 +65,7 @@ struct GameConfig {
 	bool	opt_is_multi;
 	bool	opt_limit_score;
 	bool	opt_food_variance;
-	bool	opt_have_obstacle;
+	bool	opt_have_obstacles;
 	int	max_score;
 };
 
