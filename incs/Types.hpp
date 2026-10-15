@@ -66,6 +66,7 @@ struct GameConfig {
 	bool	opt_limit_score;
 	bool	opt_food_variance;
 	bool	opt_have_obstacles;
+	bool	opt_enable_sounds;
 	int	max_score;
 	int	obstacles_count;
 };

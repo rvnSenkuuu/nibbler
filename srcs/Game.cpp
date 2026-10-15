@@ -66,6 +66,8 @@ bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 			config.obstacles_count = std::stoi(argv[i]);
 			if (config.obstacles_count < 0)
 				return false;
+		} else if (arg == "--enable-sounds") {
+			config.opt_enable_sounds = true;
 		} else {
 			return false;
 		}
@@ -409,7 +411,7 @@ bool	Game::is_valid_obstacle_pos(const Position &pos)
 	if (!is_position_free(pos))
 		return false;
 
-	const int	max_step = 3;
+	const int	max_step = 10;
 	for (const auto &snake : m_snakes) {
 		Position	head = snake.body.front();
 		for (int i = 0; i < max_step; i++) {
