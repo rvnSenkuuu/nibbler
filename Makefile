@@ -11,7 +11,8 @@ SRCS = srcs/main.cpp \
 INCS = incs/Game.hpp \
 		incs/Types.hpp \
 		incs/IGraphic.hpp \
-		incs/Lib.hpp
+		incs/Lib.hpp \
+		incs/IAudio.hpp
 
 OBJSDIR = .objs/
 OBJS = $(patsubst %.cpp, $(OBJSDIR)%.o, $(SRCS))
