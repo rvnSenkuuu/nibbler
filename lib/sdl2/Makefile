@@ -6,7 +6,7 @@ CXXFLAGS = -Wall -Werror -Wextra -std=c++17 -O2 -fPIC \
              -I../../incs -I$(DEPS_DIR)/include -I$(DEPS_DIR)/include/SDL2 -MMD -MP
 LDFLAGS = -shared -L$(DEPS_DIR)/lib -lSDL2 -lSDL2_ttf -Wl,-rpath,$(DEPS_DIR)/lib
 
-SRCS = sdl2.cpp
+SRCS = Sdl2.cpp
 
 OBJSDIR = .objs/
 OBJS = $(patsubst %.cpp, $(OBJSDIR)%.o, $(SRCS))

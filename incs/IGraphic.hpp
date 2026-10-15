@@ -4,7 +4,6 @@
 
 class IGraphic {
 	public:
-		IGraphic() { }
 		virtual ~IGraphic() { }
 
 		virtual void	create_window(int width, int height) = 0;
