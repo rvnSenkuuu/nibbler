@@ -45,8 +45,8 @@ clean:
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) ./lib/raylib/.objs ./lib/raylib/libraylib.so
-	$(RM) ./lib/sdl2/.objs ./lib/raylib/libsdl2.so
-	$(RM) ./lib/sfml/.objs ./lib/raylib/libsfml.so
+	$(RM) ./lib/sdl2/.objs ./lib/sdl2/libsdl2.so
+	$(RM) ./lib/sfml/.objs ./lib/sfml/libsfml.so ./lib/sfml/libsfmlaudio.so
 
 clean_deps: fclean
 	$(RM) "${HOME}/goinfre/nibbler_deps"
