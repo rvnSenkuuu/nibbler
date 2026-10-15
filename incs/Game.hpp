@@ -30,7 +30,7 @@ class Game {
 		void	generate_obstacle(void);
 		void	check_collision(Snake &current);
 		void	move_snake(Snake &snake);
-		Position	move_next_pos(Position &pos, Event dir);
+		Position	get_next_pos(Position &pos, Event dir);
 		void	change_snake_dir(size_t snake_index, Event event);
 		void	handle_event(Lib &lib, Event &event);
 

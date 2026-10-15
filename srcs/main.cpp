@@ -5,7 +5,7 @@
 void	usage(void)
 {
 	std::cout << "Usage: ./nibbler <width> <height> [OPTIONS]\n";
-	std::cout << "Options: \n";
+	std::cout << "Options:\n";
 	std::cout << "\t--multi\n";
     std::cout << "\tPlay with two snakes: Snake 1 uses WASD, Snake 2 uses the arrow keys\n\n";
 	std::cout << "\t--limit-score [score]\n";

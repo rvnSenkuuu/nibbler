@@ -307,7 +307,7 @@ void	Game::update_game(void)
 	}
 }
 
-Position	Game::move_next_pos(Position &pos, Event dir)
+Position	Game::get_next_pos(Position &pos, Event dir)
 {
 	int	dx = 0, dy = 0;
 
@@ -336,7 +336,7 @@ Position	Game::move_next_pos(Position &pos, Event dir)
 void	Game::move_snake(Snake &snake)
 {
 	Position	head = snake.body.front();
-	Position	next_pos = move_next_pos(head, snake.direction);
+	Position	next_pos = get_next_pos(head, snake.direction);
 
 	bool	is_food = (next_pos == m_food.pos);
 	snake.body.push_front(next_pos);
@@ -407,7 +407,7 @@ bool	Game::is_valid_obstacle_pos(const Position &pos)
 	for (const auto &snake : m_snakes) {
 		Position	head = snake.body.front();
 		for (int i = 0; i < max_step; i++) {
-			head = move_next_pos(head, snake.direction);
+			head = get_next_pos(head, snake.direction);
 			if (head == pos)
 				return false;
 		}
