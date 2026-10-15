@@ -45,6 +45,7 @@ class Game {
 		[[nodiscard]] bool	is_position_free(const Position &pos);
 		[[nodiscard]] bool	is_valid_obstacle_pos(const Position &pos);
 		Event	get_event_dir(Event event);
+		int	get_max_obstacles(void);
 
 	private:
 		size_t	m_player_count;

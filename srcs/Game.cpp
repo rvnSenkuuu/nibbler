@@ -24,10 +24,10 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	if (m_config.opt_is_multi)
 		m_player_count = 2;
 
+	init_snakes();
 	if (m_config.opt_have_obstacles)
 		generate_obstacle();
 
-	init_snakes();
 	generate_food();
 }
 
@@ -54,17 +54,23 @@ bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 			config.opt_limit_score = true;
 			if (argv[++i] == nullptr)
 				return false;
-			config.max_score = std::strtoll(argv[i], nullptr, 10);
-			if (config.max_score <= 0 || config.max_score > std::numeric_limits<int>::max())
+			config.max_score = std::stoi(argv[i]);
+			if (config.max_score < 0)
 				return false;
 		} else if (arg == "--food-variance") {
 			config.opt_food_variance = true;
 		} else if (arg == "--enable-obstacles") {
 			config.opt_have_obstacles = true;
+			if (argv[++i] == nullptr)
+				return false;
+			config.obstacles_count = std::stoi(argv[i]);
+			if (config.obstacles_count < 0)
+				return false;
 		} else {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -415,18 +421,33 @@ bool	Game::is_valid_obstacle_pos(const Position &pos)
 	return true;
 }
 
+int	Game::get_max_obstacles(void)
+{
+	const int	board_size = m_config.width * m_config.height;
+	size_t	snakes_size = m_snakes[0].body.size();
+	snakes_size += m_config.opt_is_multi ? m_snakes[1].body.size() : 0;
+	
+	const int	total_free_slot = board_size - static_cast<int>(snakes_size) - 1;
+	if (total_free_slot <= 0)
+		return 0;
+
+	return std::min(total_free_slot / 2, board_size * 20 / 100);
+};
+
 void	Game::generate_obstacle(void)
 {
-	const size_t	obstacle_count = 10;
+	int	max_obstacles = get_max_obstacles();
+	if (m_config.obstacles_count > max_obstacles)
+		throw std::logic_error("Too many obstacles for the board");
 
 	m_obstacles.clear();
-	m_obstacles.reserve(obstacle_count);
+	m_obstacles.reserve(m_config.obstacles_count);
 
 	std::uniform_int_distribution<size_t>	x_pos(0, m_config.width - 1);
 	std::uniform_int_distribution<size_t>	y_pos(0, m_config.height - 1);
 
 	size_t	i = 0;
-	while (m_obstacles.size() < obstacle_count && i < max_attempts) {
+	while (m_obstacles.size() < static_cast<size_t>(m_config.obstacles_count) && i < max_attempts) {
 		Position	pos = {x_pos(m_rng), y_pos(m_rng)};
 		if (is_valid_obstacle_pos(pos))
 			m_obstacles.push_back(pos);

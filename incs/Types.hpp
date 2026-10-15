@@ -67,6 +67,7 @@ struct GameConfig {
 	bool	opt_food_variance;
 	bool	opt_have_obstacles;
 	int	max_score;
+	int	obstacles_count;
 };
 
 struct Snake {
