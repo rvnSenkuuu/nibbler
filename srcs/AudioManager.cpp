@@ -1,0 +1,45 @@
+#include "AudioManager.hpp"
+
+AudioManager::AudioManager(void)
+{
+	load(AUDIO_LIB);
+}
+
+AudioManager::~AudioManager()
+{
+	if (m_handle)
+		unload();
+}
+
+void	AudioManager::load(const std::string &path)
+{
+	m_handle = dlopen(path.c_str(), RTLD_LAZY);
+	if (!m_handle)
+		throw std::runtime_error(dlerror());
+
+	auto	sym = [&](const char *name) {
+		void	*sym_ptr = dlsym(m_handle, name);
+		if (!sym_ptr) {
+			dlclose(m_handle);
+			throw std::runtime_error(dlerror());
+		}
+		return sym_ptr;
+	};
+
+	init = reinterpret_cast<FnInitAudio>(sym("init"));
+	play = reinterpret_cast<FnPlaySound>(sym("play"));
+	// stop = reinterpret_cast<FnPlaySound>(sym("stop_sound"));
+	destroy = reinterpret_cast<FnDestroyAudio>(sym("destroy"));
+}
+
+void	AudioManager::unload(void)
+{
+	destroy();
+	if (dlclose(m_handle) != 0)
+		throw std::runtime_error(dlerror());
+	m_handle = nullptr;
+	init = nullptr;
+	play = nullptr;
+	stop = nullptr;
+	destroy = nullptr;
+}

@@ -9,6 +9,7 @@
 #include <chrono>
 
 #include "Lib.hpp"
+#include "AudioManager.hpp"
 #include "Types.hpp"
 
 void	usage(void);
@@ -56,6 +57,7 @@ class Game {
 		std::mt19937	m_rng;
 		GameState	m_state;
 		GameConfig	m_config;
+		AudioManager	m_audio;
 
 		float	m_tick_rate;
 		std::chrono::steady_clock::time_point	m_last_update_time;

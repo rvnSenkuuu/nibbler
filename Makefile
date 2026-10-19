@@ -6,13 +6,15 @@ RM = rm -rf
 
 SRCS = srcs/main.cpp \
 		srcs/Game.cpp \
-		srcs/Lib.cpp
+		srcs/Lib.cpp \
+		srcs/AudioManager.cpp
 
 INCS = incs/Game.hpp \
 		incs/Types.hpp \
 		incs/IGraphic.hpp \
 		incs/Lib.hpp \
-		incs/IAudio.hpp
+		incs/IAudio.hpp \
+		incs/AudioManager.hpp
 
 OBJSDIR = .objs/
 OBJS = $(patsubst %.cpp, $(OBJSDIR)%.o, $(SRCS))
