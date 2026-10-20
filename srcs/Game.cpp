@@ -194,18 +194,24 @@ void	Game::run(Lib &lib)
 	}
 }
 
+void	Game::kill_snake(Snake &snake)
+{
+	m_state = GameState::GAME_OVER;
+	snake.alive = false;
+	if (m_config.opt_enable_sounds)
+		m_audio.play("DEATH");
+}
+
 void	Game::check_collision(Snake &current)
 {
 	Position	head = current.body.front();
 	if (head.x >= m_config.width || head.y >= m_config.height) {
-		m_state = GameState::GAME_OVER;
-		current.alive = false;
+		kill_snake(current);
 		return;
 	}
 
 	if (std::find(m_obstacles.begin(), m_obstacles.end(), head) != m_obstacles.end()) {
-		m_state = GameState::GAME_OVER;
-		current.alive = false;
+		kill_snake(current);
 		return;
 	}
 
@@ -219,8 +225,7 @@ void	Game::check_collision(Snake &current)
 			snake.body.end(),
 			[&head](const Position &pos) { return head == pos; }
 		)) {
-			current.alive = false;
-			m_state = GameState::GAME_OVER;
+			kill_snake(current);
 			break;
 		}
 	}
@@ -302,6 +307,8 @@ void	Game::update_game(void)
 
 	if (alive_count == 0) {
 		m_state = m_player_count == 2 ? GameState::DRAW : GameState::GAME_OVER;
+		if (m_config.opt_enable_sounds)
+			m_audio.play("DEATH");
 	} else if (m_player_count == 2 && alive_count == 1) {
 		m_state = GameState::WON;
 		m_winner = m_snakes[0].alive ? m_snakes[0].id : m_snakes[1].id;
@@ -320,7 +327,7 @@ void	Game::update_game(void)
 
 Position	Game::get_next_pos(Position &pos, Event dir)
 {
-	int	dx = 0, dy = 0;
+	size_t	dx = 0, dy = 0;
 
 	switch (dir) {
 	case Event::UP:
@@ -339,8 +346,8 @@ Position	Game::get_next_pos(Position &pos, Event dir)
 		break;
 	}
 
-	pos.x = static_cast<size_t>(static_cast<long>(pos.x) + dx);
-	pos.y = static_cast<size_t>(static_cast<long>(pos.y) + dy);
+	pos.x = pos.x + dx;
+	pos.y = pos.y + dy;
 	return pos;
 }
 
@@ -357,7 +364,8 @@ void	Game::move_snake(Snake &snake)
 		return;
 	}
 
-	m_audio.play("EAT");
+	if (m_config.opt_enable_sounds)
+		m_audio.play("EAT");
 	snake.score += m_food.given_score;
 	generate_food();
 }
