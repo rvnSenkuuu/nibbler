@@ -5,6 +5,9 @@
 
 #include "IAudio.hpp"
 
+#define EAT_SOUND "./assets/sounds/eat.wav"
+#define DEATH_SOUND "./assets/sounds/death.wav"
+
 class AudioLib : public IAudio {
 	public:
 		AudioLib(void) { }
@@ -12,17 +15,19 @@ class AudioLib : public IAudio {
 
 		void	init(void) override
 		{
+			SetTraceLogLevel(LOG_NONE);
 			InitAudioDevice();
-			load_sounds();
+
+			auto	load = [&](const std::string &type, const std::string &file) {
+				Sound	sound = LoadSound(file.c_str());
+				m_sounds.insert({type, sound});
+			};
+
+			load("EAT", EAT_SOUND);
+			load("DEATH", DEATH_SOUND);
 		}
 
-		void	load_sounds()
-		{
-			Sound	eat = LoadSound("./assets/sounds/eat.wav");
-			m_sounds.insert({"EAT", eat});
-		}
-
-		void	play(const std::string &sound)
+		void	play(const std::string &sound) override
 		{
 			auto	it = m_sounds.find(sound);
 			PlaySound(it->second);
@@ -36,6 +41,10 @@ class AudioLib : public IAudio {
 		}
 
 	private:
+		AudioLib(const AudioLib &) = delete;
+		AudioLib(const std::string &path) = delete;
+		AudioLib	&operator=(const AudioLib &) = delete;
+
 		std::unordered_map<std::string, Sound>	m_sounds;
 };
 
