@@ -10,7 +10,6 @@ static const FoodKind	food_kinds[] = {
 static const size_t	max_attempts = 1000;
 
 Food::Food() { }
-Food::Food(std::mt19937 rng) : m_rng(rng){ }
 Food::~Food() { }
 
 Position	Food::get_pos(void) const
@@ -26,6 +25,11 @@ FoodType	Food::get_type(void) const
 int	Food::get_given_score(void) const
 {
 	return m_given_score;
+}
+
+void	Food::set_rng(std::mt19937 rng)
+{
+	m_rng = rng;
 }
 
 bool	Food::is_position_free(const Position &pos, std::vector<Snake> &snakes, std::vector<Position> &obstacles)

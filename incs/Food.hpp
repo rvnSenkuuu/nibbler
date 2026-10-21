@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include <vector>
 
 enum class FoodType : int {
 	FOOD_RED,
@@ -26,6 +27,8 @@ class Food {
 		Position	get_pos(void) const;
 		FoodType	get_type(void) const;
 		int	get_given_score(void) const;
+
+		void	set_rng(std::mt19937 rng);
 
 		void	generate_food(GameConfig &config, std::vector<Snake> &snakes, std::vector<Position> &obstacles);
 		const FoodKind	&get_food_kind(void);

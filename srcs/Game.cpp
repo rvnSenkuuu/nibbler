@@ -25,6 +25,7 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	if (m_config.opt_have_obstacles)
 		generate_obstacle();
 
+	m_food.set_rng(m_rng);
 	m_food.generate_food(m_config, m_snakes, m_obstacles);
 }
 
