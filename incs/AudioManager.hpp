@@ -7,6 +7,8 @@
 
 using FnInitAudio = void	(*)(void);
 using FnPlaySound = void	(*)(const std::string &sound);
+using FnUpdateSound = void	(*)(void);
+using FnResetSound = void	(*)(void);
 using FnStopSound = void	(*)(void);
 using FnDestroyAudio = void	(*)(void);
 
@@ -20,6 +22,8 @@ class AudioManager {
 
 		FnInitAudio	init;
 		FnPlaySound	play;
+		FnUpdateSound	update;
+		FnResetSound	reset;
 		FnStopSound	stop;
 		FnDestroyAudio	destroy;
 

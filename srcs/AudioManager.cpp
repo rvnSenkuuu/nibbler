@@ -28,7 +28,9 @@ void	AudioManager::load(const std::string &path)
 
 	init = reinterpret_cast<FnInitAudio>(sym("init"));
 	play = reinterpret_cast<FnPlaySound>(sym("play"));
-	// stop = reinterpret_cast<FnPlaySound>(sym("stop_sound"));
+	update = reinterpret_cast<FnUpdateSound>(sym("update"));
+	reset = reinterpret_cast<FnResetSound>(sym("reset"));
+	stop = reinterpret_cast<FnStopSound>(sym("stop"));
 	destroy = reinterpret_cast<FnDestroyAudio>(sym("destroy"));
 }
 
@@ -40,6 +42,7 @@ void	AudioManager::unload(void)
 	m_handle = nullptr;
 	init = nullptr;
 	play = nullptr;
+	update = nullptr;
 	stop = nullptr;
 	destroy = nullptr;
 }

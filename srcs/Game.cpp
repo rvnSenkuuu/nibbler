@@ -189,9 +189,12 @@ void	Game::run(Lib &lib)
 				update_game();
 				m_last_update_time = current_time;
 			}
+			if (m_config.opt_enable_sounds)
+				m_audio.update();
 		}
 		lib.render(get_data());
 	}
+	// m_audio.stop();
 }
 
 void	Game::kill_snake(Snake &snake)
@@ -296,6 +299,7 @@ void	Game::update_game(void)
 		if (it != m_snakes.end()) {
 			m_state = GameState::WON;
 			m_winner = it->id;
+			m_audio.stop();
 		}
 	}
 
@@ -307,11 +311,14 @@ void	Game::update_game(void)
 
 	if (alive_count == 0) {
 		m_state = m_player_count == 2 ? GameState::DRAW : GameState::GAME_OVER;
-		if (m_config.opt_enable_sounds)
+		if (m_config.opt_enable_sounds) {
+			m_audio.stop();
 			m_audio.play("DEATH");
+		}
 	} else if (m_player_count == 2 && alive_count == 1) {
 		m_state = GameState::WON;
 		m_winner = m_snakes[0].alive ? m_snakes[0].id : m_snakes[1].id;
+		m_audio.stop();
 	} else if (is_board_full()) {
 		if (m_player_count == 1) {
 			m_state = GameState::WON;
@@ -322,6 +329,7 @@ void	Game::update_game(void)
 			m_state = GameState::WON;
 			m_winner = m_snakes[0].body.size() > m_snakes[1].body.size() ? m_snakes[0].id : m_snakes[1].id;
 		}
+		m_audio.stop();
 	}
 }
 
@@ -474,6 +482,8 @@ void	Game::reset_game(void)
 	init_snakes();
 	if (m_config.opt_have_obstacles)
 		generate_obstacle();
+	if (m_config.opt_enable_sounds)
+		m_audio.reset();
 	generate_food();
 	m_state = GameState::RUNNING;
 	m_winner = -1;
