@@ -43,12 +43,6 @@ enum class GameState : int {
 	QUIT
 };
 
-enum class FoodType : int {
-	FOOD_RED,
-	FOOD_GREEN,
-	FOOD_YELLOW
-};
-
 struct Position {
 	size_t	x;
 	size_t	y;
@@ -79,17 +73,7 @@ struct Snake {
 	bool	alive;
 };
 
-struct FoodKind {
-	FoodType	type;
-	int	score;
-	int	weight;
-};
-
-struct Food {
-	Position	pos;
-	FoodType	type;
-	int	given_score;
-};
+#include "Food.hpp"
 
 struct GameData {
 	std::vector<Snake>	snakes;

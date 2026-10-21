@@ -72,7 +72,8 @@ class GraphicLib : public IGraphic {
 					snake.id == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
 				);
 
-			draw_cell(data.food.pos.x, data.food.pos.y,  get_food_color(data.food.type));
+			const Position	&pos = data.food.get_pos();
+			draw_cell(pos.x, pos.y,  get_food_color(data.food.get_type()));
 		
 			draw_text("P1 Score: " + std::to_string(data.snakes[0].score), 10, 10, p1_color[1]);
 			if (data.config.opt_is_multi)

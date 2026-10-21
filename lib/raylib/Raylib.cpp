@@ -39,14 +39,14 @@ class GraphicLib : public IGraphic {
 					snake.id == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
 				);
 
-			auto	food = data.food;
+			const Position	&pos = data.food.get_pos();
 			Rectangle	food_rec = {
-				.x = static_cast<float>(food.pos.x) * CELL_SIZE,
-				.y = static_cast<float>(food.pos.y) * CELL_SIZE,
+				.x = static_cast<float>(pos.x) * CELL_SIZE,
+				.y = static_cast<float>(pos.y) * CELL_SIZE,
 				.width = CELL_SIZE,
 				.height = CELL_SIZE,
 			};
-			DrawRectangleRounded(food_rec, 2.0f, 0, get_food_color(food.type));
+			DrawRectangleRounded(food_rec, 2.0f, 0, get_food_color(data.food.get_type()));
 
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
 			

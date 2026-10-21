@@ -1,11 +1,5 @@
 #include "Game.hpp"
 
-static const FoodKind	food_kinds[] = {
-	{FoodType::FOOD_RED, 10, 6},
-	{FoodType::FOOD_GREEN, 30, 3},
-	{FoodType::FOOD_YELLOW, 50, 1},
-};
-
 #define MIN_TICK_RATE 10.0f
 #define MAX_TICK_RATE 15.0f
 #define MIN_WIDTH 15
@@ -31,7 +25,7 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	if (m_config.opt_have_obstacles)
 		generate_obstacle();
 
-	generate_food();
+	m_food.generate_food(m_config, m_snakes, m_obstacles);
 }
 
 bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
@@ -194,7 +188,6 @@ void	Game::run(Lib &lib)
 		}
 		lib.render(get_data());
 	}
-	// m_audio.stop();
 }
 
 void	Game::kill_snake(Snake &snake)
@@ -364,7 +357,7 @@ void	Game::move_snake(Snake &snake)
 	Position	head = snake.body.front();
 	Position	next_pos = get_next_pos(head, snake.direction);
 
-	bool	is_food = (next_pos == m_food.pos);
+	bool	is_food = (next_pos == m_food.get_pos());
 	snake.body.push_front(next_pos);
 
 	if (!is_food) {
@@ -374,26 +367,8 @@ void	Game::move_snake(Snake &snake)
 
 	if (m_config.opt_enable_sounds)
 		m_audio.play("EAT");
-	snake.score += m_food.given_score;
-	generate_food();
-}
-
-const FoodKind	&Game::get_food_kind(void)
-{
-	int	total = 0;
-	for (const auto &kind : food_kinds)
-		total += kind.weight;
-
-	std::uniform_int_distribution<int>	dist(0, total - 1);
-	int	roll = dist(m_rng);
-
-	for (const auto &kind : food_kinds) {
-		if (roll < kind.weight)
-			return kind;
-		roll -= kind.weight;
-	}
-	
-	return food_kinds[0]; 
+	snake.score += m_food.get_given_score();
+	m_food.generate_food(m_config, m_snakes, m_obstacles);
 }
 
 bool	Game::is_position_free(const Position &pos)
@@ -404,26 +379,6 @@ bool	Game::is_position_free(const Position &pos)
 	}
 
 	return std::find(m_obstacles.begin(), m_obstacles.end(), pos) == m_obstacles.end();
-}
-
-void	Game::generate_food(void)
-{
-	std::uniform_int_distribution<size_t>	x_pos(0, m_config.width - 1);
-	std::uniform_int_distribution<size_t>	y_pos(0, m_config.height - 1);
-
-	Position	pos;
-	size_t	i = 0;
-	while (i < max_attempts) {
-		pos = {x_pos(m_rng), y_pos(m_rng)};
-		if (is_position_free(pos))
-			break;
-		i++;
-	}
-
-	const FoodKind	&kind = m_config.opt_food_variance ? get_food_kind() : food_kinds[0];
-	m_food.pos = pos;
-	m_food.type = kind.type;
-	m_food.given_score = kind.score;
 }
 
 bool	Game::is_valid_obstacle_pos(const Position &pos)
@@ -484,7 +439,7 @@ void	Game::reset_game(void)
 		generate_obstacle();
 	if (m_config.opt_enable_sounds)
 		m_audio.reset();
-	generate_food();
+	m_food.generate_food(m_config, m_snakes, m_obstacles);
 	m_state = GameState::RUNNING;
 	m_winner = -1;
 	m_tick_rate = MIN_TICK_RATE;

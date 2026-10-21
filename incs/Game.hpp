@@ -14,6 +14,8 @@
 
 void	usage(void);
 
+class Food;
+
 class Game {
 	public:
 		Game(int argc, char **argv);
@@ -27,7 +29,6 @@ class Game {
 		void	run(Lib &lib);
 		void	update_game(void);
 		void	reset_game(void);
-		void	generate_food(void);
 		void	generate_obstacle(void);
 		void	check_collision(Snake &current);
 		void	move_snake(Snake &snake);
@@ -36,7 +37,7 @@ class Game {
 		void	change_snake_dir(size_t snake_index, Event event);
 		void	handle_event(Lib &lib, Event &event);
 
-		const FoodKind	&get_food_kind(void);
+		[[nodiscard]] bool	is_position_free(const Position &pos);
 	
 	private:
 		Game() = default;
@@ -44,7 +45,6 @@ class Game {
 		Game	&operator=(const Game &rhs) = default;
 
 		[[nodiscard]] bool	is_opposite_dir(Event a, Event b);
-		[[nodiscard]] bool	is_position_free(const Position &pos);
 		[[nodiscard]] bool	is_valid_obstacle_pos(const Position &pos);
 		Event	get_event_dir(Event event);
 		int	get_max_obstacles(void);

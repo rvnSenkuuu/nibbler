@@ -41,12 +41,13 @@ class GraphicLib : public IGraphic {
 					snake.id == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
 				);
 
-			sf::Color	food_color = get_food_color(data.food.type);
+			sf::Color	food_color = get_food_color(data.food.get_type());
 			sf::RectangleShape	food(sf::Vector2f(CELL_SIZE, CELL_SIZE));
 			food.setFillColor(food_color);
+			const Position	&pos = data.food.get_pos();
 			food.setPosition(sf::Vector2f(
-				static_cast<float>(data.food.pos.x * CELL_SIZE), 
-				static_cast<float>(data.food.pos.y * CELL_SIZE))
+				static_cast<float>(pos.x * CELL_SIZE), 
+				static_cast<float>(pos.y * CELL_SIZE))
 			);
 			m_window->draw(food);
 

@@ -1,15 +1,17 @@
 NAME = nibbler
 CXX = c++
 CXXFLAGS = -Wall -Werror -Wextra -std=c++17 -O2 -Iincs -MMD -MP -g3 -fsanitize=address,leak
-LDFLAGS = -ldl
+LDFLAGS = -ldl -rdynamic
 RM = rm -rf
 
 SRCS = srcs/main.cpp \
 		srcs/Game.cpp \
+		srcs/Food.cpp \
 		srcs/Lib.cpp \
 		srcs/AudioManager.cpp
 
 INCS = incs/Game.hpp \
+		incs/Food.hpp \
 		incs/Types.hpp \
 		incs/IGraphic.hpp \
 		incs/Lib.hpp \
