@@ -43,6 +43,7 @@ void	AudioManager::unload(void)
 	init = nullptr;
 	play = nullptr;
 	update = nullptr;
+	reset = nullptr;
 	stop = nullptr;
 	destroy = nullptr;
 }

@@ -18,15 +18,20 @@ class AudioLib : public IAudio {
 		{
 			SetTraceLogLevel(LOG_NONE);
 			InitAudioDevice();
+			m_volume = 1.0f;
 
 			auto	load = [&](const std::string &type, const std::string &file) {
 				Sound	sound = LoadSound(file.c_str());
+				SetSoundVolume(sound, m_volume);
 				m_sounds.insert({type, sound});
 			};
 
 			load("EAT", EAT_SOUND);
 			load("DEATH", DEATH_SOUND);
+			
 			m_background = LoadMusicStream(BACKGROUND_SOUND);
+			m_background.looping = true;
+			SetMusicVolume(m_background, m_volume);
 			PlayMusicStream(m_background);
 		}
 
@@ -36,17 +41,17 @@ class AudioLib : public IAudio {
 			PlaySound(it->second);
 		}
 
-		void	update(void)
+		void	update(void) override
 		{
 			UpdateMusicStream(m_background);
 		}
 
-		void	stop(void)
+		void	stop(void) override
 		{
 			StopMusicStream(m_background);
 		}
 
-		void	reset(void)
+		void	reset(void) override
 		{
 			stop();
 			PlayMusicStream(m_background);
@@ -65,6 +70,7 @@ class AudioLib : public IAudio {
 		AudioLib(const std::string &path) = delete;
 		AudioLib	&operator=(const AudioLib &) = delete;
 
+		float	m_volume;
 		std::unordered_map<std::string, Sound>	m_sounds;
 		Music	m_background;
 };
