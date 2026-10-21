@@ -4,7 +4,7 @@
 
 class IGraphic {
 	public:
-		virtual ~IGraphic() { }
+		virtual ~IGraphic(void) { }
 
 		virtual void	create_window(int width, int height) = 0;
 		virtual void	render_game(const GameData &state) = 0;

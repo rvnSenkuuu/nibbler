@@ -14,8 +14,8 @@ using FnDestroyAudio = void	(*)(void);
 
 class AudioManager {
 	public:
-		AudioManager();
-		~AudioManager();
+		AudioManager(void);
+		~AudioManager(void);
 
 		void	load(const std::string &path);
 		void	unload(void);

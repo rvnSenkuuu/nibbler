@@ -17,9 +17,7 @@ struct FoodKind {
 class Food {
 	public:
 		Food(void);
-		Food(std::mt19937 rng);
-		~Food();
-		Food(Position pos, FoodType type, int given_score) = delete;
+		~Food(void);
 		Food(const Food &rhs) = default;
 		Food	&operator=(const Food &rhs) = default;
 

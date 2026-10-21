@@ -2,7 +2,7 @@
 
 class IAudio {
 	public:
-		virtual ~IAudio() { }
+		virtual ~IAudio(void) { }
 
 		virtual void	init(void) = 0;
 		virtual void	play(const std::string &sound) = 0;

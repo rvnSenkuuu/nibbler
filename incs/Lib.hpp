@@ -17,8 +17,8 @@ using FnDestroy = void	(*)();
 
 class Lib {
 	public:
-		Lib();
-		~Lib();
+		Lib(void);
+		~Lib(void);
 
 		void	load(const std::string &path);
 		void	unload(void);

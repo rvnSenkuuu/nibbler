@@ -14,12 +14,10 @@
 
 void	usage(void);
 
-class Food;
-
 class Game {
 	public:
 		Game(int argc, char **argv);
-		~Game() { };
+		~Game(void) { };
 
 		GameData	get_data(void) const;
 
