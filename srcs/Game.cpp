@@ -314,7 +314,7 @@ bool	Game::is_valid_obstacle_pos(const Position &pos) const
 	if (!is_position_free(pos, m_snakes, m_obstacles))
 		return false;
 
-	const int	max_step = 10;
+	const int	max_step = 20;
 	for (auto &snake : m_snakes) {
 		Position	head = snake.get_head();
 		for (int i = 0; i < max_step; i++) {
