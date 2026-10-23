@@ -32,7 +32,7 @@ void	Food::set_rng(std::mt19937 &rng)
 	m_rng = rng;
 }
 
-void	Food::generate_food(GameConfig &config, std::vector<Snake> &snakes, std::vector<Position> &obstacles)
+void	Food::generate_food(GameConfig &config, const std::vector<Snake> &snakes, const std::vector<Position> &obstacles)
 {
 	std::uniform_int_distribution<size_t>	x_pos(0, config.width - 1);
 	std::uniform_int_distribution<size_t>	y_pos(0, config.height - 1);

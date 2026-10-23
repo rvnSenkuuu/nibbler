@@ -1,7 +1,6 @@
 #pragma once
 
 #include <deque>
-#include <algorithm>
 
 #include "Types.hpp"
 
@@ -15,7 +14,7 @@ class Snake {
 		void	reset(int id, const Position &start);
 		void	change_direction(Event event);
 		[[nodiscard]] bool	occupies(const Position &pos) const;
-		Position	next_pos(Position head);
+		Position	next_pos(Position head) const;
 		void	move(Position next_pos, bool grow);
 
 		int		get_id(void) const;
@@ -30,6 +29,7 @@ class Snake {
 
 	private:
 		Snake(void) = default;
+		
 		Event	normalize_direction(Event event);
 		[[nodiscard]] bool	is_opposite_dir(Event a, Event b);
 

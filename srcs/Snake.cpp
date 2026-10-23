@@ -1,4 +1,5 @@
 #include "Snake.hpp"
+#include <algorithm>
 
 Snake::Snake(int id, const Position &start)
 {
@@ -54,7 +55,7 @@ void	Snake::change_direction(Event event)
 		m_direction = normalize_direction(event);
 }
 
-Position	Snake::next_pos(Position head)
+Position	Snake::next_pos(Position head) const
 {
 	size_t	dx = 0, dy = 0;
 

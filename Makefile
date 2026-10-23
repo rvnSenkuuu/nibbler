@@ -12,6 +12,7 @@ SRCS = srcs/main.cpp \
 		srcs/AudioManager.cpp
 
 INCS = incs/Game.hpp \
+		incs/GameData.hpp \
 		incs/Food.hpp \
 		incs/Snake.hpp \
 		incs/Types.hpp \

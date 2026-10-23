@@ -35,8 +35,8 @@ class GraphicLib : public IGraphic {
 
 			for (auto &snake : data.snakes)
 				draw_snake(snake, 
-					snake.get_id() == __FIRST_SNAKE ? p1_color[0] : p2_color[0],
-					snake.get_id() == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
+					snake.get_id() == FIRST_SNAKE ? p1_color[0] : p2_color[0],
+					snake.get_id() == FIRST_SNAKE ? p1_color[1] : p2_color[1]
 				);
 
 			const Position	&pos = data.food.get_pos();

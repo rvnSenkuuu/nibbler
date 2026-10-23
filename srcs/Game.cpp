@@ -1,5 +1,4 @@
 #include "Game.hpp"
-#include "Snake.hpp"
 
 constexpr float	MIN_TICK_RATE = 10.0f;
 constexpr float	MAX_TICK_RATE = 15.0f;
@@ -10,7 +9,8 @@ constexpr int	MAX_HEIGHT = 50;
 
 static constexpr size_t	max_attempts = 1000;
 
-bool	is_position_free(const Position &pos, std::vector<Snake> &snakes, std::vector<Position> &obstacles)
+bool	is_position_free(const Position &pos, const std::vector<Snake> &snakes,
+						const std::vector<Position> &obstacles)
 {
 	for (const auto &snake : snakes) {
 		if (snake.occupies(pos))
@@ -106,10 +106,10 @@ void	Game::init_snakes(void)
 
 	size_t	row = m_player_count == 2 ? m_config.height / 3 : m_config.height / 2;
 
-	m_snakes.emplace_back(__FIRST_SNAKE, Position{m_config.width/ 2 , row});
+	m_snakes.emplace_back(FIRST_SNAKE, Position{m_config.width/ 2 , row});
 	if (m_player_count == 2) {
 		row = 2 * m_config.height / 3;
-		m_snakes.emplace_back(__SECOND_SNAKE, Position{m_config.width/ 2 , row});
+		m_snakes.emplace_back(SECOND_SNAKE, Position{m_config.width/ 2 , row});
 	}
 }
 
@@ -140,13 +140,13 @@ void	Game::handle_event(Lib &lib, Event &event)
 		case Event::S:
 		case Event::A:
 		case Event::D:
-			m_snakes[__FIRST_SNAKE].change_direction(event);
+			m_snakes[FIRST_SNAKE].change_direction(event);
 			break;
 		case Event::UP:
 		case Event::DOWN:
 		case Event::RIGHT:
 		case Event::LEFT:
-			m_snakes[m_player_count == 2 ? __SECOND_SNAKE : __FIRST_SNAKE].change_direction(event);
+			m_snakes[m_player_count == 2 ? SECOND_SNAKE : FIRST_SNAKE].change_direction(event);
 			break;
 		case Event::LIB1:
 			if (lib.switch_lib(FIRST_LIB))
@@ -231,7 +231,7 @@ void	Game::check_collision(Snake &current)
 	}
 }
 
-bool	Game::is_board_full(void)
+bool	Game::is_board_full(void) const
 {
 	size_t	total = 0;
 	for (auto &snake : m_snakes)
@@ -282,7 +282,7 @@ void	Game::update_game(void)
 	} else if (is_board_full()) {
 		if (m_player_count == 1) {
 			m_state = GameState::WON;
-			m_winner = __FIRST_SNAKE;
+			m_winner = FIRST_SNAKE;
 		} else if (m_snakes[0].length() == m_snakes[1].length()) {
 			m_state = GameState::DRAW;
 		} else {
@@ -309,7 +309,7 @@ void	Game::move_snake(Snake &snake)
 	m_food.generate_food(m_config, m_snakes, m_obstacles);
 }
 
-bool	Game::is_valid_obstacle_pos(const Position &pos)
+bool	Game::is_valid_obstacle_pos(const Position &pos) const
 {
 	if (!is_position_free(pos, m_snakes, m_obstacles))
 		return false;
@@ -326,7 +326,7 @@ bool	Game::is_valid_obstacle_pos(const Position &pos)
 	return true;
 }
 
-int	Game::get_max_obstacles(void)
+int	Game::get_max_obstacles(void) const
 {
 	const int	board_size = m_config.width * m_config.height;
 	size_t	snakes_size = m_snakes[0].length();

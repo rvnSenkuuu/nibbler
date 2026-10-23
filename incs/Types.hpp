@@ -6,8 +6,8 @@
 #define CELL_SIZE 20
 #define FONT_PATH "./assets/font.ttf"
 
-#define __FIRST_SNAKE 0
-#define __SECOND_SNAKE 1
+constexpr int FIRST_SNAKE  = 0;
+constexpr int SECOND_SNAKE  = 1;
 
 enum class GridType : int {
 	EMPTY,
@@ -63,24 +63,4 @@ struct GameConfig {
 	bool	opt_enable_sounds;
 	int	max_score;
 	int	obstacles_count;
-};
-
-// struct Snake {
-// 	std::deque<Position>	body;
-// 	size_t	score;
-// 	Event	direction;
-// 	int	id;
-// 	bool	alive;
-// };
-
-#include "Food.hpp"
-
-struct GameData {
-	std::vector<Snake>	snakes;
-	std::vector<Position>	obstacles;
-	GameConfig	config;
-	Food	food;
-	GameState	state;
-	float	tick_rate;
-	int	winner;
 };

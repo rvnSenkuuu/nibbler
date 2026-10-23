@@ -1,16 +1,17 @@
 #pragma once
 
-#include <iostream>
-#include <exception>
-#include <deque>
+#include <string>
+#include <vector>
 #include <algorithm>
 #include <iterator>
 #include <random>
 #include <chrono>
 
+#include "Snake.hpp"
+#include "Food.hpp"
 #include "Lib.hpp"
 #include "AudioManager.hpp"
-#include "Types.hpp"
+#include "GameData.hpp"
 
 void	usage(void);
 bool	is_position_free(const Position &pos, std::vector<Snake> &snakes,
@@ -23,7 +24,7 @@ class Game {
 
 		GameData	get_data(void) const;
 
-		[[nodiscard]] bool	is_board_full(void);
+		[[nodiscard]] bool	is_board_full(void) const;
 		[[nodiscard]] bool	get_game_config(int argc, char **argv, GameConfig &config);
 		void	init_snakes();
 		void	run(Lib &lib);
@@ -36,12 +37,11 @@ class Game {
 		void	handle_event(Lib &lib, Event &event);
 
 	private:
-		Game() = default;
-		Game(const Game &rhs) = default;
+		Game(const Game &rhs) = delete;
 		Game	&operator=(const Game &rhs) = default;
 
-		[[nodiscard]] bool	is_valid_obstacle_pos(const Position &pos);
-		int	get_max_obstacles(void);
+		[[nodiscard]] bool	is_valid_obstacle_pos(const Position &pos) const;
+		int	get_max_obstacles(void) const;
 
 	private:
 		size_t	m_player_count;

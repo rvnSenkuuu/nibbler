@@ -3,9 +3,7 @@
 #include <random>
 #include <vector>
 
-#include "Snake.hpp"
-
-class Snake;
+#include "Types.hpp"
 
 enum class FoodType : int {
 	FOOD_RED,
@@ -19,7 +17,10 @@ struct FoodKind {
 	int	weight;
 };
 
-bool	is_position_free(const Position &pos, std::vector<Snake> &snakes, std::vector<Position> &obstacles);
+class Snake;
+
+bool	is_position_free(const Position &pos, const std::vector<Snake> &snakes,
+						const std::vector<Position> &obstacles);
 
 class Food {
 	public:
@@ -34,7 +35,7 @@ class Food {
 
 		void	set_rng(std::mt19937 &rng);
 
-		void	generate_food(GameConfig &config, std::vector<Snake> &snakes, std::vector<Position> &obstacles);
+		void	generate_food(GameConfig &config, const std::vector<Snake> &snakes, const std::vector<Position> &obstacles);
 		const FoodKind	&get_food_kind(void);
 
 	private:

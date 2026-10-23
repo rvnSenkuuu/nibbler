@@ -3,7 +3,7 @@
 #include <dlfcn.h>
 #include <iostream>
 
-#include "Types.hpp"
+#include "GameData.hpp"
 
 #define	FIRST_LIB "./lib/raylib/libraylib.so"
 #define	SECOND_LIB "./lib/sdl2/libsdl2.so"
