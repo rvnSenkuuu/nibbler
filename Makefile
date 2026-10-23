@@ -7,11 +7,13 @@ RM = rm -rf
 SRCS = srcs/main.cpp \
 		srcs/Game.cpp \
 		srcs/Food.cpp \
+		srcs/Snake.cpp \
 		srcs/Lib.cpp \
 		srcs/AudioManager.cpp
 
 INCS = incs/Game.hpp \
 		incs/Food.hpp \
+		incs/Snake.hpp \
 		incs/Types.hpp \
 		incs/IGraphic.hpp \
 		incs/Lib.hpp \

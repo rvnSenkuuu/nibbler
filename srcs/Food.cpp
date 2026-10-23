@@ -1,13 +1,13 @@
 #include "Game.hpp"
 #include "Food.hpp"
 
-static const FoodKind	food_kinds[] = {
+static constexpr FoodKind	food_kinds[] = {
 	{FoodType::FOOD_RED, 10, 6},
 	{FoodType::FOOD_GREEN, 30, 3},
 	{FoodType::FOOD_YELLOW, 50, 1},
 };
 
-static const size_t	max_attempts = 1000;
+static constexpr size_t	max_attempts = 1000;
 
 Food::Food() { }
 Food::~Food() { }
@@ -27,19 +27,9 @@ int	Food::get_given_score(void) const
 	return m_given_score;
 }
 
-void	Food::set_rng(std::mt19937 rng)
+void	Food::set_rng(std::mt19937 &rng)
 {
 	m_rng = rng;
-}
-
-bool	Food::is_position_free(const Position &pos, std::vector<Snake> &snakes, std::vector<Position> &obstacles)
-{
-	for (const auto &snake : snakes) {
-		if (std::find(snake.body.begin(), snake.body.end(), pos) != snake.body.end())
-			return false;
-	}
-
-	return std::find(obstacles.begin(), obstacles.end(), pos) == obstacles.end();
 }
 
 void	Food::generate_food(GameConfig &config, std::vector<Snake> &snakes, std::vector<Position> &obstacles)
@@ -48,12 +38,10 @@ void	Food::generate_food(GameConfig &config, std::vector<Snake> &snakes, std::ve
 	std::uniform_int_distribution<size_t>	y_pos(0, config.height - 1);
 
 	Position	pos;
-	size_t	i = 0;
-	while (i < max_attempts) {
+	for (size_t i = 0; i < max_attempts; i++) {
 		pos = {x_pos(m_rng), y_pos(m_rng)};
 		if (is_position_free(pos, snakes, obstacles))
 			break;
-		i++;
 	}
 
 	const FoodKind	&kind = config.opt_food_variance ? get_food_kind() : food_kinds[0];

@@ -1,13 +1,24 @@
 #include "Game.hpp"
+#include "Snake.hpp"
 
-#define MIN_TICK_RATE 10.0f
-#define MAX_TICK_RATE 15.0f
-#define MIN_WIDTH 15
-#define MIN_HEIGHT 15
-#define MAX_WIDTH 50
-#define MAX_HEIGHT 50
+constexpr float	MIN_TICK_RATE = 10.0f;
+constexpr float	MAX_TICK_RATE = 15.0f;
+constexpr int	MIN_WIDTH = 15;
+constexpr int	MIN_HEIGHT = 15;
+constexpr int	MAX_WIDTH = 50;
+constexpr int	MAX_HEIGHT = 50;
 
-static const size_t	max_attempts = 1000;
+static constexpr size_t	max_attempts = 1000;
+
+bool	is_position_free(const Position &pos, std::vector<Snake> &snakes, std::vector<Position> &obstacles)
+{
+	for (const auto &snake : snakes) {
+		if (snake.occupies(pos))
+			return false;
+	}
+
+	return std::find(obstacles.begin(), obstacles.end(), pos) == obstacles.end();
+}
 
 Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
 									m_config(), m_tick_rate(MIN_TICK_RATE), m_last_update_time(std::chrono::steady_clock::now())
@@ -29,15 +40,29 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	m_food.generate_food(m_config, m_snakes, m_obstacles);
 }
 
+void	Game::reset_game(void)
+{
+	init_snakes();
+	if (m_config.opt_have_obstacles)
+		generate_obstacle();
+	if (m_config.opt_enable_sounds)
+		m_audio.reset();
+	m_food.generate_food(m_config, m_snakes, m_obstacles);
+	m_state = GameState::RUNNING;
+	m_winner = -1;
+	m_tick_rate = MIN_TICK_RATE;
+	m_last_update_time = std::chrono::steady_clock::now();
+}
+
 bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 {
-	if (argc < 3)
+	if (argc <= 2)
 		throw std::invalid_argument("Invalid argument count");
 	
 	config.width = std::stoi(argv[1]);
 	config.height = std::stoi(argv[2]);
 
-	if ((config.width < MIN_WIDTH && config.width > MAX_WIDTH) || (config.height < MIN_HEIGHT && config.height > MAX_HEIGHT))
+	if (config.width < MIN_WIDTH || config.width > MAX_WIDTH || config.height < MIN_HEIGHT || config.height > MAX_HEIGHT)
 		throw std::invalid_argument("Width or height values too low or too high");
 
 	for (int i = 3; i < argc; i++) {
@@ -76,51 +101,30 @@ bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 
 void	Game::init_snakes(void)
 {
-	m_snakes.reserve(m_player_count);
 	m_snakes.clear();
+	m_snakes.reserve(m_player_count);
 
 	size_t	row = m_player_count == 2 ? m_config.height / 3 : m_config.height / 2;
 
-	Snake	p1;
-	p1.direction = Event::LEFT;
-	p1.score = 0;
-	p1.id = __FIRST_SNAKE;
-	p1.alive = true;
-	p1.body.push_back({m_config.width / 2, row});
-	p1.body.push_back({m_config.width / 2 + 1, row});
-	p1.body.push_back({m_config.width / 2 + 2, row});
-	p1.body.push_back({m_config.width / 2 + 3, row});
-
-	m_snakes.push_back(p1);
-
+	m_snakes.emplace_back(__FIRST_SNAKE, Position{m_config.width/ 2 , row});
 	if (m_player_count == 2) {
 		row = 2 * m_config.height / 3;
-
-		Snake	p2;
-		p2.direction = Event::LEFT;
-		p2.score = 0;
-		p2.id = __SECOND_SNAKE;
-		p2.alive = true;
-		p2.body.push_back({m_config.width / 2, row});
-		p2.body.push_back({m_config.width / 2 + 1, row});
-		p2.body.push_back({m_config.width / 2 + 2, row});
-		p2.body.push_back({m_config.width / 2 + 3, row});
-
-		m_snakes.push_back(p2);
+		m_snakes.emplace_back(__SECOND_SNAKE, Position{m_config.width/ 2 , row});
 	}
 }
 
 GameData	Game::get_data(void) const
 {
-	return (GameData) {
-		.snakes = m_snakes,
-		.obstacles = m_obstacles,
-		.config = m_config,
-		.food = m_food,
-		.state = m_state,
-		.tick_rate = m_tick_rate,
-		.winner = m_winner
-	};
+	GameData	data;
+
+	data.snakes = m_snakes;
+	data.obstacles = m_obstacles;
+	data.config = m_config;
+	data.food = m_food;
+	data.state = m_state;
+	data.tick_rate = m_tick_rate;
+	data.winner = m_winner;
+	return data;
 }
 
 void	Game::handle_event(Lib &lib, Event &event)
@@ -136,13 +140,13 @@ void	Game::handle_event(Lib &lib, Event &event)
 		case Event::S:
 		case Event::A:
 		case Event::D:
-			change_snake_dir(__FIRST_SNAKE, event);
+			m_snakes[__FIRST_SNAKE].change_direction(event);
 			break;
 		case Event::UP:
 		case Event::DOWN:
 		case Event::RIGHT:
 		case Event::LEFT:
-			change_snake_dir(m_player_count == 2 ? __SECOND_SNAKE : __FIRST_SNAKE, event);
+			m_snakes[m_player_count == 2 ? __SECOND_SNAKE : __FIRST_SNAKE].change_direction(event);
 			break;
 		case Event::LIB1:
 			if (lib.switch_lib(FIRST_LIB))
@@ -160,7 +164,7 @@ void	Game::handle_event(Lib &lib, Event &event)
 			m_tick_rate = std::min(m_tick_rate + 1.0f, MAX_TICK_RATE);
 			break;
 		case Event::SPEED_DOWN:
-			m_tick_rate = std::min(m_tick_rate - 1.0f, MIN_TICK_RATE);
+			m_tick_rate = std::max(m_tick_rate - 1.0f, MIN_TICK_RATE);
 			break;
 		default:
 			break;
@@ -193,15 +197,14 @@ void	Game::run(Lib &lib)
 
 void	Game::kill_snake(Snake &snake)
 {
-	m_state = GameState::GAME_OVER;
-	snake.alive = false;
+	snake.die();
 	if (m_config.opt_enable_sounds)
 		m_audio.play("DEATH");
 }
 
 void	Game::check_collision(Snake &current)
 {
-	Position	head = current.body.front();
+	Position	head = current.get_head();
 	if (head.x >= m_config.width || head.y >= m_config.height) {
 		kill_snake(current);
 		return;
@@ -213,13 +216,13 @@ void	Game::check_collision(Snake &current)
 	}
 
 	for (auto &snake : m_snakes) {
-		auto	begin_it = snake.body.begin();
+		auto	begin_it = snake.get_body().begin();
 		if (&current == &snake)
 			begin_it = std::next(begin_it);
 
 		if (std::any_of(
 			begin_it,
-			snake.body.end(),
+			snake.get_body().end(),
 			[&head](const Position &pos) { return head == pos; }
 		)) {
 			kill_snake(current);
@@ -228,44 +231,11 @@ void	Game::check_collision(Snake &current)
 	}
 }
 
-Event	Game::get_event_dir(Event event)
-{
-	switch (event) {
-	case Event::W:
-		return Event::UP;
-	case Event::S:
-		return Event::DOWN;
-	case Event::A:
-		return Event::LEFT;
-	case Event::D:
-		return Event::RIGHT;
-	default:
-		return event;
-	}
-}
-
-bool	Game::is_opposite_dir(Event a, Event b)
-{
-	a = get_event_dir(a);
-	b = get_event_dir(b);
-
-	return (a == Event::UP && b == Event::DOWN) || (a == Event::DOWN && b == Event::UP) ||
-		(a == Event::LEFT && b == Event::RIGHT) || (a == Event::RIGHT && b == Event::LEFT);
-}
-
-void	Game::change_snake_dir(size_t snake_index, Event event)
-{
-	Snake	&snake = m_snakes[snake_index];
-	if (snake.alive && !is_opposite_dir(snake.direction, event))
-		snake.direction = get_event_dir(event);
-}
-
 bool	Game::is_board_full(void)
 {
 	size_t	total = 0;
-	for (auto &snake : m_snakes) {
-		total += snake.body.size();
-	}
+	for (auto &snake : m_snakes)
+		total += snake.length();
 
 	return total >= m_config.width * m_config.height - m_obstacles.size();
 }
@@ -273,12 +243,12 @@ bool	Game::is_board_full(void)
 void	Game::update_game(void)
 {
 	for (auto &snake : m_snakes) {
-		if (snake.alive)
+		if (snake.get_alive())
 			move_snake(snake);
 	}
 
 	for (auto &snake : m_snakes) {
-		if (snake.alive)
+		if (snake.get_alive())
 			check_collision(snake);
 	}
 
@@ -287,111 +257,68 @@ void	Game::update_game(void)
 		auto	it = std::find_if(
 			m_snakes.begin(),
 			m_snakes.end(),
-			[&max](const auto &snake) { return snake.score >= max; }
+			[&max](const auto &snake) { return snake.get_score() >= max; }
 		);
 
 		if (it != m_snakes.end()) {
 			m_state = GameState::WON;
-			m_winner = it->id;
+			m_winner = it->get_id();
 			m_audio.stop();
+			return;
 		}
 	}
 
 	size_t	alive_count = std::count_if(
 		m_snakes.begin(),
 		m_snakes.end(),
-		[](const Snake &snake) { return snake.alive; }
+		[](const Snake &snake) { return snake.get_alive(); }
 	);
 
 	if (alive_count == 0) {
 		m_state = m_player_count == 2 ? GameState::DRAW : GameState::GAME_OVER;
-		if (m_config.opt_enable_sounds) {
-			m_audio.stop();
-			m_audio.play("DEATH");
-		}
 	} else if (m_player_count == 2 && alive_count == 1) {
 		m_state = GameState::WON;
-		m_winner = m_snakes[0].alive ? m_snakes[0].id : m_snakes[1].id;
-		m_audio.stop();
+		m_winner = m_snakes[0].get_alive() ? m_snakes[0].get_id() : m_snakes[1].get_id();
 	} else if (is_board_full()) {
 		if (m_player_count == 1) {
 			m_state = GameState::WON;
 			m_winner = __FIRST_SNAKE;
-		} else if (m_snakes[0].body.size() == m_snakes[1].body.size()) {
+		} else if (m_snakes[0].length() == m_snakes[1].length()) {
 			m_state = GameState::DRAW;
 		} else {
 			m_state = GameState::WON;
-			m_winner = m_snakes[0].body.size() > m_snakes[1].body.size() ? m_snakes[0].id : m_snakes[1].id;
+			m_winner = m_snakes[0].length() > m_snakes[1].length() ? m_snakes[0].get_id() : m_snakes[1].get_id();
 		}
 		m_audio.stop();
 	}
 }
 
-Position	Game::get_next_pos(Position &pos, Event dir)
-{
-	size_t	dx = 0, dy = 0;
-
-	switch (dir) {
-	case Event::UP:
-		dy = -1;
-		break;
-	case Event::DOWN:
-		dy = 1;
-		break;
-	case Event::LEFT:
-		dx = -1;
-		break;
-	case Event::RIGHT:
-		dx = 1;
-		break;
-	default:
-		break;
-	}
-
-	pos.x = pos.x + dx;
-	pos.y = pos.y + dy;
-	return pos;
-}
-
 void	Game::move_snake(Snake &snake)
 {
-	Position	head = snake.body.front();
-	Position	next_pos = get_next_pos(head, snake.direction);
-
+	Position	next_pos = snake.next_pos(snake.get_head());
 	bool	is_food = (next_pos == m_food.get_pos());
-	snake.body.push_front(next_pos);
 
-	if (!is_food) {
-		snake.body.pop_back();
+	snake.move(next_pos, is_food);
+	if (!is_food)
 		return;
-	}
 
 	if (m_config.opt_enable_sounds)
 		m_audio.play("EAT");
-	snake.score += m_food.get_given_score();
+
+	snake.add_score(m_food.get_given_score());
 	m_food.generate_food(m_config, m_snakes, m_obstacles);
-}
-
-bool	Game::is_position_free(const Position &pos)
-{
-	for (const auto &snake : m_snakes) {
-		if (std::find(snake.body.begin(), snake.body.end(), pos) != snake.body.end())
-			return false;
-	}
-
-	return std::find(m_obstacles.begin(), m_obstacles.end(), pos) == m_obstacles.end();
 }
 
 bool	Game::is_valid_obstacle_pos(const Position &pos)
 {
-	if (!is_position_free(pos))
+	if (!is_position_free(pos, m_snakes, m_obstacles))
 		return false;
 
 	const int	max_step = 10;
-	for (const auto &snake : m_snakes) {
-		Position	head = snake.body.front();
+	for (auto &snake : m_snakes) {
+		Position	head = snake.get_head();
 		for (int i = 0; i < max_step; i++) {
-			head = get_next_pos(head, snake.direction);
+			head = snake.next_pos(head);
 			if (head == pos)
 				return false;
 		}
@@ -402,8 +329,8 @@ bool	Game::is_valid_obstacle_pos(const Position &pos)
 int	Game::get_max_obstacles(void)
 {
 	const int	board_size = m_config.width * m_config.height;
-	size_t	snakes_size = m_snakes[0].body.size();
-	snakes_size += m_config.opt_is_multi ? m_snakes[1].body.size() : 0;
+	size_t	snakes_size = m_snakes[0].length();
+	snakes_size += m_config.opt_is_multi ? m_snakes[1].length() : 0;
 	
 	const int	total_free_slot = board_size - static_cast<int>(snakes_size) - 1;
 	if (total_free_slot <= 0)
@@ -431,18 +358,4 @@ void	Game::generate_obstacle(void)
 			m_obstacles.push_back(pos);
 		i++;
 	}
-}
-
-void	Game::reset_game(void)
-{
-	init_snakes();
-	if (m_config.opt_have_obstacles)
-		generate_obstacle();
-	if (m_config.opt_enable_sounds)
-		m_audio.reset();
-	m_food.generate_food(m_config, m_snakes, m_obstacles);
-	m_state = GameState::RUNNING;
-	m_winner = -1;
-	m_tick_rate = MIN_TICK_RATE;
-	m_last_update_time = std::chrono::steady_clock::now();
 }

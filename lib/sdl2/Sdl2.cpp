@@ -68,16 +68,16 @@ class GraphicLib : public IGraphic {
 
 			for (auto &snake : data.snakes)
 				draw_snake(snake, 
-					snake.id == __FIRST_SNAKE ? p1_color[0] : p2_color[0],
-					snake.id == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
+					snake.get_id() == __FIRST_SNAKE ? p1_color[0] : p2_color[0],
+					snake.get_id() == __FIRST_SNAKE ? p1_color[1] : p2_color[1]
 				);
 
 			const Position	&pos = data.food.get_pos();
 			draw_cell(pos.x, pos.y,  get_food_color(data.food.get_type()));
 		
-			draw_text("P1 Score: " + std::to_string(data.snakes[0].score), 10, 10, p1_color[1]);
+			draw_text("P1 Score: " + std::to_string(data.snakes[0].get_score()), 10, 10, p1_color[1]);
 			if (data.config.opt_is_multi)
-				draw_text("P2 Score: " + std::to_string(data.snakes[0].score), 10, 40, p2_color[1]);
+				draw_text("P2 Score: " + std::to_string(data.snakes[0].get_score()), 10, 40, p2_color[1]);
 
 			char speed[32];
 			snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
@@ -99,11 +99,11 @@ class GraphicLib : public IGraphic {
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
 				else
-					game_winner = data.winner == data.snakes[0].id ? "P1 won !" : "P2 won !";
+					game_winner = data.winner == data.snakes[0].get_id() ? "P1 won !" : "P2 won !";
 
 				draw_text_centered(game_winner, center_x, start_y, RAYWHITE_C);
-				draw_text_centered("P1 Score: " + std::to_string(data.snakes[0].score), center_x, start_y + 30, p1_color[1]);
-				draw_text_centered("P2 Score: " + std::to_string(data.snakes[1].score), center_x, start_y + 60, p2_color[1]);
+				draw_text_centered("P1 Score: " + std::to_string(data.snakes[0].get_score()), center_x, start_y + 30, p1_color[1]);
+				draw_text_centered("P2 Score: " + std::to_string(data.snakes[1].get_score()), center_x, start_y + 60, p2_color[1]);
 				draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 90, RAYWHITE_C);
 				
 				SDL_RenderPresent(m_renderer);
@@ -112,7 +112,7 @@ class GraphicLib : public IGraphic {
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
 			draw_text_centered(end_msg, center_x, start_y, RAYWHITE_C);
-			draw_text_centered("Your score: " + std::to_string(data.snakes[0].score), center_x, start_y + 45, p1_color[1]);
+			draw_text_centered("Your score: " + std::to_string(data.snakes[0].get_score()), center_x, start_y + 45, p1_color[1]);
 			draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 100, RAYWHITE_C);
 
 			SDL_RenderPresent(m_renderer);
@@ -189,8 +189,8 @@ class GraphicLib : public IGraphic {
 
 			void	draw_snake(const Snake &snake, const SDL_Color head_color, const SDL_Color body_color)
 			{
-				for (auto &pos : snake.body) {
-					const SDL_Color	color = (pos == snake.body[0]) ? head_color : body_color; 
+				for (auto &pos : snake.get_body()) {
+					const SDL_Color	color = (pos == snake.get_head()) ? head_color : body_color; 
 					const SDL_Rect	rect = {
 						.x = static_cast<int>(pos.x) * CELL_SIZE,
 						.y = static_cast<int>(pos.y) * CELL_SIZE,

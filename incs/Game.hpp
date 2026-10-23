@@ -13,11 +13,13 @@
 #include "Types.hpp"
 
 void	usage(void);
+bool	is_position_free(const Position &pos, std::vector<Snake> &snakes,
+						std::vector<Position> &obstacles);
 
 class Game {
 	public:
 		Game(int argc, char **argv);
-		~Game(void) { };
+		~Game(void) = default;
 
 		GameData	get_data(void) const;
 
@@ -31,20 +33,14 @@ class Game {
 		void	check_collision(Snake &current);
 		void	move_snake(Snake &snake);
 		void	kill_snake(Snake &snake);
-		Position	get_next_pos(Position &pos, Event dir);
-		void	change_snake_dir(size_t snake_index, Event event);
 		void	handle_event(Lib &lib, Event &event);
 
-		[[nodiscard]] bool	is_position_free(const Position &pos);
-	
 	private:
 		Game() = default;
 		Game(const Game &rhs) = default;
 		Game	&operator=(const Game &rhs) = default;
 
-		[[nodiscard]] bool	is_opposite_dir(Event a, Event b);
 		[[nodiscard]] bool	is_valid_obstacle_pos(const Position &pos);
-		Event	get_event_dir(Event event);
 		int	get_max_obstacles(void);
 
 	private:

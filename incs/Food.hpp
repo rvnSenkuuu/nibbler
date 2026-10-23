@@ -3,6 +3,10 @@
 #include <random>
 #include <vector>
 
+#include "Snake.hpp"
+
+class Snake;
+
 enum class FoodType : int {
 	FOOD_RED,
 	FOOD_GREEN,
@@ -15,6 +19,8 @@ struct FoodKind {
 	int	weight;
 };
 
+bool	is_position_free(const Position &pos, std::vector<Snake> &snakes, std::vector<Position> &obstacles);
+
 class Food {
 	public:
 		Food(void);
@@ -22,13 +28,11 @@ class Food {
 		Food(const Food &rhs) = default;
 		Food	&operator=(const Food &rhs) = default;
 
-		[[nodiscard]] bool	is_position_free(const Position &pos, std::vector<Snake> &snakes, std::vector<Position>	&obstacles);
-
 		Position	get_pos(void) const;
 		FoodType	get_type(void) const;
 		int	get_given_score(void) const;
 
-		void	set_rng(std::mt19937 rng);
+		void	set_rng(std::mt19937 &rng);
 
 		void	generate_food(GameConfig &config, std::vector<Snake> &snakes, std::vector<Position> &obstacles);
 		const FoodKind	&get_food_kind(void);

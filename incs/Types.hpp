@@ -65,13 +65,13 @@ struct GameConfig {
 	int	obstacles_count;
 };
 
-struct Snake {
-	std::deque<Position>	body;
-	size_t	score;
-	Event	direction;
-	int	id;
-	bool	alive;
-};
+// struct Snake {
+// 	std::deque<Position>	body;
+// 	size_t	score;
+// 	Event	direction;
+// 	int	id;
+// 	bool	alive;
+// };
 
 #include "Food.hpp"
 
