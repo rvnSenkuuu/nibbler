@@ -56,6 +56,13 @@ void	Game::reset_game(void)
 
 bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 {
+	for (int i = 1; i < argc; i++) {
+		if (std::string(argv[i]) == "--help") {
+			usage();
+			std::exit(0);
+		}
+	}
+
 	if (argc <= 2)
 		throw std::invalid_argument("Invalid argument count");
 	
@@ -67,18 +74,15 @@ bool	Game::get_game_config(int argc, char **argv, GameConfig &config)
 
 	for (int i = 3; i < argc; i++) {
 		std::string	arg = argv[i];
-		
-		if (arg == "--help") {
-			usage();
-			std::exit(0);
-		} else if (arg == "--multi") {
+
+		if (arg == "--multi") {
 			config.opt_is_multi = true;
 		} else if (arg == "--limit-score") {
 			config.opt_limit_score = true;
 			if (argv[++i] == nullptr)
 				return false;
 			config.max_score = std::stoi(argv[i]);
-			if (config.max_score < 0)
+			if (config.max_score <= 0)
 				return false;
 		} else if (arg == "--food-variance") {
 			config.opt_food_variance = true;
@@ -337,7 +341,7 @@ int	Game::get_max_obstacles(void) const
 		return 0;
 
 	return std::min(total_free_slot / 2, board_size * 20 / 100);
-};
+}
 
 void	Game::generate_obstacle(void)
 {
