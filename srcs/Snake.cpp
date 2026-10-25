@@ -57,34 +57,29 @@ void	Snake::change_direction(Event event)
 
 Position	Snake::next_pos(Position head) const
 {
-	size_t	dx = 0, dy = 0;
-
 	switch (m_direction) {
 	case Event::UP:
-		dy = -1;
+		head.y--;
 		break;
 	case Event::DOWN:
-		dy = 1;
+		head.y++;
 		break;
 	case Event::LEFT:
-		dx = -1;
+		head.x--;
 		break;
 	case Event::RIGHT:
-		dx = 1;
+		head.x++;
 		break;
 	default:
 		break;
 	}
 
-	head.x = head.x + dx;
-	head.y = head.y + dy;
 	return head;
 }
 
 void	Snake::move(Position next_pos, bool grow)
 {
 	m_body.push_front(next_pos);
-
 	if (!grow)
 		m_body.pop_back();
 }

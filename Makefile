@@ -9,7 +9,7 @@ SRCS = srcs/main.cpp \
 		srcs/Food.cpp \
 		srcs/Snake.cpp \
 		srcs/Lib.cpp \
-		srcs/AudioManager.cpp
+		srcs/Audio.cpp
 
 INCS = incs/Game.hpp \
 		incs/GameData.hpp \
@@ -19,7 +19,7 @@ INCS = incs/Game.hpp \
 		incs/IGraphic.hpp \
 		incs/Lib.hpp \
 		incs/IAudio.hpp \
-		incs/AudioManager.hpp
+		incs/Audio.hpp
 
 OBJSDIR = .objs/
 OBJS = $(patsubst %.cpp, $(OBJSDIR)%.o, $(SRCS))

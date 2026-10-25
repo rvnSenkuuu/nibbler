@@ -24,8 +24,8 @@ bool	is_position_free(const Position &pos, const std::vector<Snake> &snakes,
 
 class Food {
 	public:
-		Food(void);
-		~Food(void);
+		Food(void) = default;
+		~Food(void) = default;
 		Food(const Food &rhs) = default;
 		Food	&operator=(const Food &rhs) = default;
 
@@ -33,10 +33,12 @@ class Food {
 		FoodType	get_type(void) const;
 		int	get_given_score(void) const;
 
-		void	set_rng(std::mt19937 &rng);
+		void	set_rng(const std::mt19937 &rng);
 
-		void	generate_food(GameConfig &config, const std::vector<Snake> &snakes, const std::vector<Position> &obstacles);
-		const FoodKind	&get_food_kind(void);
+		bool	generate_food(GameConfig &config, const std::vector<Snake> &snakes, const std::vector<Position> &obstacles);
+		
+		private:
+			const FoodKind	&get_food_kind(void);
 
 	private:
 		std::mt19937	m_rng;

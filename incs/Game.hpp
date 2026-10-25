@@ -1,19 +1,32 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
+#include <charconv>
 #include <algorithm>
 #include <iterator>
 #include <random>
+#include <optional>
+#include <system_error>
 #include <chrono>
 
 #include "Snake.hpp"
 #include "Food.hpp"
 #include "Lib.hpp"
-#include "AudioManager.hpp"
+#include "Audio.hpp"
 #include "GameData.hpp"
 
 void	usage(void);
+
+template<typename T>
+bool	get_option_value(const char *arg, T &option)
+{
+	const std::string_view	str(arg);
+	const auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), option);
+	
+	return ec == std::errc() && ptr == str.data() + str.size();
+}
 
 class Game {
 	public:
@@ -23,9 +36,10 @@ class Game {
 		GameData	get_data(void) const;
 
 		[[nodiscard]] bool	is_board_full(void) const;
-		[[nodiscard]] bool	get_game_config(int argc, char **argv, GameConfig &config);
+		[[nodiscard]] std::optional<GameConfig>	get_game_config(int argc, char **argv);
 		void	init_snakes();
 		void	run(Lib &lib);
+		void	end_game(GameState state, int winner);
 		void	update_game(void);
 		void	reset_game(void);
 		void	generate_obstacle(void);
@@ -50,7 +64,7 @@ class Game {
 		std::mt19937	m_rng;
 		GameState	m_state;
 		GameConfig	m_config;
-		AudioManager	m_audio;
+		Audio	m_audio;
 
 		float	m_tick_rate;
 		std::chrono::steady_clock::time_point	m_last_update_time;

@@ -9,6 +9,8 @@ constexpr const char	*FONT_PATH = "./assets/font.ttf";
 constexpr int FIRST_SNAKE  = 0;
 constexpr int SECOND_SNAKE  = 1;
 
+constexpr size_t	max_spawn_attempts = 1000;
+
 enum class GridType : int {
 	EMPTY,
 	SNAKE_HEAD,
@@ -53,14 +55,14 @@ struct Position {
 };
 
 struct GameConfig {
-	size_t	width;
-	size_t	height;
+	size_t	width = 0;
+	size_t	height = 0;
 
-	bool	opt_is_multi;
-	bool	opt_limit_score;
-	bool	opt_food_variance;
-	bool	opt_have_obstacles;
-	bool	opt_enable_sounds;
-	int	max_score;
-	int	obstacles_count;
+	bool	opt_is_multi = false;
+	bool	opt_limit_score = false;
+	bool	opt_food_variance = false;
+	bool	opt_have_obstacles = false;
+	bool	opt_enable_sounds = false;
+	int	max_score = 0;
+	int	obstacles_count = 0;
 };
