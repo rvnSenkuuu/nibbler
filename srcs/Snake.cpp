@@ -109,6 +109,11 @@ size_t	Snake::get_score(void) const
 	return m_score;
 }
 
+Event	Snake::get_direction(void) const
+{
+	return m_direction;
+}
+
 const std::deque<Position>	&Snake::get_body(void) const
 {
 	return m_body;

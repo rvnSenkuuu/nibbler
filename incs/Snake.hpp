@@ -22,6 +22,7 @@ class Snake {
 		Position	get_head(void) const;
 		size_t	length() const;
 		size_t	get_score() const;
+		Event	get_direction(void) const;
 		const std::deque<Position>	&get_body(void) const;
 
 		void	add_score(size_t score);
