@@ -3,8 +3,8 @@
 #include <deque>
 #include <vector>
 
-#define CELL_SIZE 20
-#define FONT_PATH "./assets/font.ttf"
+constexpr int	CELL_SIZE = 20;
+constexpr const char	*FONT_PATH = "./assets/font.ttf";
 
 constexpr int FIRST_SNAKE  = 0;
 constexpr int SECOND_SNAKE  = 1;

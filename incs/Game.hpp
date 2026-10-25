@@ -14,8 +14,6 @@
 #include "GameData.hpp"
 
 void	usage(void);
-bool	is_position_free(const Position &pos, std::vector<Snake> &snakes,
-						std::vector<Position> &obstacles);
 
 class Game {
 	public:
