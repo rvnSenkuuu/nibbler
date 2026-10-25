@@ -12,10 +12,10 @@ using FnResetSound = void	(*)(void);
 using FnStopSound = void	(*)(void);
 using FnDestroyAudio = void	(*)(void);
 
-class AudioManager {
+class Audio {
 	public:
-		AudioManager(void);
-		~AudioManager(void);
+		Audio(void);
+		~Audio(void);
 
 		void	load(const std::string &path);
 		void	unload(void);
@@ -28,9 +28,9 @@ class AudioManager {
 		FnDestroyAudio	destroy;
 
 	private:
-		AudioManager(const AudioManager &) = delete;
-		AudioManager(const std::string &path) = delete;
-		AudioManager	&operator=(const AudioManager &) = delete;
+		Audio(const Audio &) = delete;
+		Audio(const std::string &path) = delete;
+		Audio	&operator=(const Audio &) = delete;
 
 		void	*m_handle;
 };

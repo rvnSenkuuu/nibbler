@@ -1,17 +1,17 @@
-#include "AudioManager.hpp"
+#include "Audio.hpp"
 
-AudioManager::AudioManager(void)
+Audio::Audio(void)
 {
 	load(AUDIO_LIB);
 }
 
-AudioManager::~AudioManager()
+Audio::~Audio()
 {
 	if (m_handle)
 		unload();
 }
 
-void	AudioManager::load(const std::string &path)
+void	Audio::load(const std::string &path)
 {
 	m_handle = dlopen(path.c_str(), RTLD_LAZY);
 	if (!m_handle)
@@ -35,7 +35,7 @@ void	AudioManager::load(const std::string &path)
 	destroy = reinterpret_cast<FnDestroyAudio>(sym("destroy"));
 }
 
-void	AudioManager::unload(void)
+void	Audio::unload(void)
 {
 	destroy();
 	if (dlclose(m_handle) != 0)
