@@ -239,7 +239,7 @@ extern "C" {
 
 	void	render_game(const GameData &data)
 	{
-		if (data.state == GameState::GAME_OVER || data.state == GameState::WON || data.state == GameState::DRAW) {
+		if (data.state != GameState::RUNNING) {
 			lib.render_end_game(data);
 			return;
 		}
