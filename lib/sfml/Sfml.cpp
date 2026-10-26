@@ -23,6 +23,7 @@ enum TextureId {
 	FOOD_GREEN,
 	FOOD_YELLOW,
 	WALL,
+	GROUND,
 	
 	__TEXTURE_ID_COUNT
 };
@@ -64,7 +65,8 @@ class GraphicLib : public IGraphic {
 				!load_texture(SNAKE_1_BODY, "./assets/snake/snake_1_body.png") ||
 				!load_texture(SNAKE_2_HEAD, "./assets/snake/snake_2_head.png") ||
 				!load_texture(SNAKE_2_BODY, "./assets/snake/snake_2_body.png") ||
-				!load_texture(WALL, "./assets/wall.png"))
+				!load_texture(WALL, "./assets/wall.png") ||
+				!load_texture(GROUND, "./assets/ground.png"))
 				return false;
 
 			return true;
@@ -88,11 +90,24 @@ class GraphicLib : public IGraphic {
 				destroy_window();
 				throw std::runtime_error("Failed to init textures");
 			}
+
+			const sf::Vector2u	ground_size = m_textures[GROUND].getSize();
+			m_textures[GROUND].setRepeated(true);
+			m_ground_sprite.setTexture(m_textures[GROUND]);
+			m_ground_sprite.setTextureRect(
+				sf::IntRect(0, 0,width * ground_size.x, height * ground_size.y)
+			);
+			m_ground_sprite.setScale(
+				static_cast<float>(CELL_SIZE) / ground_size.x,
+				static_cast<float>(CELL_SIZE) / ground_size.y
+			);
 		}
 
 		void	render_game(const GameData &data) override
 		{
 			m_window->clear(sf::Color::Black);
+
+			m_window->draw(m_ground_sprite);
 
 			auto	food_texture = [](const FoodType type) {
 				if (type == FoodType::FOOD_RED)
@@ -278,14 +293,23 @@ class GraphicLib : public IGraphic {
 			{
 				for (auto &pos : snake.get_body()) {
 					if (pos == snake.get_head())
-						draw_sprite(pos, snake.get_id() == FIRST_SNAKE ? SNAKE_1_HEAD : SNAKE_2_HEAD, sprite_rotation(snake.get_direction()));
+						draw_sprite(
+							pos,
+							snake.get_id() == FIRST_SNAKE ? SNAKE_1_HEAD : SNAKE_2_HEAD,
+							sprite_rotation(snake.get_direction())
+						);
 					else 
-						draw_sprite(pos, snake.get_id() == FIRST_SNAKE ? SNAKE_1_BODY : SNAKE_2_BODY, sprite_rotation(snake.get_direction()));
+						draw_sprite(
+							pos,
+							snake.get_id() == FIRST_SNAKE ? SNAKE_1_BODY : SNAKE_2_BODY,
+							sprite_rotation(snake.get_direction())
+						);
 				}
 			}
 
 			sf::RenderWindow	*m_window;
 			sf::Font	*m_font;
+			sf::Sprite	m_ground_sprite;
 
 			std::unordered_map<TextureId, sf::Texture>	m_textures;
 };
