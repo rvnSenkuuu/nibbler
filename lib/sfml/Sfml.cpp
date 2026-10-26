@@ -4,15 +4,9 @@
 #include "Types.hpp"
 #include "IGraphic.hpp"
 
-const sf::Color	RAYWHITE_C(245, 245, 245);
-const sf::Color	RED(255, 0, 0);
-const sf::Color	DARKBLUE_C(0, 82, 172);
+const sf::Color	GRAY_C(80, 80, 80);
+const sf::Color	BLACK_C(0, 0, 0);
 const sf::Color	BLUE_C(0, 121, 241);
-const sf::Color	DARKBROWN_C(76, 63, 47);
-const sf::Color	BROWN_C(127, 106, 79);
-
-const sf::Color	p1_color[2] = {DARKBROWN_C, BROWN_C};
-const sf::Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
 
 enum TextureId {
 	SNAKE_1_HEAD,
@@ -126,7 +120,7 @@ class GraphicLib : public IGraphic {
 			for (auto &snake : data.snakes)
 				draw_snake(snake);
 
-			draw_score(data.snakes, p1_color[1], p2_color[1]);
+			draw_score(data.snakes);
 			draw_speed(data);
 
 			m_window->display();
@@ -161,8 +155,8 @@ class GraphicLib : public IGraphic {
 					game_winner = data.winner == data.snakes[0].get_id() ? "P1 won !" : "P2 won !";
 
 				draw_centered(game_winner, start_y, sf::Color::White);
-				draw_centered("P1 Score: " + std::to_string(data.snakes[0].get_score()), start_y + 30, p1_color[1]);
-				draw_centered("P2 Score: " + std::to_string(data.snakes[1].get_score()), start_y + 60, p2_color[1]);
+				draw_centered("P1 Score: " + std::to_string(data.snakes[0].get_score()), start_y + 30, GRAY_C);
+				draw_centered("P2 Score: " + std::to_string(data.snakes[1].get_score()), start_y + 60, BLUE_C);
 				draw_centered("Press 'Enter' for restart the game", start_y + 90, sf::Color::White);
 				
 				m_window->display();
@@ -171,7 +165,7 @@ class GraphicLib : public IGraphic {
 
 			const std::string	end_msg = data.state == GameState::WON ? "You Won !" :  "Game Over !";
 			draw_centered(end_msg, start_y, sf::Color::White);
-			draw_centered("Your score: " + std::to_string(data.snakes[0].get_score()), start_y + 45, p1_color[1]);
+			draw_centered("Your score: " + std::to_string(data.snakes[0].get_score()), start_y + 45, GRAY_C);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100, sf::Color::White);
 
 			m_window->display();
@@ -238,19 +232,19 @@ class GraphicLib : public IGraphic {
 			GraphicLib(const GraphicLib &other) = delete;
 			GraphicLib	&operator=(const GraphicLib &other) = delete;
 
-			void	draw_score(const std::vector<Snake> &snakes, sf::Color p1, sf::Color p2)
+			void	draw_score(const std::vector<Snake> &snakes)
 			{
 				sf::Text	score;
 				score.setFont(*m_font);
 				score.setCharacterSize(20);
 				score.setString("P1 Score: " + std::to_string(snakes[0].get_score()));
-				score.setFillColor(p1);
+				score.setFillColor(GRAY_C);
 				score.setPosition(10, 10);
 				m_window->draw(score);
 				
 				if (snakes.size() == 2) {
 					score.setString("P2 Score: " + std::to_string(snakes[1].get_score()));
-					score.setFillColor(p2);
+					score.setFillColor(BLUE_C);
 					score.setPosition(10, 40);
 					m_window->draw(score);
 				}
@@ -265,7 +259,7 @@ class GraphicLib : public IGraphic {
 				text.setFont(*m_font);
 				text.setString(speed);
 				text.setCharacterSize(20);
-				text.setFillColor(RAYWHITE_C);
+				text.setFillColor(BLACK_C);
 
 				sf::FloatRect	bounds = text.getLocalBounds();
 				text.setOrigin(bounds.width, 0.f);
