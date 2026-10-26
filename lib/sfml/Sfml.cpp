@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
 
 #include "Types.hpp"
 #include "IGraphic.hpp"
@@ -10,11 +11,64 @@ const sf::Color	BLUE_C(0, 121, 241);
 const sf::Color	DARKBROWN_C(76, 63, 47);
 const sf::Color	BROWN_C(127, 106, 79);
 
+const sf::Color	p1_color[2] = {DARKBROWN_C, BROWN_C};
+const sf::Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
+
+enum TextureId {
+	SNAKE_1_HEAD,
+	SNAKE_1_BODY,
+	SNAKE_2_HEAD,
+	SNAKE_2_BODY,
+	FOOD_RED,
+	FOOD_GREEN,
+	FOOD_YELLOW,
+	WALL,
+	
+	__TEXTURE_ID_COUNT
+};
+
+static float	sprite_rotation(Event dir)
+{
+	switch (dir) {
+	case Event::UP:
+		return 90.f;
+	case Event::RIGHT:
+		return 180.f;
+	case Event::DOWN:
+		return 270.f;
+	default:
+		return 0.f;
+	}
+}
+
 class GraphicLib : public IGraphic {
 	public:
 
 		GraphicLib(void) : m_window(nullptr), m_font(nullptr) { };
 		~GraphicLib(void) { };
+
+		bool	load_texture(TextureId id, const char *path)
+		{
+			return m_textures[id].loadFromFile(path);
+		}
+
+		bool	init_textures(void)
+		{
+			m_textures.reserve(__TEXTURE_ID_COUNT);
+			m_textures.clear();
+
+			if (!load_texture(FOOD_RED, "./assets/food/food_red.png") ||
+				!load_texture(FOOD_GREEN, "./assets/food/food_green.png") ||
+				!load_texture(FOOD_YELLOW, "./assets/food/food_yellow.png") ||
+				!load_texture(SNAKE_1_HEAD, "./assets/snake/snake_1_head.png") ||
+				!load_texture(SNAKE_1_BODY, "./assets/snake/snake_1_body.png") ||
+				!load_texture(SNAKE_2_HEAD, "./assets/snake/snake_2_head.png") ||
+				!load_texture(SNAKE_2_BODY, "./assets/snake/snake_2_body.png") ||
+				!load_texture(WALL, "./assets/wall.png"))
+				return false;
+
+			return true;
+		}
 
 		void	create_window(int width, int height) override
 		{
@@ -29,27 +83,33 @@ class GraphicLib : public IGraphic {
 				destroy_window();
 				throw std::runtime_error("Failed to load font");
 			}
+
+			if (!init_textures()) {
+				destroy_window();
+				throw std::runtime_error("Failed to init textures");
+			}
 		}
-		
+
 		void	render_game(const GameData &data) override
 		{
 			m_window->clear(sf::Color::Black);
 
-			for (auto &snake : data.snakes)
-				draw_snake(snake, 
-					snake.get_id() == FIRST_SNAKE ? p1_color[0] : p2_color[0],
-					snake.get_id() == FIRST_SNAKE ? p1_color[1] : p2_color[1]
-				);
+			auto	food_texture = [](const FoodType type) {
+				if (type == FoodType::FOOD_RED)
+					return TextureId::FOOD_RED;
+				else if (type == FoodType::FOOD_GREEN)
+					return TextureId::FOOD_GREEN;
+				else
+					return TextureId::FOOD_YELLOW;
+			};
 
-			sf::Color	food_color = get_food_color(data.food.get_type());
-			sf::RectangleShape	food(sf::Vector2f(CELL_SIZE, CELL_SIZE));
-			food.setFillColor(food_color);
-			const Position	&pos = data.food.get_pos();
-			food.setPosition(sf::Vector2f(
-				static_cast<float>(pos.x * CELL_SIZE), 
-				static_cast<float>(pos.y * CELL_SIZE))
-			);
-			m_window->draw(food);
+			for (auto &obstable : data.obstacles)
+				draw_sprite(obstable, WALL);
+
+			draw_sprite(data.food.get_pos(), food_texture(data.food.get_type()));
+
+			for (auto &snake : data.snakes)
+				draw_snake(snake);
 
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
 			draw_speed(data);
@@ -198,35 +258,36 @@ class GraphicLib : public IGraphic {
 				m_window->draw(text);
 			}
 
-			void	draw_snake(const Snake &snake, const sf::Color &head_color, const sf::Color &body_color)
+			void	draw_sprite(const Position &pos, TextureId id, float rotation = 0.f)
 			{
-				for (auto &pos : snake.get_body()) {
-					sf::RectangleShape	cell(sf::Vector2f(CELL_SIZE, CELL_SIZE));
-					sf::Color	color = (pos == snake.get_head()) ? head_color : body_color;
-					cell.setFillColor(color);
-					cell.setPosition(sf::Vector2f(
-						static_cast<float>(pos.x * CELL_SIZE),
-						static_cast<float>(pos.y * CELL_SIZE))
-					);
-					m_window->draw(cell);
-				}
+				sf::Texture	&texture = m_textures.find(id)->second;
+				const sf::Vector2u	texture_size = texture.getSize();
+				sf::Sprite	sprite(texture);
+
+				sprite.setOrigin(texture_size.x / 2.f, texture_size.y / 2.f);
+				sprite.setScale(
+					static_cast<float>(CELL_SIZE) / texture_size.x,
+					static_cast<float>(CELL_SIZE) / texture_size.y
+				);
+				sprite.setPosition((pos.x + 0.5f) * CELL_SIZE, (pos.y + 0.5f) * CELL_SIZE);
+				sprite.rotate(rotation);
+				m_window->draw(sprite);
 			}
 
-			sf::Color	get_food_color(const FoodType &type)
+			void	draw_snake(const Snake &snake)
 			{
-				sf::Color	food_color = sf::Color::Red;	
-				if (type == FoodType::FOOD_GREEN)
-					food_color = sf::Color::Green;
-				else if (type == FoodType::FOOD_YELLOW)
-					food_color = sf::Color::Yellow;
-				return food_color;
+				for (auto &pos : snake.get_body()) {
+					if (pos == snake.get_head())
+						draw_sprite(pos, snake.get_id() == FIRST_SNAKE ? SNAKE_1_HEAD : SNAKE_2_HEAD, sprite_rotation(snake.get_direction()));
+					else 
+						draw_sprite(pos, snake.get_id() == FIRST_SNAKE ? SNAKE_1_BODY : SNAKE_2_BODY, sprite_rotation(snake.get_direction()));
+				}
 			}
 
 			sf::RenderWindow	*m_window;
 			sf::Font	*m_font;
 
-			const sf::Color	p1_color[2] = {DARKBROWN_C, BROWN_C};
-			const sf::Color	p2_color[2] = {DARKBLUE_C, BLUE_C};
+			std::unordered_map<TextureId, sf::Texture>	m_textures;
 };
 
 GraphicLib	lib;
