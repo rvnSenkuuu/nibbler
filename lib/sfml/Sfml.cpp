@@ -5,7 +5,6 @@
 #include "IGraphic.hpp"
 
 const sf::Color	GRAY_C(80, 80, 80);
-const sf::Color	BLACK_C(0, 0, 0);
 const sf::Color	BLUE_C(0, 121, 241);
 
 enum TextureId {
@@ -259,7 +258,7 @@ class GraphicLib : public IGraphic {
 				text.setFont(*m_font);
 				text.setString(speed);
 				text.setCharacterSize(20);
-				text.setFillColor(BLACK_C);
+				text.setFillColor(sf::Color::Black);
 
 				sf::FloatRect	bounds = text.getLocalBounds();
 				text.setOrigin(bounds.width, 0.f);
