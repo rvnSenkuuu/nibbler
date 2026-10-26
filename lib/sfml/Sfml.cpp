@@ -253,7 +253,7 @@ class GraphicLib : public IGraphic {
 			void	draw_speed(const GameData &data)
 			{
 				char speed[32];
-				snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
+				snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
 
 				sf::Text	text;
 				text.setFont(*m_font);

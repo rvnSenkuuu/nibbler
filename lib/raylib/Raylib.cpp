@@ -51,8 +51,8 @@ class GraphicLib : public IGraphic {
 			draw_score(data.snakes, p1_color[1], p2_color[1]);
 			
 			char speed[32];
-			snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
-			DrawText(speed, data.config.width * CELL_SIZE - 125, 10, 20, WHITE);
+			snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
+			DrawText(speed, data.config.width * CELL_SIZE - 185, 10, 20, WHITE);
 			
 			EndDrawing();
 		}

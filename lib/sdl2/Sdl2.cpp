@@ -80,8 +80,8 @@ class GraphicLib : public IGraphic {
 				draw_text("P2 Score: " + std::to_string(data.snakes[0].get_score()), 10, 40, p2_color[1]);
 
 			char speed[32];
-			snprintf(speed, sizeof(speed), "Speed: %.2f", data.tick_rate);
-			draw_text(speed, data.config.width * CELL_SIZE - 155, 10, RAYWHITE_C);
+			snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
+			draw_text(speed, data.config.width * CELL_SIZE - 225, 10, RAYWHITE_C);
 			
 			SDL_RenderPresent(m_renderer);
 		}
