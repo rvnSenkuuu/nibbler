@@ -33,15 +33,14 @@ class Food {
 		FoodType	get_type(void) const;
 		int	get_given_score(void) const;
 
-		void	set_rng(const std::mt19937 &rng);
-
-		bool	generate_food(GameConfig &config, const std::vector<Snake> &snakes, const std::vector<Position> &obstacles);
+		bool	generate_food(GameConfig &config, std::mt19937 &rng,
+			std::vector<Snake> &snakes, const std::vector<Position> &obstacles);
 		
 		private:
-			const FoodKind	&get_food_kind(void);
+			const FoodKind	&get_food_kind(std::mt19937 &rng);
 
 	private:
-		std::mt19937	m_rng;
+		// std::mt19937	m_rng;
 		Position	m_pos;
 		FoodType	m_type;
 		int	m_given_score;

@@ -22,22 +22,18 @@ int	Food::get_given_score(void) const
 	return m_given_score;
 }
 
-void	Food::set_rng(const std::mt19937 &rng)
-{
-	m_rng = rng;
-}
-
-bool	Food::generate_food(GameConfig &config, const std::vector<Snake> &snakes, const std::vector<Position> &obstacles)
+bool	Food::generate_food(GameConfig &config, std::mt19937 &rng,
+	std::vector<Snake> &snakes, const std::vector<Position> &obstacles)
 {
 	std::uniform_int_distribution<size_t>	x_pos(0, config.width - 1);
 	std::uniform_int_distribution<size_t>	y_pos(0, config.height - 1);
 
 	for (size_t i = 0; i < max_spawn_attempts; i++) {
-		const Position	pos = {x_pos(m_rng), y_pos(m_rng)};
+		const Position	pos = {x_pos(rng), y_pos(rng)};
 		if (!is_position_free(pos, snakes, obstacles))
 			continue;
 			
-		const FoodKind	&kind = config.opt_food_variance ? get_food_kind() : food_kinds[0];
+		const FoodKind	&kind = config.opt_food_variance ? get_food_kind(rng) : food_kinds[0];
 		m_pos = pos;
 		m_type = kind.type;
 		m_given_score = kind.score;
@@ -46,14 +42,14 @@ bool	Food::generate_food(GameConfig &config, const std::vector<Snake> &snakes, c
 	return false;
 }
 
-const FoodKind	&Food::get_food_kind(void)
+const FoodKind	&Food::get_food_kind(std::mt19937 &rng)
 {
 	int	total = 0;
 	for (const auto &kind : food_kinds)
 		total += kind.weight;
 
 	std::uniform_int_distribution<int>	dist(0, total - 1);
-	int	roll = dist(m_rng);
+	int	roll = dist(rng);
 
 	for (const auto &kind : food_kinds) {
 		if (roll < kind.weight)

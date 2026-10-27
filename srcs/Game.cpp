@@ -36,8 +36,7 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	if (m_config.opt_have_obstacles)
 		generate_obstacle();
 
-	m_food.set_rng(m_rng);
-	m_food.generate_food(m_config, m_snakes, m_obstacles);
+	m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles);
 }
 
 void	Game::reset_game(void)
@@ -47,7 +46,7 @@ void	Game::reset_game(void)
 		generate_obstacle();
 	if (m_config.opt_enable_sounds)
 		m_audio.reset();
-	m_food.generate_food(m_config, m_snakes, m_obstacles);
+	m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles);
 	m_state = GameState::RUNNING;
 	m_winner = -1;
 	m_tick_rate = MIN_TICK_RATE;
@@ -313,7 +312,7 @@ void	Game::move_snake(Snake &snake)
 		m_audio.play("EAT");
 
 	snake.add_score(m_food.get_given_score());
-	if (!m_food.generate_food(m_config, m_snakes, m_obstacles))
+	if (!m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles))
 		end_game(GameState::WON, snake.get_id());
 }
 
