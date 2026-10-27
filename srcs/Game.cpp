@@ -86,6 +86,8 @@ std::optional<GameConfig>	Game::get_game_config(int argc, char **argv)
 			i++;
 		} else if (arg == "--food-variance") {
 			config.opt_food_variance = true;
+		} else if (arg == "--food-disappear") {
+			config.opt_food_disappear = true;
 		} else if (arg == "--enable-obstacles") {
 			if (i + 1 >= argc || !get_option_value(argv[i + 1], config.obstacles_count) || config.obstacles_count < 0)
 				return std::nullopt;
@@ -186,11 +188,17 @@ void	Game::run(Lib &lib)
 		handle_event(lib, event);
 		if (m_state == GameState::RUNNING) {
 			auto	current_time = std::chrono::steady_clock::now();
-			float	delta_time = std::chrono::duration<float>(current_time - m_last_update_time).count();
+			float	delta_time = std::chrono::duration<float>(
+				current_time - m_last_update_time).count();
+			
 			if (delta_time >= 1.0f / m_tick_rate) {
+				if (m_config.opt_food_disappear)
+					handle_disappearing_food(current_time);
+
 				update_game();
 				m_last_update_time = current_time;
 			}
+			
 			if (m_config.opt_enable_sounds)
 				m_audio.update();
 		}
@@ -251,6 +259,17 @@ void	Game::end_game(GameState state, int winner)
 		m_audio.stop();
 }
 
+void	Game::end_by_board_full(void)
+{
+    if (m_player_count == 1)
+        end_game(GameState::WON, FIRST_SNAKE);
+	else if (m_snakes[0].length() == m_snakes[1].length())
+        end_game(GameState::DRAW, -1);
+	else
+        end_game(GameState::WON, m_snakes[0].length() > m_snakes[1].length()
+			? m_snakes[0].get_id() : m_snakes[1].get_id());
+}
+
 void	Game::update_game(void)
 {
 	for (auto &snake : m_snakes) {
@@ -283,20 +302,13 @@ void	Game::update_game(void)
 		[](const Snake &snake) { return snake.get_alive(); }
 	);
 
-	if (alive_count == 0) {
+
+	if (alive_count == 0)
 		end_game(m_player_count == 2 ? GameState::DRAW : GameState::GAME_OVER, -1);
-	} else if (m_player_count == 2 && alive_count == 1) {
+	else if (m_player_count == 2 && alive_count == 1)
 		end_game(GameState::WON, m_snakes[0].get_alive() ? m_snakes[0].get_id() : m_snakes[1].get_id());
-	} else if (is_board_full()) {
-		if (m_player_count == 1) {
-			end_game(GameState::WON, FIRST_SNAKE);
-		} else if (m_snakes[0].length() == m_snakes[1].length()) {
-			end_game(GameState::DRAW, -1);
-		} else {
-			bool	first_player = m_snakes[0].length() > m_snakes[1].length();
-			end_game(GameState::WON, first_player ? m_snakes[0].get_id() : m_snakes[1].get_id());
-		}
-	}
+	else if (is_board_full())
+		end_by_board_full();
 }
 
 void	Game::move_snake(Snake &snake)
@@ -367,4 +379,13 @@ void	Game::generate_obstacle(void)
 	
 	std::shuffle(slot.begin(), slot.end(), m_rng);
 	m_obstacles.assign(slot.begin(), slot.begin() + m_config.obstacles_count);
+}
+
+void	Game::handle_disappearing_food(std::chrono::steady_clock::time_point current_time)
+{
+	float	food_delta_time = std::chrono::duration<float>(
+		current_time - m_food.get_spawn_time()).count();
+	if (food_delta_time >= FOOD_LIFETIME &&
+		!m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles))
+			end_by_board_full();	
 }

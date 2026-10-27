@@ -39,7 +39,6 @@ class Game {
 		[[nodiscard]] std::optional<GameConfig>	get_game_config(int argc, char **argv);
 		void	init_snakes();
 		void	run(Lib &lib);
-		void	end_game(GameState state, int winner);
 		void	update_game(void);
 		void	reset_game(void);
 		void	generate_obstacle(void);
@@ -54,6 +53,10 @@ class Game {
 
 		[[nodiscard]] bool	is_valid_obstacle_pos(const Position &pos) const;
 		int	get_max_obstacles(void) const;
+		
+		void	end_game(GameState state, int winner);
+		void	end_by_board_full(void);
+		void	handle_disappearing_food(std::chrono::steady_clock::time_point current_time);
 
 	private:
 		size_t	m_player_count;

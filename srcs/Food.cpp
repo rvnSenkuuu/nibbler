@@ -22,6 +22,11 @@ int	Food::get_given_score(void) const
 	return m_given_score;
 }
 
+std::chrono::steady_clock::time_point	Food::get_spawn_time() const
+{
+	return m_spawn_time;
+}
+
 bool	Food::generate_food(GameConfig &config, std::mt19937 &rng,
 	std::vector<Snake> &snakes, const std::vector<Position> &obstacles)
 {
@@ -37,6 +42,7 @@ bool	Food::generate_food(GameConfig &config, std::mt19937 &rng,
 		m_pos = pos;
 		m_type = kind.type;
 		m_given_score = kind.score;
+		m_spawn_time = std::chrono::steady_clock::now();
 		return true;
 	}
 	return false;

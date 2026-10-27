@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include <chrono>
 #include <vector>
 
 #include "Types.hpp"
@@ -17,6 +18,8 @@ struct FoodKind {
 	int	weight;
 };
 
+constexpr float	FOOD_LIFETIME = 10.0f;
+
 class Snake;
 
 bool	is_position_free(const Position &pos, const std::vector<Snake> &snakes,
@@ -32,6 +35,7 @@ class Food {
 		Position	get_pos(void) const;
 		FoodType	get_type(void) const;
 		int	get_given_score(void) const;
+		std::chrono::steady_clock::time_point	get_spawn_time() const;
 
 		bool	generate_food(GameConfig &config, std::mt19937 &rng,
 			std::vector<Snake> &snakes, const std::vector<Position> &obstacles);
@@ -40,8 +44,9 @@ class Food {
 			const FoodKind	&get_food_kind(std::mt19937 &rng);
 
 	private:
-		// std::mt19937	m_rng;
 		Position	m_pos;
 		FoodType	m_type;
 		int	m_given_score;
+
+		std::chrono::steady_clock::time_point	m_spawn_time;
 };

@@ -61,6 +61,7 @@ struct GameConfig {
 	bool	opt_is_multi = false;
 	bool	opt_limit_score = false;
 	bool	opt_food_variance = false;
+	bool	opt_food_disappear = false;
 	bool	opt_have_obstacles = false;
 	bool	opt_enable_sounds = false;
 	int	max_score = 0;

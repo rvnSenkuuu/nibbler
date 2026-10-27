@@ -12,6 +12,8 @@ void	usage(void)
     std::cout << "\tSet a score limit\n\n";
 	std::cout << "\t--food-variance\n";
     std::cout << "\tSpawns three types of apples (RED, GREEN, YELLOW), each worth a different amount of points\n\n";
+	std::cout << "\t--food-disappear\n";
+	std::cout << "\tFood disappear every 10 seconds\n\n";
 	std::cout << "\t--enable-obstacles [obstacles count]\n";
 	std::cout << "\tAdds random obstacles. The snake dies if it collides with one\n\n";
 	std::cout << "\t--enable-sounds\n";
