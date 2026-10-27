@@ -10,6 +10,7 @@ A Snake game written in **C++17**, where the graphics are not part of the game i
   - **Two-player mode** on the same board (single player stays available)
   - **Score limit**: the first snake to reach it wins
   - **Three kinds of apples** worth 10, 30 or 50 points, with different spawn rates
+  - **Food Disappear** every 10 seconds
   - **Random obstacles**
   - **Sounds and music**, also handled by a dynamic library
   - Adjustable speed and instant restart
@@ -37,6 +38,7 @@ $> ./nibbler <width> <height> [options]
 | `--food-variance` | Red (10 points), green (30) and yellow (50) apples; yellow ones are the rarest |
 | `--enable-obstacles <n>` | Add `n` random obstacles (the snake dies if it hits one) |
 | `--enable-sounds` | Background music, eating and death sounds |
+| `--food-disappear` | Every 10 seconds |
 | `--help` | Print the usage |
 
 Examples:
