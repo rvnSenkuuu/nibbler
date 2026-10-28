@@ -25,9 +25,6 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	if (!config)
 		throw std::invalid_argument("Failed to get game configuration");
 	m_config = *config;
-	
-	if (m_config.opt_is_multi)
-		m_player_count = 2;
 
 	if (m_config.opt_enable_sounds)
 		m_audio.init();
@@ -79,6 +76,7 @@ std::optional<GameConfig>	Game::get_game_config(int argc, char **argv)
 
 		if (arg == "--multi") {
 			config.opt_is_multi = true;
+			m_player_count = 2;
 		} else if (arg == "--limit-score") {
 			if (i + 1 >= argc || !get_option_value(argv[i + 1], config.max_score) || config.max_score <= 0)
 				return std::nullopt;
