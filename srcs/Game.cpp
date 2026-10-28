@@ -1,11 +1,11 @@
 #include "Game.hpp"
 
-constexpr float	MIN_TICK_RATE = 10.0f;
-constexpr float	MAX_TICK_RATE = 15.0f;
-constexpr int	MIN_WIDTH = 15;
-constexpr int	MIN_HEIGHT = 15;
-constexpr int	MAX_WIDTH = 50;
-constexpr int	MAX_HEIGHT = 50;
+constexpr float	MIN_TICK_RATE{10.0f};
+constexpr float	MAX_TICK_RATE{15.0f};
+constexpr int	MIN_WIDTH{15};
+constexpr int	MIN_HEIGHT{15};
+constexpr int	MAX_WIDTH{50};
+constexpr int	MAX_HEIGHT{50};
 
 bool	is_position_free(const Position &pos, const std::vector<Snake> &snakes,
 						const std::vector<Position> &obstacles)
@@ -52,7 +52,7 @@ void	Game::reset_game(void)
 
 std::optional<GameConfig>	Game::get_game_config(int argc, char **argv)
 {
-	for (int i = 1; i < argc; i++) {
+	for (int i{1}; i < argc; i++) {
 		if (std::string(argv[i]) == "--help") {
 			usage();
 			std::exit(0);
@@ -71,7 +71,7 @@ std::optional<GameConfig>	Game::get_game_config(int argc, char **argv)
 		config.height < MIN_HEIGHT || config.height > MAX_HEIGHT)
 		return std::nullopt;
 
-	for (int i = 3; i < argc; i++) {
+	for (int i{3}; i < argc; i++) {
 		const std::string_view	arg = argv[i];
 
 		if (arg == "--multi") {
@@ -106,7 +106,7 @@ void	Game::init_snakes(void)
 	m_snakes.clear();
 	m_snakes.reserve(m_player_count);
 
-	size_t	row = m_player_count == 2 ? m_config.height / 3 : m_config.height / 2;
+	size_t	row{m_player_count == 2 ? m_config.height / 3 : m_config.height / 2};
 
 	m_snakes.emplace_back(FIRST_SNAKE, Position{m_config.width/ 2 , row});
 	if (m_player_count == 2) {
@@ -179,15 +179,15 @@ void	Game::run(Lib &lib)
 {
 	lib.create(m_config.width, m_config.height);
 	while (true) {
-		Event	event = lib.get_event();
+		Event	event{lib.get_event()};
 		if (event == Event::QUIT)
 			return;
 		
 		handle_event(lib, event);
 		if (m_state == GameState::RUNNING) {
-			auto	current_time = std::chrono::steady_clock::now();
-			float	delta_time = std::chrono::duration<float>(
-				current_time - m_last_update_time).count();
+			auto	current_time{std::chrono::steady_clock::now()};
+			float	delta_time{std::chrono::duration<float>(
+				current_time - m_last_update_time).count()};
 			
 			if (delta_time >= 1.0f / m_tick_rate) {
 				if (m_config.opt_food_disappear)
@@ -213,7 +213,7 @@ void	Game::kill_snake(Snake &snake)
 
 void	Game::check_collision(Snake &current)
 {
-	const Position	head = current.get_head();
+	const Position	head{current.get_head()};
 	if (head.x >= m_config.width || head.y >= m_config.height) {
 		kill_snake(current);
 		return;
@@ -225,7 +225,7 @@ void	Game::check_collision(Snake &current)
 	}
 
 	for (auto &snake : m_snakes) {
-		auto	begin_it = snake.get_body().begin();
+		auto	begin_it{snake.get_body().begin()};
 		if (&current == &snake)
 			begin_it = std::next(begin_it);
 
@@ -242,7 +242,7 @@ void	Game::check_collision(Snake &current)
 
 bool	Game::is_board_full(void) const
 {
-	size_t	total = 0;
+	size_t	total{0};
 	for (const auto &snake : m_snakes)
 		total += snake.length();
 
@@ -281,7 +281,7 @@ void	Game::update_game(void)
 	}
 
 	if (m_config.opt_limit_score) {
-		size_t	max = static_cast<std::size_t>(m_config.max_score);
+		size_t	max{static_cast<std::size_t>(m_config.max_score)};
 		auto	it = std::find_if(
 			m_snakes.begin(),
 			m_snakes.end(),
@@ -311,8 +311,8 @@ void	Game::update_game(void)
 
 void	Game::move_snake(Snake &snake)
 {
-	Position	next_pos = snake.next_pos(snake.get_head());
-	bool	is_food = (next_pos == m_food.get_pos());
+	Position	next_pos{snake.next_pos(snake.get_head())};
+	bool	is_food{next_pos == m_food.get_pos()};
 
 	snake.move(next_pos, is_food);
 	if (!is_food)
@@ -331,9 +331,9 @@ bool	Game::is_valid_obstacle_pos(const Position &pos) const
 	if (!is_position_free(pos, m_snakes, m_obstacles))
 		return false;
 
-	const int	max_step = 20;
+	const int	max_step{20};
 	for (auto &snake : m_snakes) {
-		Position	head = snake.get_head();
+		Position	head{snake.get_head()};
 		for (int i = 0; i < max_step; i++) {
 			head = snake.next_pos(head);
 			if (head == pos)
@@ -345,11 +345,11 @@ bool	Game::is_valid_obstacle_pos(const Position &pos) const
 
 int	Game::get_max_obstacles(void) const
 {
-	const int	board_size = m_config.width * m_config.height;
-	size_t	snakes_size = m_snakes[0].length();
+	const size_t	board_size{m_config.width * m_config.height};
+	size_t	snakes_size{m_snakes[0].length()};
 	snakes_size += m_config.opt_is_multi ? m_snakes[1].length() : 0;
 	
-	const int	total_free_slot = board_size - static_cast<int>(snakes_size) - 1;
+	const size_t	total_free_slot{board_size - static_cast<int>(snakes_size) - 1};
 	if (total_free_slot <= 0)
 		return 0;
 
@@ -366,7 +366,7 @@ void	Game::generate_obstacle(void)
 
 	std::vector<Position>	slot;
 	slot.reserve(m_config.width * m_config.height);
-	for (size_t i = 0; i < m_config.width * m_config.height; i++) {
+	for (size_t i{0}; i < m_config.width * m_config.height; i++) {
 		const Position	pos{i % m_config.width, i / m_config.width};
 		if (is_valid_obstacle_pos(pos))
 			slot.push_back(pos);
@@ -379,10 +379,10 @@ void	Game::generate_obstacle(void)
 	m_obstacles.assign(slot.begin(), slot.begin() + m_config.obstacles_count);
 }
 
-void	Game::handle_disappearing_food(std::chrono::steady_clock::time_point current_time)
+void	Game::handle_disappearing_food(std::chrono::steady_clock::time_point &current_time)
 {
-	float	food_delta_time = std::chrono::duration<float>(
-		current_time - m_food.get_spawn_time()).count();
+	float	food_delta_time{std::chrono::duration<float>(
+		current_time - m_food.get_spawn_time()).count()};
 	if (food_delta_time >= FOOD_LIFETIME &&
 		!m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles))
 			end_by_board_full();	

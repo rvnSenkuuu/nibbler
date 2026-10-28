@@ -18,7 +18,7 @@ void	Lib::load(const std::string &path)
 		throw std::runtime_error(dlerror());
 
 	auto	sym = [&](const char *name) {
-		void	*sym_ptr = dlsym(m_handle, name);
+		void	*sym_ptr{dlsym(m_handle, name)};
 		if (!sym_ptr) {
 			std::string	err = dlerror();
 			dlclose(m_handle);

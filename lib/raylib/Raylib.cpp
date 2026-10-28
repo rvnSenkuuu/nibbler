@@ -62,9 +62,9 @@ class GraphicLib : public IGraphic {
 			BeginDrawing();
 			ClearBackground(BLACK);
 
-			const int	font_size = 20;
-			const int	center_x = data.config.width * CELL_SIZE / 2;
-			const int	start_y = data.config.height * CELL_SIZE / 2 - (100 + font_size) / 2;
+			const int	font_size{20};
+			const size_t	center_x{data.config.width * CELL_SIZE / 2};
+			const size_t	start_y{data.config.height * CELL_SIZE / 2 - (100 + font_size) / 2};
 
 			auto	draw_centered = [&](const std::string &text, int y, Color color) {
 				int	text_width = MeasureText(text.c_str(), font_size);
@@ -86,7 +86,7 @@ class GraphicLib : public IGraphic {
 				return;
 			}
 
-			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
+			const std::string	end_msg{data.state == GameState::WON ? "You Won !" : "Game Over !"};
 			draw_centered(end_msg, start_y, RAYWHITE);
 			draw_centered("Your score: " + std::to_string(data.snakes[0].get_score()), start_y + 45, RAYWHITE);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100, RAYWHITE);
@@ -146,7 +146,7 @@ class GraphicLib : public IGraphic {
 			void	draw_snake(const Snake &snake, const Color &head_color, const Color &body_color)
 			{
 				for (auto &pos : snake.get_body()) {
-					Color	color = (pos == snake.get_head()) ? head_color : body_color;
+					Color	color{pos == snake.get_head() ? head_color : body_color};
 					DrawRectangle(pos.x * CELL_SIZE, pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, color);
 				}
 			}
@@ -160,7 +160,7 @@ class GraphicLib : public IGraphic {
 
 			Color	get_food_color(const FoodType &type)
 			{
-				Color	food_color = RED;	
+				Color	food_color{RED};	
 				if (type == FoodType::FOOD_GREEN)
 					food_color = GREEN;
 				else if (type == FoodType::FOOD_YELLOW)

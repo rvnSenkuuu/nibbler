@@ -33,7 +33,7 @@ bool	Food::generate_food(GameConfig &config, std::mt19937 &rng,
 	std::uniform_int_distribution<size_t>	x_pos(0, config.width - 1);
 	std::uniform_int_distribution<size_t>	y_pos(0, config.height - 1);
 
-	for (size_t i = 0; i < max_spawn_attempts; i++) {
+	for (size_t i{0}; i < max_spawn_attempts; i++) {
 		const Position	pos = {x_pos(rng), y_pos(rng)};
 		if (!is_position_free(pos, snakes, obstacles))
 			continue;
@@ -50,12 +50,12 @@ bool	Food::generate_food(GameConfig &config, std::mt19937 &rng,
 
 const FoodKind	&Food::get_food_kind(std::mt19937 &rng)
 {
-	int	total = 0;
+	int	total{0};
 	for (const auto &kind : food_kinds)
 		total += kind.weight;
 
 	std::uniform_int_distribution<int>	dist(0, total - 1);
-	int	roll = dist(rng);
+	int	roll{dist(rng)};
 
 	for (const auto &kind : food_kinds) {
 		if (roll < kind.weight)

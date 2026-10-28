@@ -84,7 +84,7 @@ class GraphicLib : public IGraphic {
 				throw std::runtime_error("Failed to init textures");
 			}
 
-			const sf::Vector2u	ground_size = m_textures[GROUND].getSize();
+			const sf::Vector2u	ground_size{m_textures[GROUND].getSize()};
 			m_textures[GROUND].setRepeated(true);
 			m_ground_sprite.setTexture(m_textures[GROUND]);
 			m_ground_sprite.setTextureRect(
@@ -127,9 +127,9 @@ class GraphicLib : public IGraphic {
 
 		void	render_end_game(const GameData &data)
 		{
-			const int	font_size = 20;
-			const float	center_x = data.config.width * CELL_SIZE / 2.f;
-			const float	start_y = data.config.height * CELL_SIZE / 2.f - (100 + font_size) / 2.f;
+			const int	font_size{20};
+			const float	center_x{data.config.width * CELL_SIZE / 2.f};
+			const float	start_y{data.config.height * CELL_SIZE / 2.f - (100 + font_size) / 2.f};
 
 			auto	draw_centered = [&](const std::string &str, float y, sf::Color color) {
 				sf::Text	text;
@@ -162,7 +162,7 @@ class GraphicLib : public IGraphic {
 				return;
 			}
 
-			const std::string	end_msg = data.state == GameState::WON ? "You Won !" :  "Game Over !";
+			const std::string	end_msg{data.state == GameState::WON ? "You Won !" :  "Game Over !"};
 			draw_centered(end_msg, start_y, sf::Color::White);
 			draw_centered("Your score: " + std::to_string(data.snakes[0].get_score()), start_y + 45, GRAY_C);
 			draw_centered("Press 'Enter' for restart the game", start_y + 100, sf::Color::White);
@@ -260,7 +260,7 @@ class GraphicLib : public IGraphic {
 				text.setCharacterSize(20);
 				text.setFillColor(sf::Color::Black);
 
-				sf::FloatRect	bounds = text.getLocalBounds();
+				sf::FloatRect	bounds{text.getLocalBounds()};
 				text.setOrigin(bounds.width, 0.f);
 				text.setPosition(data.config.width * CELL_SIZE - 10.f, 10.f);
 				m_window->draw(text);
@@ -268,8 +268,8 @@ class GraphicLib : public IGraphic {
 
 			void	draw_sprite(const Position &pos, TextureId id, float rotation = 0.f)
 			{
-				sf::Texture	&texture = m_textures.find(id)->second;
-				const sf::Vector2u	texture_size = texture.getSize();
+				sf::Texture	&texture{m_textures.find(id)->second};
+				const sf::Vector2u	texture_size{texture.getSize()};
 				sf::Sprite	sprite(texture);
 
 				sprite.setOrigin(texture_size.x / 2.f, texture_size.y / 2.f);

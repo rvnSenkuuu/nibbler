@@ -56,7 +56,7 @@ class Game {
 		
 		void	end_game(GameState state, int winner);
 		void	end_by_board_full(void);
-		void	handle_disappearing_food(std::chrono::steady_clock::time_point current_time);
+		void	handle_disappearing_food(std::chrono::steady_clock::time_point &current_time);
 
 	private:
 		size_t	m_player_count;

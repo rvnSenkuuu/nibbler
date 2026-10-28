@@ -5,17 +5,17 @@
 #include "Types.hpp"
 #include "IGraphic.hpp"
 
-static constexpr SDL_Color	BLACK_C = {0, 0, 0, 255};
-static constexpr SDL_Color	DARKGREEN_C = {0, 117, 44, 255};
-static constexpr SDL_Color	GREEN_C = {0, 228, 48, 255};
-static constexpr SDL_Color	DARKBLUE_C = {0, 82, 172, 255};
-static constexpr SDL_Color	BLUE_C = {0, 121, 241, 255};
-static constexpr SDL_Color	RED_C = {255, 0, 0, 255};
-static constexpr SDL_Color	WHITE_C = {255, 255, 255, 255};
-static constexpr SDL_Color	RAYWHITE_C = {245, 245, 245, 255};
-static constexpr SDL_Color	YELLOW_C = {253, 249, 0, 255};
-static constexpr SDL_Color	DARKORANGE_C = {255, 161, 0, 255};
-static constexpr SDL_Color	ORANGE_C = {255, 205, 4, 255};
+static constexpr SDL_Color	BLACK_C{0, 0, 0, 255};
+static constexpr SDL_Color	DARKGREEN_C{0, 117, 44, 255};
+static constexpr SDL_Color	GREEN_C{0, 228, 48, 255};
+static constexpr SDL_Color	DARKBLUE_C{0, 82, 172, 255};
+static constexpr SDL_Color	BLUE_C{0, 121, 241, 255};
+static constexpr SDL_Color	RED_C{255, 0, 0, 255};
+static constexpr SDL_Color	WHITE_C{255, 255, 255, 255};
+static constexpr SDL_Color	RAYWHITE_C{245, 245, 245, 255};
+static constexpr SDL_Color	YELLOW_C{253, 249, 0, 255};
+static constexpr SDL_Color	DARKORANGE_C{255, 161, 0, 255};
+static constexpr SDL_Color	ORANGE_C{255, 205, 4, 255};
 
 class GraphicLib : public IGraphic {
 	public:
@@ -35,7 +35,7 @@ class GraphicLib : public IGraphic {
 
 			m_font = TTF_OpenFont(FONT_PATH, 20);
 			if (!m_font) {
-				const std::string	err = SDL_GetError();
+				const std::string	err{SDL_GetError()};
 				destroy_window();
 				throw std::runtime_error(err);
 			}
@@ -45,14 +45,14 @@ class GraphicLib : public IGraphic {
 				width * CELL_SIZE, height * CELL_SIZE, SDL_WINDOW_SHOWN
 			);
 			if (!m_window) {
-				const std::string	err = SDL_GetError();
+				const std::string	err{SDL_GetError()};
 				destroy_window();
 				throw std::runtime_error(err);
 			}
 			
 			m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
 			if (!m_renderer) {
-				const std::string	err = SDL_GetError();
+				const std::string	err{SDL_GetError()};
 				destroy_window();
 				throw std::runtime_error(err);
 			}
@@ -72,7 +72,7 @@ class GraphicLib : public IGraphic {
 					snake.get_id() == FIRST_SNAKE ? p1_color[1] : p2_color[1]
 				);
 
-			const Position	&pos = data.food.get_pos();
+			const Position	&pos{data.food.get_pos()};
 			draw_cell(pos.x, pos.y,  get_food_color(data.food.get_type()));
 		
 			draw_text("P1 Score: " + std::to_string(data.snakes[0].get_score()), 10, 10, p1_color[1]);
@@ -91,8 +91,8 @@ class GraphicLib : public IGraphic {
 			SDL_SetRenderDrawColor(m_renderer, BLACK_C.r, BLACK_C.g, BLACK_C.b, BLACK_C.a);
 			SDL_RenderClear(m_renderer);
 
-			const int	center_x = data.config.width * CELL_SIZE / 2;
-			const int	start_y = data.config.height * CELL_SIZE / 2 - (100 + 20) / 2;
+			const size_t	center_x{data.config.width * CELL_SIZE / 2};
+			const size_t	start_y{data.config.height * CELL_SIZE / 2 - (100 + 20) / 2};
 
 			if (data.config.opt_is_multi) {
 				std::string	game_winner;
@@ -110,7 +110,7 @@ class GraphicLib : public IGraphic {
 				return;
 			}
 
-			const std::string	end_msg = data.state == GameState::WON ? "You Won !" : "Game Over !";
+			const std::string	end_msg{data.state == GameState::WON ? "You Won !" : "Game Over !"};
 			draw_text_centered(end_msg, center_x, start_y, RAYWHITE_C);
 			draw_text_centered("Your score: " + std::to_string(data.snakes[0].get_score()), center_x, start_y + 45, p1_color[1]);
 			draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 100, RAYWHITE_C);
@@ -190,8 +190,8 @@ class GraphicLib : public IGraphic {
 			void	draw_snake(const Snake &snake, const SDL_Color head_color, const SDL_Color body_color)
 			{
 				for (auto &pos : snake.get_body()) {
-					const SDL_Color	color = (pos == snake.get_head()) ? head_color : body_color; 
-					const SDL_Rect	rect = {
+					const SDL_Color	color = {pos == snake.get_head() ? head_color : body_color};
+					const SDL_Rect	rect{
 						.x = static_cast<int>(pos.x) * CELL_SIZE,
 						.y = static_cast<int>(pos.y) * CELL_SIZE,
 						.w = CELL_SIZE,
@@ -204,7 +204,7 @@ class GraphicLib : public IGraphic {
 
 			void	draw_cell(int x, int y, const SDL_Color &color)
 			{
-				const SDL_Rect	rect = {
+				const SDL_Rect	rect{
 					.x = x * CELL_SIZE,
 					.y = y * CELL_SIZE,
 					.w = CELL_SIZE,
@@ -215,9 +215,9 @@ class GraphicLib : public IGraphic {
 
 			void	draw_text(const std::string &text, int x, int y, const SDL_Color &color)
 			{
-				SDL_Surface	*surface = TTF_RenderText_Solid(m_font, text.c_str(), color);
-				SDL_Texture	*texture = SDL_CreateTextureFromSurface(m_renderer, surface);
-				const SDL_Rect	rect = {
+				SDL_Surface	*surface{TTF_RenderText_Solid(m_font, text.c_str(), color)};
+				SDL_Texture	*texture{SDL_CreateTextureFromSurface(m_renderer, surface)};
+				const SDL_Rect	rect{
 					.x = x,
 					.y = y,
 					.w = surface->w,
@@ -231,15 +231,15 @@ class GraphicLib : public IGraphic {
 
 			void	draw_text_centered(const std::string &text, int center_x, int y, const SDL_Color &color)
 			{
-				int	w = 0;
-				int	h = 0;
+				int	w{0};
+				int	h{0};
 				TTF_SizeText(m_font, text.c_str(), &w, &h);
 				draw_text(text, center_x - w / 2, y, color);
 			}
 
 			SDL_Color	get_food_color(const FoodType &type)
 			{
-				SDL_Color	food_color = RED_C;	
+				SDL_Color	food_color{RED_C};	
 				if (type == FoodType::FOOD_GREEN)
 					food_color = GREEN_C;
 				else if (type == FoodType::FOOD_YELLOW)
