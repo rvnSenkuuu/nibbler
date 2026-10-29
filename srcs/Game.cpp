@@ -1,12 +1,5 @@
 #include "Game.hpp"
 
-constexpr float	MIN_TICK_RATE{10.0f};
-constexpr float	MAX_TICK_RATE{15.0f};
-constexpr int	MIN_WIDTH{15};
-constexpr int	MIN_HEIGHT{15};
-constexpr int	MAX_WIDTH{50};
-constexpr int	MAX_HEIGHT{50};
-
 bool	is_position_free(const Position &pos, const std::vector<Snake> &snakes,
 						const std::vector<Position> &obstacles)
 {
@@ -18,8 +11,7 @@ bool	is_position_free(const Position &pos, const std::vector<Snake> &snakes,
 	return std::find(obstacles.begin(), obstacles.end(), pos) == obstacles.end();
 }
 
-Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::random_device{}()), m_state(GameState::RUNNING),
-									m_config(), m_tick_rate(MIN_TICK_RATE), m_last_update_time(std::chrono::steady_clock::now())
+Game::Game(int argc, char **argv)
 {
 	const std::optional<GameConfig>	config = get_game_config(argc, argv);
 	if (!config)
@@ -29,21 +21,20 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 	if (m_config.opt_sounds)
 		m_audio.init();
 
-	init_snakes();
-	if (m_config.opt_have_obstacles)
-		generate_obstacle();
-
-	m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles);
+	start_new_game();
 }
 
-void	Game::reset_game(void)
+void	Game::start_new_game(void)
 {
 	init_snakes();
+
 	m_obstacles.clear();
 	if (m_config.opt_have_obstacles)
 		generate_obstacle();
+
 	if (m_config.opt_sounds)
 		m_audio.reset();
+
 	m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles);
 	m_state = GameState::RUNNING;
 	m_winner = -1;
@@ -139,7 +130,7 @@ void	Game::handle_event(Lib &lib, Event &event)
 {
 	if (m_state != GameState::RUNNING) {
 		if (event == Event::RESTART)
-			reset_game();
+			start_new_game();
 		return;
 	}
 

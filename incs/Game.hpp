@@ -17,6 +17,13 @@
 #include "Audio.hpp"
 #include "GameData.hpp"
 
+constexpr float	MIN_TICK_RATE{10.0f};
+constexpr float	MAX_TICK_RATE{15.0f};
+constexpr int	MIN_WIDTH{15};
+constexpr int	MIN_HEIGHT{15};
+constexpr int	MAX_WIDTH{50};
+constexpr int	MAX_HEIGHT{50};
+
 void	usage(void);
 
 template<typename T>
@@ -40,7 +47,7 @@ class Game {
 		void	init_snakes();
 		void	run(Lib &lib);
 		void	update_game(void);
-		void	reset_game(void);
+		void	start_new_game(void);
 		void	generate_obstacle(void);
 		void	check_collision(Snake &current);
 		void	move_snake(Snake &snake);
@@ -49,7 +56,7 @@ class Game {
 
 	private:
 		Game(const Game &rhs) = delete;
-		Game	&operator=(const Game &rhs) = default;
+		Game	&operator=(const Game &rhs) = delete;
 
 		[[nodiscard]] bool	is_valid_obstacle_pos(const Position &pos) const;
 		int	get_max_obstacles(void) const;
@@ -59,16 +66,16 @@ class Game {
 		void	handle_disappearing_food(std::chrono::steady_clock::time_point &current_time);
 
 	private:
-		size_t	m_player_count;
-		int	m_winner;
+		size_t	m_player_count{1};
+		int	m_winner{-1};
 		std::vector<Snake>	m_snakes;
 		std::vector<Position>	m_obstacles;
 		Food	m_food;
-		std::mt19937	m_rng;
-		GameState	m_state;
+		std::mt19937	m_rng{std::random_device{}()};
+		GameState	m_state{GameState::RUNNING};
 		GameConfig	m_config;
 		Audio	m_audio;
 
-		float	m_tick_rate;
-		std::chrono::steady_clock::time_point	m_last_update_time;
+		float	m_tick_rate{MIN_TICK_RATE};
+		std::chrono::steady_clock::time_point	m_last_update_time{std::chrono::steady_clock::now()};
 };
