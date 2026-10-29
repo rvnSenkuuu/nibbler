@@ -76,7 +76,7 @@ class GraphicLib : public IGraphic {
 			draw_cell(pos.x, pos.y,  get_food_color(data.food.get_type()));
 		
 			draw_text("P1 Score: " + std::to_string(data.snakes[0].get_score()), 10, 10, p1_color[1]);
-			if (data.config.opt_is_multi)
+			if (data.config.opt_multi)
 				draw_text("P2 Score: " + std::to_string(data.snakes[0].get_score()), 10, 40, p2_color[1]);
 
 			char speed[32];
@@ -94,7 +94,7 @@ class GraphicLib : public IGraphic {
 			const size_t	center_x{data.config.width * CELL_SIZE / 2};
 			const size_t	start_y{data.config.height * CELL_SIZE / 2 - (100 + 20) / 2};
 
-			if (data.config.opt_is_multi) {
+			if (data.config.opt_multi) {
 				std::string	game_winner;
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
@@ -148,6 +148,10 @@ class GraphicLib : public IGraphic {
 						return Event::LEFT;
 					case SDL_SCANCODE_RIGHT:
 						return Event::RIGHT;
+					case SDL_SCANCODE_R:
+						return Event::P1_SHRINK;
+					case SDL_SCANCODE_RCTRL:
+						return Event::P2_SHRINK;
 					case SDL_SCANCODE_ESCAPE:
 						return Event::QUIT;
 					case SDL_SCANCODE_RETURN:

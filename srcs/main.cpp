@@ -8,6 +8,9 @@ void	usage(void)
 	std::cout << "Options:\n";
 	std::cout << "\t--multi\n";
     std::cout << "\tPlay with two snakes: Snake 1 uses WASD, Snake 2 uses the arrow keys\n\n";
+	std::cout << "\t--enable-trap\n";
+	std::cout << "\t* WARNING * This option is available only with \"--multi\"\n";
+	std::cout << "\tPlayers can shrink themselves and place an obstacle at the end of their tail.\n\n";
 	std::cout << "\t--limit-score [score]\n";
     std::cout << "\tSet a score limit\n\n";
 	std::cout << "\t--food-variance\n";

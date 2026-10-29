@@ -84,6 +84,17 @@ void	Snake::move(Position next_pos, bool grow)
 		m_body.pop_back();
 }
 
+void	Snake::shrink(std::vector<Position> &obstacles, Audio &audio)
+{
+	if (m_body.size() - 1 <= 1)
+		return;
+
+	Position	tail = get_tail();
+	m_body.pop_back();
+	obstacles.push_back(tail);
+	audio.play("SHRINK");
+}
+
 int	Snake::get_id(void) const
 {
 	return m_id;
@@ -97,6 +108,11 @@ bool	Snake::get_alive(void) const
 Position	Snake::get_head(void) const
 {
 	return m_body.front();
+}
+
+Position	Snake::get_tail(void) const
+{
+	return m_body.back();
 }
 
 size_t	Snake::length(void) const

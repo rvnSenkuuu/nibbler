@@ -146,7 +146,7 @@ class GraphicLib : public IGraphic {
 
 			m_window->clear(sf::Color::Black);
 
-			if (data.config.opt_is_multi) {
+			if (data.config.opt_multi) {
 				std::string	game_winner;
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
@@ -200,6 +200,10 @@ class GraphicLib : public IGraphic {
 						return Event::LEFT;
 					case sf::Keyboard::Right:
 						return Event::RIGHT;
+					case sf::Keyboard::R:
+						return Event::P1_SHRINK;
+					case sf::Keyboard::RControl:
+						return Event::P2_SHRINK;
 					case sf::Keyboard::Escape:
 						return Event::QUIT;
 					case sf::Keyboard::Enter:

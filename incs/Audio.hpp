@@ -3,7 +3,7 @@
 #include <dlfcn.h>
 #include <iostream>
 
-#define AUDIO_LIB "./lib/raylib/libraylib_audio.so"
+constexpr const char	*AUDIO_LIB{"./lib/raylib/libraylib_audio.so"};
 
 using FnInitAudio = void	(*)(void);
 using FnPlaySound = void	(*)(const std::string &sound);

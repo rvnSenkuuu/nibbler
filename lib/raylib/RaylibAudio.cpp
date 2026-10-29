@@ -5,9 +5,10 @@
 
 #include "IAudio.hpp"
 
-#define EAT_SOUND "./assets/sounds/eat.wav"
-#define DEATH_SOUND "./assets/sounds/death.wav"
-#define BACKGROUND_SOUND "./assets/sounds/background.mp3"
+constexpr const char	*EAT_SOUND{"./assets/sounds/eat.wav"};
+constexpr const char	*DEATH_SOUND{"./assets/sounds/death.wav"};
+constexpr const char	*SHRINK_SOUND{"./assets/sounds/shrink.wav"};
+constexpr const char	*BACKGROUND_SOUND{"./assets/sounds/background.mp3"};
 
 class AudioLib : public IAudio {
 	public:
@@ -28,6 +29,7 @@ class AudioLib : public IAudio {
 
 			load("EAT", EAT_SOUND);
 			load("DEATH", DEATH_SOUND);
+			load("SHRINK", SHRINK_SOUND);
 			
 			m_background = LoadMusicStream(BACKGROUND_SOUND);
 			m_background.looping = true;

@@ -71,7 +71,7 @@ class GraphicLib : public IGraphic {
 				DrawText(text.c_str(), center_x - text_width / 2, y, font_size, color);
 			};
 
-			if (data.config.opt_is_multi) {
+			if (data.config.opt_multi) {
 				std::string	game_winner;
 				if (data.state == GameState::DRAW)
 					game_winner = "Draw !";
@@ -121,6 +121,10 @@ class GraphicLib : public IGraphic {
 				return Event::LEFT;
 			case KEY_RIGHT:
 				return Event::RIGHT;
+			case KEY_R:
+				return Event::P1_SHRINK;
+			case KEY_RIGHT_CONTROL:
+				return Event::P2_SHRINK;
 			case KEY_ONE:
 				return Event::LIB1;
 			case KEY_TWO:

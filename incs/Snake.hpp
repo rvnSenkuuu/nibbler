@@ -2,6 +2,7 @@
 
 #include <deque>
 
+#include "Audio.hpp"
 #include "Types.hpp"
 
 class Snake {
@@ -16,10 +17,12 @@ class Snake {
 		[[nodiscard]] bool	occupies(const Position &pos) const;
 		Position	next_pos(Position head) const;
 		void	move(Position next_pos, bool grow);
+		void	shrink(std::vector<Position> &obstacles, Audio &audio);
 
 		int		get_id(void) const;
 		bool	get_alive(void) const;
 		Position	get_head(void) const;
+		Position	get_tail(void) const;
 		size_t	length() const;
 		size_t	get_score() const;
 		Event	get_direction(void) const;

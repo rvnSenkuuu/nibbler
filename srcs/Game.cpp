@@ -26,7 +26,7 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 		throw std::invalid_argument("Failed to get game configuration");
 	m_config = *config;
 
-	if (m_config.opt_enable_sounds)
+	if (m_config.opt_sounds)
 		m_audio.init();
 
 	init_snakes();
@@ -39,9 +39,10 @@ Game::Game(int argc, char **argv) : m_player_count(1), m_winner(-1), m_rng(std::
 void	Game::reset_game(void)
 {
 	init_snakes();
+	m_obstacles.clear();
 	if (m_config.opt_have_obstacles)
 		generate_obstacle();
-	if (m_config.opt_enable_sounds)
+	if (m_config.opt_sounds)
 		m_audio.reset();
 	m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles);
 	m_state = GameState::RUNNING;
@@ -75,7 +76,7 @@ std::optional<GameConfig>	Game::get_game_config(int argc, char **argv)
 		const std::string_view	arg = argv[i];
 
 		if (arg == "--multi") {
-			config.opt_is_multi = true;
+			config.opt_multi = true;
 			m_player_count = 2;
 		} else if (arg == "--limit-score") {
 			if (i + 1 >= argc || !get_option_value(argv[i + 1], config.max_score) || config.max_score <= 0)
@@ -92,11 +93,16 @@ std::optional<GameConfig>	Game::get_game_config(int argc, char **argv)
 			config.opt_have_obstacles = true;
 			i++;
 		} else if (arg == "--enable-sounds") {
-			config.opt_enable_sounds = true;
+			config.opt_sounds = true;
+		} else if (arg == "--enable-trap") {
+			config.opt_trap = true;
 		} else {
 			return std::nullopt;
 		}
 	}
+
+	if (config.opt_trap && !config.opt_multi)
+		return std::nullopt;
 
 	return config;
 }
@@ -152,6 +158,14 @@ void	Game::handle_event(Lib &lib, Event &event)
 	case Event::LEFT:
 		m_snakes[m_player_count == 2 ? SECOND_SNAKE : FIRST_SNAKE].change_direction(event);
 		break;
+	case Event::P1_SHRINK:
+		if (m_config.opt_trap)
+			m_snakes[FIRST_SNAKE].shrink(m_obstacles, m_audio);
+		break;
+	case Event::P2_SHRINK:
+		if (m_config.opt_trap)
+			m_snakes[SECOND_SNAKE].shrink(m_obstacles, m_audio);
+		break;
 	case Event::LIB1:
 		if (lib.switch_lib(FIRST_LIB))
 			lib.create(m_config.width, m_config.height);
@@ -197,7 +211,7 @@ void	Game::run(Lib &lib)
 				m_last_update_time = current_time;
 			}
 			
-			if (m_config.opt_enable_sounds)
+			if (m_config.opt_sounds)
 				m_audio.update();
 		}
 		lib.render(get_data());
@@ -207,7 +221,7 @@ void	Game::run(Lib &lib)
 void	Game::kill_snake(Snake &snake)
 {
 	snake.die();
-	if (m_config.opt_enable_sounds)
+	if (m_config.opt_sounds)
 		m_audio.play("DEATH");
 }
 
@@ -253,7 +267,7 @@ void	Game::end_game(GameState state, int winner)
 {
 	m_state = state;
 	m_winner = winner;
-	if (m_config.opt_enable_sounds)
+	if (m_config.opt_sounds)
 		m_audio.stop();
 }
 
@@ -318,7 +332,7 @@ void	Game::move_snake(Snake &snake)
 	if (!is_food)
 		return;
 
-	if (m_config.opt_enable_sounds)
+	if (m_config.opt_sounds)
 		m_audio.play("EAT");
 
 	snake.add_score(m_food.get_given_score());
@@ -347,7 +361,7 @@ int	Game::get_max_obstacles(void) const
 {
 	const size_t	board_size{m_config.width * m_config.height};
 	size_t	snakes_size{m_snakes[0].length()};
-	snakes_size += m_config.opt_is_multi ? m_snakes[1].length() : 0;
+	snakes_size += m_config.opt_multi ? m_snakes[1].length() : 0;
 	
 	const size_t	total_free_slot{board_size - static_cast<int>(snakes_size) - 1};
 	if (total_free_slot <= 0)

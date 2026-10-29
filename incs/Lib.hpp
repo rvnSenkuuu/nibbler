@@ -5,10 +5,10 @@
 
 #include "GameData.hpp"
 
-#define	FIRST_LIB "./lib/raylib/libraylib.so"
-#define	SECOND_LIB "./lib/sdl2/libsdl2.so"
-#define	THIRD_LIB "./lib/sfml/libsfml.so"
-#define DEFAULT_LIB FIRST_LIB
+constexpr const char	*FIRST_LIB {"./lib/raylib/libraylib.so"};
+constexpr const char	*SECOND_LIB {"./lib/sdl2/libsdl2.so"};
+constexpr const char	*THIRD_LIB {"./lib/sfml/libsfml.so"};
+constexpr const char	*DEFAULT_LIB{FIRST_LIB};
 
 using FnCreate = void	(*)(int width, int height);
 using FnRender = void	(*)(const GameData &);

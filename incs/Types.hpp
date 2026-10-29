@@ -3,13 +3,13 @@
 #include <deque>
 #include <vector>
 
-constexpr int	CELL_SIZE = 20;
-constexpr const char	*FONT_PATH = "./assets/font.ttf";
+constexpr int	CELL_SIZE{20};
+constexpr const char	*FONT_PATH{"./assets/font.ttf"};
 
-constexpr int FIRST_SNAKE  = 0;
-constexpr int SECOND_SNAKE  = 1;
+constexpr int FIRST_SNAKE{0};
+constexpr int SECOND_SNAKE{1};
 
-constexpr size_t	max_spawn_attempts = 1000;
+constexpr size_t	max_spawn_attempts{1000};
 
 enum class GridType : int {
 	EMPTY,
@@ -28,6 +28,8 @@ enum class Event : int {
 	S,
 	A,
 	D,
+	P1_SHRINK,
+	P2_SHRINK,
 	LIB1,
 	LIB2,
 	LIB3,
@@ -58,12 +60,13 @@ struct GameConfig {
 	size_t	width = 0;
 	size_t	height = 0;
 
-	bool	opt_is_multi = false;
+	bool	opt_multi = false;
 	bool	opt_limit_score = false;
 	bool	opt_food_variance = false;
 	bool	opt_food_disappear = false;
 	bool	opt_have_obstacles = false;
-	bool	opt_enable_sounds = false;
+	bool	opt_sounds = false;
+	bool	opt_trap = false;
 	int	max_score = 0;
 	int	obstacles_count = 0;
 };
