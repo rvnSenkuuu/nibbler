@@ -8,6 +8,7 @@ A Snake game written in **C++17**, where the graphics are not part of the game i
 - Three interchangeable graphical libraries, switchable live with `1`, `2` and `3`
 - Bonus features:
   - **Two-player mode** on the same board (single player stays available)
+  - **Trap** Only available with "--multi"
   - **Score limit**: the first snake to reach it wins
   - **Three kinds of apples** worth 10, 30 or 50 points, with different spawn rates
   - **Food Disappear** every 10 seconds
@@ -34,6 +35,7 @@ $> ./nibbler <width> <height> [options]
 | Option | Description |
 | --- | --- |
 | `--multi` | Two snakes on the same board |
+| `--enable-trap` | Can sacrifice part of their body to create an obstacle in its place |
 | `--limit-score <n>` | The first snake to reach `n` points wins |
 | `--food-variance` | Red (10 points), green (30) and yellow (50) apples; yellow ones are the rarest |
 | `--enable-obstacles <n>` | Add `n` random obstacles (the snake dies if it hits one) |
@@ -57,5 +59,6 @@ Examples:
 | Arrow keys | Steer snake 2 in `--multi` mode (snake 1 otherwise) |
 | `1` `2` `3` | Switch to raylib / SDL2 / SFML |
 | `=` / `-` | Speed up / slow down |
+| `R` / `RCtrl` | Player 1 shrink / Player 2 shrink |
 | `Enter` | Restart after the game is over |
 | `Esc` | Quit |
