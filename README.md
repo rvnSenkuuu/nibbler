@@ -8,7 +8,7 @@ A Snake game written in **C++17**, where the graphics are not part of the game i
 - Three interchangeable graphical libraries, switchable live with `1`, `2` and `3`
 - Bonus features:
   - **Two-player mode** on the same board (single player stays available)
-  - **Trap** Only available with "--multi"
+  - **Trap** only available with "--multi"
   - **Score limit**: the first snake to reach it wins
   - **Three kinds of apples** worth 10, 30 or 50 points, with different spawn rates
   - **Food Disappear** every 10 seconds
