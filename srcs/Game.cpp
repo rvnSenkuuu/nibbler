@@ -205,6 +205,7 @@ void	Game::run(Lib &lib)
 				m_audio.update();
 		}
 		lib.render(get_data());
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}
 }
 

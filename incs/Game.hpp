@@ -10,6 +10,7 @@
 #include <optional>
 #include <system_error>
 #include <chrono>
+#include <thread>
 
 #include "Snake.hpp"
 #include "Food.hpp"
