@@ -2,3 +2,5 @@ nibbler
 .objs
 *.so
 .vscode
+*.out
+*.vgcore
