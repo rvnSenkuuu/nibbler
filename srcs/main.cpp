@@ -1,5 +1,4 @@
 #include "Game.hpp"
-#include "Lib.hpp"
 #include "Types.hpp"
 
 void	usage(void)
