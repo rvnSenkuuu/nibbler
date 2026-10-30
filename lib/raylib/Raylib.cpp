@@ -145,9 +145,14 @@ class GraphicLib : public IGraphic {
 		private:
 			void	draw_snake(const Snake &snake, const Color &head_color, const Color &body_color)
 			{
-				for (auto &pos : snake.get_body()) {
-					Color	color{pos == snake.get_head() ? head_color : body_color};
-					DrawRectangle(pos.x * CELL_SIZE, pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, color);
+				const Position	head = snake.get_head();
+				for (const auto &pos : snake.get_body()) {
+					DrawRectangle(
+						pos.x * CELL_SIZE,
+						pos.y * CELL_SIZE,
+						CELL_SIZE, CELL_SIZE,
+						pos == head ? head_color : body_color
+					);
 				}
 			}
 
@@ -164,12 +169,14 @@ class GraphicLib : public IGraphic {
 
 			Color	get_food_color(const FoodType &type)
 			{
-				Color	food_color{RED};	
-				if (type == FoodType::FOOD_GREEN)
-					food_color = GREEN;
-				else if (type == FoodType::FOOD_YELLOW)
-					food_color = YELLOW;
-				return food_color;
+				switch (type) {
+				case FoodType::FOOD_GREEN:
+					return GREEN;
+				case FoodType::FOOD_YELLOW:
+					return YELLOW;
+				default:
+					return RED;
+    			}
 			}
 };
 

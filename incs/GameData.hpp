@@ -7,10 +7,10 @@
 #include "Food.hpp"
 
 struct GameData {
-	std::vector<Snake>	snakes;
-	std::vector<Position>	obstacles;
-	GameConfig	config;
-	Food	food;
+	const std::vector<Snake>	&snakes;
+	const std::vector<Position>	&obstacles;
+	const GameConfig	&config;
+	const Food	&food;
 	GameState	state;
 	float	tick_rate;
 	int	winner;

@@ -114,16 +114,15 @@ void	Game::init_snakes(void)
 
 GameData	Game::get_data(void) const
 {
-	GameData	data;
-
-	data.snakes = m_snakes;
-	data.obstacles = m_obstacles;
-	data.config = m_config;
-	data.food = m_food;
-	data.state = m_state;
-	data.tick_rate = m_tick_rate;
-	data.winner = m_winner;
-	return data;
+    return GameData {
+		m_snakes,
+		m_obstacles,
+		m_config,
+		m_food,
+		m_state,
+		m_tick_rate,
+		m_winner
+	};
 }
 
 void	Game::handle_event(Lib &lib, Event &event)

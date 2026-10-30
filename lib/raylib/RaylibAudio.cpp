@@ -23,13 +23,17 @@ class AudioLib : public IAudio {
 
 			auto	load = [&](const std::string &type, const std::string &file) {
 				Sound	sound = LoadSound(file.c_str());
+				if (!sound.stream.buffer)
+					return false;
 				SetSoundVolume(sound, m_volume);
 				m_sounds.insert({type, sound});
+				return true;
 			};
 
-			load("EAT", EAT_SOUND);
-			load("DEATH", DEATH_SOUND);
-			load("SHRINK", SHRINK_SOUND);
+			if (!load("EAT", EAT_SOUND) ||
+				!load("DEATH", DEATH_SOUND) ||
+				!load("SHRINK", SHRINK_SOUND))
+				throw std::runtime_error("Failed to load sounds");
 			
 			m_background = LoadMusicStream(BACKGROUND_SOUND);
 			m_background.looping = true;
