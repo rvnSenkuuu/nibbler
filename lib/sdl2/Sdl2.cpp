@@ -74,15 +74,9 @@ class GraphicLib : public IGraphic {
 
 			const Position	&pos{data.food.get_pos()};
 			draw_cell(pos.x, pos.y,  get_food_color(data.food.get_type()));
-		
-			draw_text("P1 Score: " + std::to_string(data.snakes[0].get_score()), 10, 10, p1_color[1]);
-			if (data.config.opt_multi)
-				draw_text("P2 Score: " + std::to_string(data.snakes[0].get_score()), 10, 40, p2_color[1]);
 
-			char speed[32];
-			snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
-			draw_text(speed, data.config.width * CELL_SIZE - 225, 10, RAYWHITE_C);
-			
+			draw_hud(data);
+
 			SDL_RenderPresent(m_renderer);
 		}
 
@@ -204,6 +198,17 @@ class GraphicLib : public IGraphic {
 					SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 					SDL_RenderFillRect(m_renderer, &rect);
 				}
+			}
+
+			void	draw_hud(const GameData &data)
+			{
+				draw_text("P1 Score: " + std::to_string(data.snakes[0].get_score()), 10, 10, p1_color[1]);
+				if (data.config.opt_multi)
+					draw_text("P2 Score: " + std::to_string(data.snakes[0].get_score()), 10, 40, p2_color[1]);
+
+				char speed[32];
+				snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
+				draw_text(speed, data.config.width * CELL_SIZE - 225, 10, RAYWHITE_C);
 			}
 
 			void	draw_cell(int x, int y, const SDL_Color &color)

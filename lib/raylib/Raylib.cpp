@@ -48,11 +48,7 @@ class GraphicLib : public IGraphic {
 			};
 			DrawRectangleRounded(food_rec, 2.0f, 0, get_food_color(data.food.get_type()));
 
-			draw_score(data.snakes, p1_color[1], p2_color[1]);
-			
-			char speed[32];
-			snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
-			DrawText(speed, data.config.width * CELL_SIZE - 185, 10, 20, WHITE);
+			draw_hud(data, p1_color[1], p2_color[1]);
 			
 			EndDrawing();
 		}
@@ -155,11 +151,15 @@ class GraphicLib : public IGraphic {
 				}
 			}
 
-			void	draw_score(const std::vector<Snake> &snakes, Color p1, Color p2)
+			void	draw_hud(const GameData &data, Color p1, Color p2)
 			{
-				DrawText(TextFormat("P1 Score: %zu", snakes[0].get_score()), 10, 10, 20, p1);
-				if (snakes.size() == 2)
-					DrawText(TextFormat("P2 Score: %zu", snakes[1].get_score()), 10, 40, 20, p2);
+				DrawText(TextFormat("P1 Score: %zu", data.snakes[0].get_score()), 10, 10, 20, p1);
+				if (data.snakes.size() == 2)
+					DrawText(TextFormat("P2 Score: %zu", data.snakes[1].get_score()), 10, 40, 20, p2);
+
+				char speed[32];
+				snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
+				DrawText(speed, data.config.width * CELL_SIZE - 185, 10, 20, WHITE);
 			}
 
 			Color	get_food_color(const FoodType &type)
