@@ -350,11 +350,12 @@ bool	Game::is_valid_obstacle_pos(const Position &pos) const
 
 int	Game::get_max_obstacles(void) const
 {
-	const size_t	board_size{m_config.width * m_config.height};
-	size_t	snakes_size{m_snakes[0].length()};
-	snakes_size += m_config.opt_multi ? m_snakes[1].length() : 0;
+	const int	board_size = m_config.width * m_config.height;
+	int	snakes_size = m_snakes[FIRST_SNAKE].length();
+	if (m_config.opt_multi)
+		snakes_size += m_snakes[SECOND_SNAKE].length();
 	
-	const size_t	total_free_slot{board_size - static_cast<int>(snakes_size) - 1};
+	const int	total_free_slot{board_size - snakes_size - 1};
 	if (total_free_slot <= 0)
 		return 0;
 
