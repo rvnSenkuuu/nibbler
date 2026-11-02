@@ -375,7 +375,7 @@ void	Game::generate_obstacle(void)
 		const Position	pos{i % m_config.width, i / m_config.width};
 		if (is_valid_obstacle_pos(pos))
 			slot.push_back(pos);
-		}
+	}
 
 	if (slot.size() < static_cast<std::size_t>(m_config.obstacles_count))
 		throw std::logic_error("Not enough valid cells for the requested obstacles");

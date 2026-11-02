@@ -1,6 +1,6 @@
 NAME = nibbler
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=c++17 -O2 -Iincs -MMD -MP -g3 -fsanitize=address,leak
+CXXFLAGS = -Wall -Werror -Wextra -std=c++17 -O2 -Iincs -MMD -MP
 LDFLAGS = -ldl -rdynamic
 RM = rm -rf
 
