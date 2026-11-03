@@ -92,7 +92,7 @@ void	Snake::shrink(std::vector<Position> &obstacles, Audio &audio)
 	Position	tail = get_tail();
 	m_body.pop_back();
 	obstacles.push_back(tail);
-	audio.play("SHRINK");
+	audio.play(SHRINK);
 }
 
 int	Snake::get_id(void) const

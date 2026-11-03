@@ -1,6 +1,6 @@
 #include <raylib.h>
 #include <iostream>
-#include <unordered_map>
+#include <array>
 #include <algorithm>
 
 #include "IAudio.hpp"
@@ -9,6 +9,12 @@ constexpr const char	*EAT_SOUND{"./assets/sounds/eat.wav"};
 constexpr const char	*DEATH_SOUND{"./assets/sounds/death.wav"};
 constexpr const char	*SHRINK_SOUND{"./assets/sounds/shrink.wav"};
 constexpr const char	*BACKGROUND_SOUND{"./assets/sounds/background.mp3"};
+
+constexpr const char	*SOUNDS[__SOUND_COUNT] = {
+	EAT_SOUND,
+	DEATH_SOUND,
+	SHRINK_SOUND
+};
 
 class AudioLib : public IAudio {
 	public:
@@ -21,19 +27,13 @@ class AudioLib : public IAudio {
 			InitAudioDevice();
 			m_volume = 1.0f;
 
-			auto	load = [&](const std::string &type, const std::string &file) {
-				Sound	sound = LoadSound(file.c_str());
+			for (int i{0}; i < __SOUND_COUNT; i++) {
+				Sound	sound = LoadSound(SOUNDS[i]);
 				if (!sound.stream.buffer)
-					return false;
+					throw std::runtime_error("Failed to load sound : " + std::string(SOUNDS[i]));
 				SetSoundVolume(sound, m_volume);
-				m_sounds.insert({type, sound});
-				return true;
-			};
-
-			if (!load("EAT", EAT_SOUND) ||
-				!load("DEATH", DEATH_SOUND) ||
-				!load("SHRINK", SHRINK_SOUND))
-				throw std::runtime_error("Failed to load sounds");
+				m_sounds.at(i) = sound;
+			}
 			
 			m_background = LoadMusicStream(BACKGROUND_SOUND);
 			m_background.looping = true;
@@ -41,10 +41,9 @@ class AudioLib : public IAudio {
 			PlayMusicStream(m_background);
 		}
 
-		void	play(const std::string &sound) override
+		void	play(const SoundId id) override
 		{
-			auto	it = m_sounds.find(sound);
-			PlaySound(it->second);
+			PlaySound(m_sounds.at(id));
 		}
 
 		void	update(void) override
@@ -67,7 +66,7 @@ class AudioLib : public IAudio {
 		{
 			UnloadMusicStream(m_background);
 			for (auto &sound : m_sounds)
-				UnloadSound(sound.second);
+				UnloadSound(sound);
 			CloseAudioDevice();
 		}
 
@@ -77,7 +76,7 @@ class AudioLib : public IAudio {
 		AudioLib	&operator=(const AudioLib &) = delete;
 
 		float	m_volume;
-		std::unordered_map<std::string, Sound>	m_sounds;
+		std::array<Sound, __SOUND_COUNT>	m_sounds;
 		Music	m_background;
 };
 
@@ -89,9 +88,9 @@ extern "C" {
 		lib.init();
 	}
 
-	void	play(const std::string &sound)
+	void	play(const SoundId id)
 	{
-		lib.play(sound);
+		lib.play(id);
 	}
 
 	void	update(void)

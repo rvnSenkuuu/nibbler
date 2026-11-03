@@ -1,12 +1,14 @@
 #pragma once
 #include <string>
 
+#include "Types.hpp"
+
 class IAudio {
 	public:
 		virtual ~IAudio(void) { }
 
 		virtual void	init(void) = 0;
-		virtual void	play(const std::string &sound) = 0;
+		virtual void	play(const SoundId id) = 0;
 		virtual void	update(void) = 0;
 		virtual void	stop(void) = 0;
 		virtual void	reset(void) = 0;

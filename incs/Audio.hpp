@@ -3,10 +3,12 @@
 #include <dlfcn.h>
 #include <iostream>
 
+#include "Types.hpp"
+
 constexpr const char	*AUDIO_LIB{"./lib/raylib/libraylib_audio.so"};
 
 using FnInitAudio = void	(*)(void);
-using FnPlaySound = void	(*)(const std::string &sound);
+using FnPlaySound = void	(*)(const SoundId id);
 using FnUpdateSound = void	(*)(void);
 using FnResetSound = void	(*)(void);
 using FnStopSound = void	(*)(void);

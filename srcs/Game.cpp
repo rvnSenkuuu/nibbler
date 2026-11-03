@@ -213,7 +213,7 @@ void	Game::kill_snake(Snake &snake)
 {
 	snake.die();
 	if (m_config.opt_sounds)
-		m_audio.play("DEATH");
+		m_audio.play(DEATH);
 }
 
 void	Game::check_collision(Snake &current)
@@ -324,7 +324,7 @@ void	Game::move_snake(Snake &snake)
 		return;
 
 	if (m_config.opt_sounds)
-		m_audio.play("EAT");
+		m_audio.play(EAT);
 
 	snake.add_score(m_food.get_given_score());
 	if (!m_food.generate_food(m_config, m_rng, m_snakes, m_obstacles))

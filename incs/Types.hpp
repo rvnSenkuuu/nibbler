@@ -47,6 +47,14 @@ enum class GameState : int {
 	QUIT
 };
 
+enum SoundId {
+	EAT,
+	DEATH,
+	SHRINK,
+
+	__SOUND_COUNT
+};
+
 struct Position {
 	size_t	x;
 	size_t	y;
