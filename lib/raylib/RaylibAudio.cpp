@@ -5,15 +5,12 @@
 
 #include "IAudio.hpp"
 
-constexpr const char	*EAT_SOUND{"./assets/sounds/eat.wav"};
-constexpr const char	*DEATH_SOUND{"./assets/sounds/death.wav"};
-constexpr const char	*SHRINK_SOUND{"./assets/sounds/shrink.wav"};
 constexpr const char	*BACKGROUND_SOUND{"./assets/sounds/background.mp3"};
 
 constexpr const char	*SOUNDS[__SOUND_COUNT] = {
-	EAT_SOUND,
-	DEATH_SOUND,
-	SHRINK_SOUND
+	"./assets/sounds/eat.wav",
+	"./assets/sounds/death.wav",
+	"./assets/sounds/shrink.wav",
 };
 
 class AudioLib : public IAudio {

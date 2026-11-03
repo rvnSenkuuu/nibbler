@@ -1,5 +1,5 @@
 #include <SFML/Graphics.hpp>
-#include <unordered_map>
+#include <array>
 
 #include "Types.hpp"
 #include "IGraphic.hpp"
@@ -19,6 +19,18 @@ enum TextureId {
 	GROUND,
 	
 	__TEXTURE_ID_COUNT
+};
+
+constexpr const char	*TEXTURES[__TEXTURE_ID_COUNT] = {
+	"./assets/snake/snake_1_head.png",
+	"./assets/snake/snake_1_body.png",
+	"./assets/snake/snake_2_head.png",
+	"./assets/snake/snake_2_body.png",
+	"./assets/food/food_red.png",
+	"./assets/food/food_green.png",
+	"./assets/food/food_yellow.png",
+	"./assets/wall.png",
+	"./assets/ground.png",
 };
 
 static float	sprite_rotation(Event dir)
@@ -41,27 +53,12 @@ class GraphicLib : public IGraphic {
 		GraphicLib(void) : m_window(nullptr), m_font(nullptr) { };
 		~GraphicLib(void) { };
 
-		bool	load_texture(TextureId id, const char *path)
-		{
-			return m_textures[id].loadFromFile(path);
-		}
-
 		bool	init_textures(void)
 		{
-			m_textures.reserve(__TEXTURE_ID_COUNT);
-			m_textures.clear();
-
-			if (!load_texture(FOOD_RED, "./assets/food/food_red.png") ||
-				!load_texture(FOOD_GREEN, "./assets/food/food_green.png") ||
-				!load_texture(FOOD_YELLOW, "./assets/food/food_yellow.png") ||
-				!load_texture(SNAKE_1_HEAD, "./assets/snake/snake_1_head.png") ||
-				!load_texture(SNAKE_1_BODY, "./assets/snake/snake_1_body.png") ||
-				!load_texture(SNAKE_2_HEAD, "./assets/snake/snake_2_head.png") ||
-				!load_texture(SNAKE_2_BODY, "./assets/snake/snake_2_body.png") ||
-				!load_texture(WALL, "./assets/wall.png") ||
-				!load_texture(GROUND, "./assets/ground.png"))
-				return false;
-
+			for (int i{0}; i < __TEXTURE_ID_COUNT; i++) {
+				if (!m_textures.at(i).second.loadFromFile(TEXTURES[i]))
+					return false;
+			}
 			return true;
 		}
 
@@ -84,9 +81,9 @@ class GraphicLib : public IGraphic {
 				throw std::runtime_error("Failed to init textures");
 			}
 
-			const sf::Vector2u	ground_size{m_textures[GROUND].getSize()};
-			m_textures[GROUND].setRepeated(true);
-			m_ground_sprite.setTexture(m_textures[GROUND]);
+			const sf::Vector2u	ground_size{m_textures[GROUND].second.getSize()};
+			m_textures[GROUND].second.setRepeated(true);
+			m_ground_sprite.setTexture(m_textures[GROUND].second);
 			m_ground_sprite.setTextureRect(
 				sf::IntRect(0, 0,width * ground_size.x, height * ground_size.y)
 			);
@@ -272,7 +269,7 @@ class GraphicLib : public IGraphic {
 
 			void	draw_sprite(const Position &pos, TextureId id, float rotation = 0.f)
 			{
-				sf::Texture	&texture{m_textures.find(id)->second};
+				sf::Texture	&texture{m_textures.at(id).second};
 				const sf::Vector2u	texture_size{texture.getSize()};
 				sf::Sprite	sprite(texture);
 
@@ -308,7 +305,7 @@ class GraphicLib : public IGraphic {
 			sf::Font	*m_font;
 			sf::Sprite	m_ground_sprite;
 
-			std::unordered_map<TextureId, sf::Texture>	m_textures;
+			std::array<std::pair<TextureId, sf::Texture>, __TEXTURE_ID_COUNT>	m_textures;
 };
 
 GraphicLib	lib;
