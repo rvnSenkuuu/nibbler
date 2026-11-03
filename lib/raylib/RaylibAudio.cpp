@@ -8,9 +8,9 @@
 constexpr const char	*BACKGROUND_SOUND{"./assets/sounds/background.mp3"};
 
 constexpr const char	*SOUNDS[__SOUND_COUNT] = {
-	"./assets/sounds/eat.wav",
-	"./assets/sounds/death.wav",
-	"./assets/sounds/shrink.wav",
+	[EAT] = "./assets/sounds/eat.wav",
+	[DEATH] = "./assets/sounds/death.wav",
+	[SHRINK] = "./assets/sounds/shrink.wav",
 };
 
 class AudioLib : public IAudio {

@@ -22,15 +22,15 @@ enum TextureId {
 };
 
 constexpr const char	*TEXTURES[__TEXTURE_ID_COUNT] = {
-	"./assets/snake/snake_1_head.png",
-	"./assets/snake/snake_1_body.png",
-	"./assets/snake/snake_2_head.png",
-	"./assets/snake/snake_2_body.png",
-	"./assets/food/food_red.png",
-	"./assets/food/food_green.png",
-	"./assets/food/food_yellow.png",
-	"./assets/wall.png",
-	"./assets/ground.png",
+	[SNAKE_1_HEAD] = "./assets/snake/snake_1_head.png",
+	[SNAKE_1_BODY] = "./assets/snake/snake_1_body.png",
+	[SNAKE_2_HEAD] = "./assets/snake/snake_2_head.png",
+	[SNAKE_2_BODY] = "./assets/snake/snake_2_body.png",
+	[FOOD_RED] = "./assets/food/food_red.png",
+	[FOOD_GREEN] = "./assets/food/food_green.png",
+	[FOOD_YELLOW] = "./assets/food/food_yellow.png",
+	[WALL] = "./assets/wall.png",
+	[GROUND] = "./assets/ground.png",
 };
 
 static float	sprite_rotation(Event dir)
