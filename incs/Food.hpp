@@ -18,7 +18,7 @@ struct FoodKind {
 	int	weight;
 };
 
-constexpr float	FOOD_LIFETIME = 10.0f;
+constexpr float	FOOD_LIFETIME{10.0f};
 
 class Snake;
 
