@@ -33,7 +33,7 @@ class GraphicLib : public IGraphic {
 				throw std::runtime_error(err);
 			}
 
-			m_font = TTF_OpenFont(FONT_PATH, 15);
+			m_font = TTF_OpenFont(FONT_PATH, 18);
 			if (!m_font) {
 				const std::string	err{SDL_GetError()};
 				destroy_window();
@@ -41,7 +41,7 @@ class GraphicLib : public IGraphic {
 			}
 			
 			m_window = SDL_CreateWindow("Nibbler",
-				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED - 5,
+				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED + 15,
 				width * CELL_SIZE, height * CELL_SIZE, SDL_WINDOW_SHOWN
 			);
 			if (!m_window) {
