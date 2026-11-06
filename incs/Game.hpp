@@ -20,8 +20,8 @@
 
 constexpr float	MIN_TICK_RATE{10.0f};
 constexpr float	MAX_TICK_RATE{15.0f};
-constexpr int	MIN_WIDTH{15};
-constexpr int	MIN_HEIGHT{15};
+constexpr int	MIN_WIDTH{20};
+constexpr int	MIN_HEIGHT{20};
 constexpr int	MAX_WIDTH{50};
 constexpr int	MAX_HEIGHT{50};
 
