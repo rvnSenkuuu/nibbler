@@ -33,7 +33,7 @@ class GraphicLib : public IGraphic {
 				throw std::runtime_error(err);
 			}
 
-			m_font = TTF_OpenFont(FONT_PATH, 20);
+			m_font = TTF_OpenFont(FONT_PATH, 15);
 			if (!m_font) {
 				const std::string	err{SDL_GetError()};
 				destroy_window();
@@ -207,7 +207,10 @@ class GraphicLib : public IGraphic {
 
 				char speed[32];
 				snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
-				draw_text(speed, data.config.width * CELL_SIZE - 225, 10, RAYWHITE_C);
+
+				int	w{0}, h{0};
+				TTF_SizeText(m_font, speed, &w, &h);
+				draw_text(speed, data.config.width * CELL_SIZE - w - 10, 10, RAYWHITE_C);
 			}
 
 			void	draw_cell(int x, int y, const SDL_Color &color)

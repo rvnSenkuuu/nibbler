@@ -124,7 +124,7 @@ class GraphicLib : public IGraphic {
 
 		void	render_end_game(const GameData &data)
 		{
-			const int	font_size{20};
+			const int	font_size{18};
 			const float	center_x{data.config.width * CELL_SIZE / 2.f};
 			const float	start_y{data.config.height * CELL_SIZE / 2.f - (100 + font_size) / 2.f};
 
