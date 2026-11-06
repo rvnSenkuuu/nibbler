@@ -89,10 +89,9 @@ class GraphicLib : public IGraphic {
 			const size_t	start_y{data.config.height * CELL_SIZE / 2 - (100 + 20) / 2};
 
 			if (data.config.opt_multi) {
-				std::string	game_winner;
-				if (data.state == GameState::DRAW)
-					game_winner = "Draw !";
-				else
+				std::string	game_winner{"Draw !"};
+
+				if (data.state != GameState::DRAW)
 					game_winner = data.winner == data.snakes[0].get_id() ? "P1 won !" : "P2 won !";
 
 				draw_text_centered(game_winner, center_x, start_y, RAYWHITE_C);
@@ -106,7 +105,7 @@ class GraphicLib : public IGraphic {
 
 			const std::string	end_msg{data.state == GameState::WON ? "You Won !" : "Game Over !"};
 			draw_text_centered(end_msg, center_x, start_y, RAYWHITE_C);
-			draw_text_centered("Your score: " + std::to_string(data.snakes[0].get_score()), center_x, start_y + 45, p1_color[1]);
+			draw_text_centered("Your score: " + std::to_string(data.snakes[0].get_score()), center_x, start_y + 45, RAYWHITE_C);
 			draw_text_centered("Press 'Enter' for restart the game", center_x, start_y + 100, RAYWHITE_C);
 
 			SDL_RenderPresent(m_renderer);

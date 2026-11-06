@@ -144,10 +144,9 @@ class GraphicLib : public IGraphic {
 			m_window->clear(sf::Color::Black);
 
 			if (data.config.opt_multi) {
-				std::string	game_winner;
-				if (data.state == GameState::DRAW)
-					game_winner = "Draw !";
-				else
+				std::string	game_winner{"Draw !"};
+				
+				if (data.state != GameState::DRAW)
 					game_winner = data.winner == data.snakes[0].get_id() ? "P1 won !" : "P2 won !";
 
 				draw_centered(game_winner, start_y, sf::Color::White);
