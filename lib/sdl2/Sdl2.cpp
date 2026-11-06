@@ -203,7 +203,7 @@ class GraphicLib : public IGraphic {
 			{
 				draw_text("P1 Score: " + std::to_string(data.snakes[0].get_score()), 10, 10, p1_color[1]);
 				if (data.config.opt_multi)
-					draw_text("P2 Score: " + std::to_string(data.snakes[0].get_score()), 10, 40, p2_color[1]);
+					draw_text("P2 Score: " + std::to_string(data.snakes[1].get_score()), 10, 40, p2_color[1]);
 
 				char speed[32];
 				snprintf(speed, sizeof(speed), "[+/-] Speed: %.2f", data.tick_rate);
