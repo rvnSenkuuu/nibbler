@@ -34,6 +34,7 @@ $> ./nibbler <width> <height> [options]
 
 | Option | Description |
 | --- | --- |
+| `--raylib --sdl2 --sfml` | Launch with the selected graphics library by default (raylib, SDL2, or SFML) |
 | `--multi` | Two snakes on the same board |
 | `--enable-trap` | Can sacrifice part of their body to create an obstacle in its place |
 | `--limit-score <n>` | The first snake to reach `n` points wins |

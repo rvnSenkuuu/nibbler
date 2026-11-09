@@ -1,8 +1,8 @@
 #include "Lib.hpp"
 
-Lib::Lib(void) : m_current_lib_path(DEFAULT_LIB)
+Lib::Lib(const std::string &path) : m_current_lib_path(path)
 {
-	load(DEFAULT_LIB);
+	load(m_current_lib_path);
 }
 
 Lib::~Lib()

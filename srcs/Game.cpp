@@ -63,10 +63,20 @@ std::optional<GameConfig>	Game::get_game_config(int argc, char **argv)
 		config.height < MIN_HEIGHT || config.height > MAX_HEIGHT)
 		return std::nullopt;
 
+	bool	lib_path_is_set = false;
 	for (int i{3}; i < argc; i++) {
 		const std::string_view	arg = argv[i];
 
-		if (arg == "--multi") {
+		if (arg == "--raylib" && !lib_path_is_set) {
+			config.lib_path = FIRST_LIB;
+			lib_path_is_set = true;
+		} else if (arg == "--sdl2" && !lib_path_is_set) {
+			config.lib_path = SECOND_LIB;
+			lib_path_is_set = true;
+		} else if (arg == "--sfml" && !lib_path_is_set) {
+			config.lib_path = THIRD_LIB;
+			lib_path_is_set = true;
+		} else if (arg == "--multi") {
 			config.opt_multi = true;
 			m_player_count = 2;
 		} else if (arg == "--limit-score") {
@@ -92,6 +102,9 @@ std::optional<GameConfig>	Game::get_game_config(int argc, char **argv)
 		}
 	}
 
+	if (!lib_path_is_set)
+		config.lib_path = DEFAULT_LIB;
+
 	if (config.opt_trap && !config.opt_multi)
 		return std::nullopt;
 
@@ -110,6 +123,11 @@ void	Game::init_snakes(void)
 		row = 2 * m_config.height / 3;
 		m_snakes.emplace_back(SECOND_SNAKE, Position{m_config.width/ 2 , row});
 	}
+}
+
+std::string	Game::get_lib_path(void) const
+{
+	return m_config.lib_path;
 }
 
 GameData	Game::get_data(void) const

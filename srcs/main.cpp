@@ -5,6 +5,8 @@ void	usage(void)
 {
 	std::cout << "Usage: ./nibbler <width> <height> [OPTIONS]\n";
 	std::cout << "Options:\n";
+	std::cout << "\t--raylib --sdl2 --sfml\n";
+	std::cout << "\tLaunch with the selected graphics library by default (raylib, SDL2, or SFML)\n\n";
 	std::cout << "\t<width> <height>\n";
 	std::cout << "\tvalue must be between 20-50\n\n";
 	std::cout << "\t--multi\n";
@@ -29,7 +31,7 @@ int	main(int argc, char **argv)
 {
 	try {
 		Game	game(argc, argv);
-		Lib	lib;
+		Lib	lib(std::move(game.get_lib_path()));
 		game.run(lib);
 	} catch (const std::exception &e) {
 		std::cerr << "Error: " << e.what() << std::endl;

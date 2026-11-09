@@ -65,6 +65,7 @@ struct Position {
 };
 
 struct GameConfig {
+	std::string	lib_path;
 	size_t	width = 0;
 	size_t	height = 0;
 

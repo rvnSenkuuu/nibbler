@@ -41,6 +41,7 @@ class Game {
 		Game(int argc, char **argv);
 		~Game(void) = default;
 
+		std::string	get_lib_path(void) const;
 		GameData	get_data(void) const;
 
 		[[nodiscard]] bool	is_board_full(void) const;
