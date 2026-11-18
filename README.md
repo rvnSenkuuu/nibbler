@@ -30,7 +30,7 @@ $> make
 $> ./nibbler <width> <height> [options]
 ```
 
-`width` and `height` are the size of the board in cells (from 15 to 50).
+`width` and `height` are the size of the board in cells (from 20 to 50).
 
 | Option | Description |
 | --- | --- |
